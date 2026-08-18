@@ -1,0 +1,45 @@
+name: Clonar app real en laboratorio
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  clone:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout laboratorio
+        uses: actions/checkout@v4
+        with:
+          path: target
+
+      - name: Checkout app real
+        uses: actions/checkout@v4
+        with:
+          repository: STR-IG/str-pwa
+          ref: main
+          path: source
+
+      - name: Copiar app real
+        run: |
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/clonar-app-real.yml' \
+            source/ target/
+
+      - name: Publicar clon
+        working-directory: target
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No hay cambios que copiar"
+            exit 0
+          fi
+          git commit -m "Clon inicial de STR-IG/str-pwa"
+          git push
