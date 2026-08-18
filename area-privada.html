@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e30613">
+  <title>Área privada · STR-IG</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --red: #e30613;
+      --red-dark: #b9000b;
+      --ink: #18181b;
+      --muted: #6e6e73;
+      --line: #e5e5e7;
+      --surface: #ffffff;
+      --background: #f5f5f7;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 68px;
+      padding: 12px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .back {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--ink);
+      background: #f0f0f2;
+      text-decoration: none;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .topbar strong { font-size: 18px; }
+
+    main {
+      width: min(100% - 28px, 480px);
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .lock {
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      border-radius: 22px;
+      color: white;
+      background: linear-gradient(145deg, var(--red), var(--red-dark));
+      box-shadow: 0 12px 28px rgba(227, 6, 19, .24);
+      font-size: 32px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: 30px;
+      letter-spacing: -.6px;
+    }
+
+    .intro {
+      margin: 0 auto 26px;
+      max-width: 390px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      padding: 24px 20px;
+      border: 1px solid rgba(0, 0, 0, .04);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .07);
+    }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    input {
+      width: 100%;
+      min-height: 54px;
+      padding: 14px 16px;
+      border: 1px solid #cfcfd3;
+      border-radius: 14px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font-size: 16px;
+    }
+
+    input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(227, 6, 19, .12);
+    }
+
+    .code-input {
+      text-align: center;
+      letter-spacing: 8px;
+      font-size: 27px;
+      font-weight: 800;
+    }
+
+    .primary {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 16px;
+      border: 0;
+      border-radius: 999px;
+      color: white;
+      background: var(--red);
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .primary:active { background: var(--red-dark); }
+
+    .primary:disabled {
+      cursor: wait;
+      opacity: .65;
+    }
+
+    .help {
+      margin: 16px 2px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .status {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #fff5e6;
+      color: #6a4300;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .status.show { display: block; }
+
+    .verified {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      color: white;
+      background: #18864b;
+      font-size: 31px;
+      font-weight: 800;
+    }
+
+    .member-title {
+      margin: 0 0 8px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .member-copy {
+      margin: 0 0 20px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .member-screen { display: none; }
+    .member-screen.active { display: block; }
+
+    .instructions-heading {
+      margin: 0 0 8px;
+      text-align: center;
+      font-size: 25px;
+    }
+
+    .instructions-intro {
+      margin: 0 auto 20px;
+      max-width: 370px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .instructions-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .instruction-card {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .instruction-number {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: white;
+      background: var(--red);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .instruction-card strong {
+      display: block;
+      margin: 1px 0 4px;
+      font-size: 14px;
+    }
+
+    .instruction-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .payroll-column {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: #126537;
+      background: #e8f6ed;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .instructions-warning {
+      margin-top: 14px;
+      padding: 14px;
+      border-left: 4px solid #e0a000;
+      border-radius: 12px;
+      color: #684900;
+      background: #fff8df;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .calculator-heading {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    .private-tool {
+      padding: 17px;
+      border: 1px solid #f0c5c8;
+      border-radius: 16px;
+      background: #fff6f7;
+    }
+
+    .private-tool h3 { margin: 0 0 6px; }
+
+    .private-tool p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .calculator-intro { margin-bottom: 16px !important; }
+
+    .month-card {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .month-card h4 {
+      margin: 0 0 14px;
+      font-size: 16px;
+    }
+
+    .field + .field { margin-top: 13px; }
+
+    .field label {
+      margin-bottom: 7px;
+      font-size: 13px;
+    }
+
+    .field-hint {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .plus-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .plus-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 112px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .plus-label {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .concept-code {
+      display: inline-block;
+      min-width: 38px;
+      margin-right: 5px;
+      color: var(--red-dark);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .plus-row input {
+      min-height: 46px;
+      padding: 10px 11px;
+      text-align: right;
+    }
+
+    details.other-pluses {
+      margin-top: 15px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    details.other-pluses summary {
+      color: var(--red-dark);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .month-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 15px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .excluded-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f3f3f5;
+    }
+
+    .excluded-box strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+    }
+
+    .excluded-box ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .calculator-result {
+      display: none;
+      margin-top: 16px;
+      padding: 20px 16px;
+      border: 1px solid #b9dfc9;
+      border-radius: 16px;
+      background: #f0faf4;
+      text-align: center;
+    }
+
+    .calculator-result.show { display: block; }
+
+    .result-label {
+      color: #28613f;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .result-value {
+      display: block;
+      margin: 6px 0 8px;
+      color: #126537;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .result-detail {
+      margin: 0 !important;
+      color: #365c45 !important;
+      font-size: 13px !important;
+    }
+
+    .calculate-note {
+      margin: 14px 2px 0 !important;
+      font-size: 12px !important;
+      line-height: 1.45 !important;
+    }
+
+    .secondary {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 12px;
+      border: 1px solid #cfcfd3;
+      border-radius: 999px;
+      color: var(--ink);
+      background: white;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .privacy {
+      display: flex;
+      gap: 10px;
+      margin: 18px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a>
+    <strong>Área privada</strong>
+  </header>
+
+  <main>
+    <div class="lock" aria-hidden="true">🔒</div>
+    <h1>Acceso para afiliados</h1>
+    <p id="intro" class="intro">Introduce el correo personal que facilitaste a STR. Te enviaremos un código de 6 dígitos para verificar tu acceso.</p>
+
+    <section class="panel" aria-live="polite">
+      <form id="email-form" class="step active">
+        <label for="email">Correo electrónico personal</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+        <button id="send-code" class="primary" type="submit">Recibir código de acceso</button>
+        <p class="help">Si el correo está autorizado por STR, recibirás un código temporal de 6 dígitos.</p>
+        <p id="setup-message" class="status"></p>
+      </form>
+
+      <form id="code-form" class="step">
+        <label for="otp-code">Código de 6 dígitos</label>
+        <input id="otp-code" class="code-input" name="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
+        <button id="verify-code" class="primary" type="submit">Entrar</button>
+        <p class="help">Hemos enviado el código al correo indicado. Revisa también la carpeta de correo no deseado.</p>
+        <p id="code-message" class="status"></p>
+        <button id="change-email" class="secondary" type="button">Usar otro correo</button>
+      </form>
+
+      <div id="member-area" class="step">
+        <div id="instructions-screen" class="member-screen active">
+          <div class="verified" aria-hidden="true">✓</div>
+          <h2 class="instructions-heading">Cómo usar Calcula tu V</h2>
+          <p class="instructions-intro">Antes de empezar, prepara las tres nóminas inmediatamente anteriores al inicio de tus vacaciones.</p>
+
+          <ol class="instructions-list">
+            <li class="instruction-card">
+              <span class="instruction-number">1</span>
+              <div>
+                <strong>Prepara las tres nóminas</strong>
+                <p>Deben ser tres meses consecutivos, colocados del más antiguo al más reciente.</p>
+              </div>
+            </li>
+            <li class="instruction-card">
+              <span class="instruction-number">2</span>
+              <div>
+                <strong>Indica los días laborales</strong>
+                <p>Escribe los días laborales de cada mes según tu calendario. No copies los días que aparecen en «Plus de turno».</p>
+              </div>
+            </li>
+            <li class="instruction-card">
+              <span class="instruction-number">3</span>
+              <div>
+                <strong>Copia el importe de cada plus</strong>
+                <p>Busca el concepto en la nómina y copia únicamente su cantidad de la columna <span class="payroll-column">DEVENGOS</span>. No copies «Cantidad» ni «Importe diario».</p>
+              </div>
+            </li>
+            <li class="instruction-card">
+              <span class="instruction-number">4</span>
+              <div>
+                <strong>Rellena solo los pluses de tu nómina</strong>
+                <p>Introduce únicamente los pluses que aparezcan en esa nómina. Los demás déjalos vacíos.</p>
+              </div>
+            </li>
+            <li class="instruction-card">
+              <span class="instruction-number">5</span>
+              <div>
+                <strong>Indica tus días de vacaciones</strong>
+                <p>La herramienta mostrará el importe de la V por día y el total correspondiente a esos días.</p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="instructions-warning"><strong>Importante:</strong> no introduzcas el Plus de rotatividad, las Dietas festivos ni los Pluses vacaciones. La propia calculadora te recordará todos los conceptos excluidos.</div>
+          <button id="start-calculator" class="primary" type="button">Entendido, empezar</button>
+          <button id="sign-out-instructions" class="secondary" type="button">Cerrar sesión</button>
+        </div>
+
+        <div id="calculator-screen" class="member-screen">
+          <div class="private-tool">
+            <h2 class="calculator-heading">Calcula tu V</h2>
+            <p class="calculator-intro">Introduce los datos de los tres meses anteriores al inicio de tus vacaciones.</p>
+
+            <p id="calculator-loading" class="help">Cargando los conceptos de la nómina…</p>
+            <form id="v-form" hidden>
+              <div id="months-container"></div>
+
+              <div class="field" style="margin-top:16px;">
+                <label for="vacation-days">Días de vacaciones que quieres calcular</label>
+                <input id="vacation-days" name="vacation-days" type="number" inputmode="numeric" min="1" max="25" step="1" placeholder="Ejemplo: 2" required>
+              </div>
+
+              <div class="excluded-box">
+                <strong>No introduzcas estos conceptos:</strong>
+                <ul id="excluded-list"></ul>
+              </div>
+
+              <button id="calculate-v" class="primary" type="submit">Calcular mi V</button>
+              <p id="calculator-message" class="status"></p>
+              <div id="calculator-result" class="calculator-result">
+                <span class="result-label">Tu V por cada día de vacaciones</span>
+                <strong id="daily-result" class="result-value"></strong>
+                <p id="total-result" class="result-detail"></p>
+                <p id="formula-detail" class="result-detail" style="margin-top:6px !important;"></p>
+              </div>
+              <p class="calculate-note">El cálculo se realiza de forma protegida. Los meses y los importes introducidos no se guardan.</p>
+            </form>
+          </div>
+          <button id="show-instructions" class="secondary" type="button">Ver de nuevo las instrucciones</button>
+          <button id="sign-out-calculator" class="secondary" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="privacy"><span aria-hidden="true">🛡️</span><span>El acceso es personal. STR no solicitará tu contraseña del correo electrónico.</span></p>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://icneigdnuntzugisexaz.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const OTP_ENDPOINT = `${SUPABASE_URL}/functions/v1/request-private-otp`;
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        detectSessionInUrl: false,
+        persistSession: true,
+        autoRefreshToken: true
+      }
+    });
+
+    const emailForm = document.getElementById('email-form');
+    const codeForm = document.getElementById('code-form');
+    const memberArea = document.getElementById('member-area');
+    const setupMessage = document.getElementById('setup-message');
+    const codeMessage = document.getElementById('code-message');
+    const sendCodeButton = document.getElementById('send-code');
+    const verifyCodeButton = document.getElementById('verify-code');
+    const intro = document.getElementById('intro');
+    const vForm = document.getElementById('v-form');
+    const calculatorMessage = document.getElementById('calculator-message');
+    const calculatorLoading = document.getElementById('calculator-loading');
+    const monthsContainer = document.getElementById('months-container');
+    const excludedList = document.getElementById('excluded-list');
+    const calculatorResult = document.getElementById('calculator-result');
+    const calculateButton = document.getElementById('calculate-v');
+    const instructionsScreen = document.getElementById('instructions-screen');
+    const calculatorScreen = document.getElementById('calculator-screen');
+    const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+    let pendingEmail = '';
+    let calculatorFields = [];
+    let calculatorReady = false;
+
+    function activateStep(step) {
+      emailForm.classList.remove('active');
+      codeForm.classList.remove('active');
+      memberArea.classList.remove('active');
+      step.classList.add('active');
+    }
+
+    function showSignedOut() {
+      pendingEmail = '';
+      sessionStorage.removeItem('strPendingEmail');
+      activateStep(emailForm);
+      intro.textContent = 'Introduce el correo personal que facilitaste a STR. Te enviaremos un código de 6 dígitos para verificar tu acceso.';
+    }
+
+    function showCodeStep(email) {
+      pendingEmail = email;
+      sessionStorage.setItem('strPendingEmail', email);
+      activateStep(codeForm);
+      intro.textContent = 'Introduce el código de 6 dígitos que hemos enviado a tu correo.';
+      document.getElementById('otp-code').value = '';
+      document.getElementById('otp-code').focus();
+    }
+
+    function showSignedIn(session) {
+      sessionStorage.removeItem('strPendingEmail');
+      activateStep(memberArea);
+      intro.textContent = 'Área exclusiva para personas afiliadas a STR.';
+      instructionsScreen.classList.add('active');
+      calculatorScreen.classList.remove('active');
+      loadCalculator();
+    }
+
+    function showCalculatorScreen() {
+      instructionsScreen.classList.remove('active');
+      calculatorScreen.classList.add('active');
+      intro.textContent = 'Introduce los importes tal como aparecen en la columna «Devengos» de tus nóminas.';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showInstructionsScreen() {
+      calculatorScreen.classList.remove('active');
+      instructionsScreen.classList.add('active');
+      intro.textContent = 'Lee estos pasos antes de introducir los datos de tus nóminas.';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function plusRows(fields, monthIndex) {
+      return fields.map((field) => `
+        <div class="plus-row">
+          <label class="plus-label" for="${escapeHtml(field.key)}-${monthIndex}">
+            ${field.code ? `<span class="concept-code">${escapeHtml(field.code)}</span>` : ''}${escapeHtml(field.label)}
+          </label>
+          <input
+            id="${escapeHtml(field.key)}-${monthIndex}"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            max="10000"
+            step="0.01"
+            placeholder="0,00 €"
+            data-plus-key="${escapeHtml(field.key)}"
+            data-month-index="${monthIndex}"
+          >
+        </div>
+      `).join('');
+    }
+
+    function renderMonthCard(monthIndex) {
+      const usual = calculatorFields.filter((field) => field.group === 'usual');
+      const other = calculatorFields.filter((field) => field.group === 'other');
+      const titles = ['Primer mes', 'Segundo mes', 'Tercer mes'];
+
+      return `
+        <div class="month-card" data-month-card="${monthIndex}">
+          <h4>${titles[monthIndex - 1]}</h4>
+          <div class="field">
+            <label for="month-${monthIndex}">Mes</label>
+            <input id="month-${monthIndex}" type="month" required>
+          </div>
+          <div class="field">
+            <label for="days-${monthIndex}">Días laborales de calendario</label>
+            <input id="days-${monthIndex}" type="number" inputmode="numeric" min="1" max="31" step="1" placeholder="Ejemplo: 18" required>
+            <span class="field-hint">No son los días que aparecen en «Plus de turno».</span>
+          </div>
+          <div class="plus-list">${plusRows(usual, monthIndex)}</div>
+          ${other.length ? `
+            <details class="other-pluses">
+              <summary>Otros pluses que pueden aparecer</summary>
+              <div class="plus-list">${plusRows(other, monthIndex)}</div>
+            </details>
+          ` : ''}
+          <div class="month-total">
+            <span>Total del mes</span>
+            <span id="month-total-${monthIndex}">0,00 €</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function monthSubtotal(monthIndex) {
+      return [...document.querySelectorAll(`[data-month-index="${monthIndex}"]`)]
+        .reduce((total, input) => total + (Number(input.value) || 0), 0);
+    }
+
+    function updateMonthTotals() {
+      for (let index = 1; index <= 3; index++) {
+        const total = document.getElementById(`month-total-${index}`);
+        if (total) total.textContent = euro.format(monthSubtotal(index));
+      }
+    }
+
+    async function loadCalculator() {
+      if (calculatorReady) return;
+      calculatorLoading.textContent = 'Cargando los conceptos de la nómina…';
+      calculatorMessage.classList.remove('show');
+
+      const { data, error } = await supabase.functions.invoke('calculate-v', {
+        body: { action: 'config' }
+      });
+
+      if (error || !Array.isArray(data?.fields)) {
+        calculatorLoading.textContent = 'No se ha podido cargar la calculadora. Cierra la sesión y vuelve a intentarlo.';
+        return;
+      }
+
+      calculatorFields = data.fields;
+      monthsContainer.innerHTML = [1, 2, 3].map(renderMonthCard).join('');
+      excludedList.innerHTML = (data.excluded || []).map((concept) => `<li>${escapeHtml(concept)}</li>`).join('');
+      calculatorLoading.hidden = true;
+      vForm.hidden = false;
+      calculatorReady = true;
+      updateMonthTotals();
+    }
+
+    async function isAuthorizedSession(session) {
+      if (!session) return false;
+      const { data, error } = await supabase.rpc('is_current_user_private_access_allowed');
+      return !error && data === true;
+    }
+
+    async function requestCode(email) {
+      await fetch(OTP_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({ email })
+      });
+    }
+
+    emailForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+
+      sendCodeButton.disabled = true;
+      sendCodeButton.textContent = 'Enviando…';
+      setupMessage.classList.remove('show');
+
+      try {
+        await requestCode(email);
+        setupMessage.textContent = 'Si el correo está autorizado, recibirás un código de acceso. Revisa también la carpeta de correo no deseado.';
+        setupMessage.classList.add('show');
+        setTimeout(() => showCodeStep(email), 450);
+      } catch (_error) {
+        setupMessage.textContent = 'No se ha podido completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.';
+        setupMessage.classList.add('show');
+      } finally {
+        sendCodeButton.disabled = false;
+        sendCodeButton.textContent = 'Recibir código de acceso';
+      }
+    });
+
+    codeForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const token = document.getElementById('otp-code').value.replace(/\D/g, '').slice(0, 6);
+      if (!pendingEmail || token.length !== 6) return;
+
+      verifyCodeButton.disabled = true;
+      verifyCodeButton.textContent = 'Verificando…';
+      codeMessage.classList.remove('show');
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: pendingEmail,
+        token,
+        type: 'email'
+      });
+
+      if (error || !data.session) {
+        codeMessage.textContent = 'El código no es correcto o ha caducado. Solicita uno nuevo e inténtalo otra vez.';
+        codeMessage.classList.add('show');
+        verifyCodeButton.disabled = false;
+        verifyCodeButton.textContent = 'Entrar';
+        return;
+      }
+
+      if (!(await isAuthorizedSession(data.session))) {
+        await supabase.auth.signOut();
+        codeMessage.textContent = 'Este correo no tiene acceso al área privada. Ponte en contacto con tu delegado sindical.';
+        codeMessage.classList.add('show');
+        verifyCodeButton.disabled = false;
+        verifyCodeButton.textContent = 'Entrar';
+        return;
+      }
+
+      showSignedIn(data.session);
+      verifyCodeButton.disabled = false;
+      verifyCodeButton.textContent = 'Entrar';
+    });
+
+    document.getElementById('change-email').addEventListener('click', () => {
+      showSignedOut();
+    });
+
+    document.getElementById('start-calculator').addEventListener('click', showCalculatorScreen);
+    document.getElementById('show-instructions').addEventListener('click', showInstructionsScreen);
+
+    async function signOut() {
+      await supabase.auth.signOut();
+      showSignedOut();
+    }
+
+    document.getElementById('sign-out-instructions').addEventListener('click', signOut);
+    document.getElementById('sign-out-calculator').addEventListener('click', signOut);
+
+    vForm.addEventListener('input', (event) => {
+      if (event.target.matches('[data-plus-key]')) updateMonthTotals();
+    });
+
+    vForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!calculatorReady) return;
+
+      calculatorMessage.classList.remove('show');
+      calculatorResult.classList.remove('show');
+      calculateButton.disabled = true;
+      calculateButton.textContent = 'Calculando…';
+
+      const months = [1, 2, 3].map((index) => {
+        const amounts = {};
+        document.querySelectorAll(`[data-month-index="${index}"]`).forEach((input) => {
+          amounts[input.dataset.plusKey] = input.value || 0;
+        });
+
+        return {
+          month: document.getElementById(`month-${index}`).value,
+          days: Number(document.getElementById(`days-${index}`).value),
+          amounts
+        };
+      });
+
+      const { data, error } = await supabase.functions.invoke('calculate-v', {
+        body: {
+          action: 'calculate',
+          months,
+          vacationDays: Number(document.getElementById('vacation-days').value)
+        }
+      });
+
+      calculateButton.disabled = false;
+      calculateButton.textContent = 'Calcular mi V';
+
+      if (error || data?.error) {
+        const errorCode = data?.error || '';
+        calculatorMessage.textContent = errorCode === 'MONTHS_NOT_CONSECUTIVE'
+          ? 'Los tres meses deben ser consecutivos y estar colocados del más antiguo al más reciente.'
+          : 'Revisa los meses, los días laborales y los importes introducidos e inténtalo de nuevo.';
+        calculatorMessage.classList.add('show');
+        return;
+      }
+
+      document.getElementById('daily-result').textContent = euro.format(data.dailyValue);
+      document.getElementById('total-result').textContent = `${data.vacationDays} ${data.vacationDays === 1 ? 'día' : 'días'} de vacaciones: ${euro.format(data.totalVacation)}`;
+      document.getElementById('formula-detail').textContent = `${euro.format(data.totalComplements)} en pluses ÷ ${data.totalDays} días laborales`;
+      calculatorResult.classList.add('show');
+      calculatorResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      if (await isAuthorizedSession(session)) {
+        showSignedIn(session);
+      } else {
+        await supabase.auth.signOut();
+        showSignedOut();
+      }
+    } else {
+      const savedEmail = sessionStorage.getItem('strPendingEmail');
+      if (savedEmail) showCodeStep(savedEmail);
+    }
+  </script>
+</body>
+</html>

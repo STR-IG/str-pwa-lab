@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e30613">
+  <title>Validando acceso · STR-IG</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f5f7;color:#18181b;font-family:Arial,Helvetica,sans-serif;padding:24px}.card{width:min(100%,440px);padding:28px 22px;border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center}.lock{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 18px;border-radius:20px;color:#fff;background:linear-gradient(145deg,#e30613,#b9000b);font-size:28px}h1{margin:0 0 10px;font-size:26px}p{margin:0;color:#6e6e73;line-height:1.5}.error{display:none;margin-top:16px;padding:12px;border-radius:12px;background:#fff1f1;color:#8d141c;font-size:14px}.error.show{display:block}a{display:inline-block;margin-top:16px;color:#b9000b;font-weight:700}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="lock" aria-hidden="true">🔒</div>
+    <h1>Validando tu acceso</h1>
+    <p id="message">Un momento, estamos comprobando tu enlace de acceso.</p>
+    <div id="error" class="error"></div>
+    <a id="retry" href="acceso-privado.html" hidden>Volver a solicitar acceso</a>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    const supabase=createClient('https://icneigdnuntzugisexaz.supabase.co','sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m',{
+      auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}
+    });
+    const message=document.getElementById('message');
+    const errorBox=document.getElementById('error');
+    const retry=document.getElementById('retry');
+    function fail(text){message.textContent='No hemos podido validar el acceso.';errorBox.textContent=text;errorBox.classList.add('show');retry.hidden=false}
+    async function finish(session){
+      if(!session){fail('El enlace no es válido o ya se ha utilizado. Solicita uno nuevo.');return}
+      const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
+      if(error||data!==true){await supabase.auth.signOut();fail('Este correo no tiene acceso al área privada. Ponte en contacto con tu delegado sindical.');return}
+      window.location.replace('area-privada.html');
+    }
+    const {data:{session},error}=await supabase.auth.getSession();
+    if(error){fail('El enlace no es válido o ha caducado. Solicita uno nuevo.')}else if(session){await finish(session)}else{
+      let settled=false;
+      const {data:{subscription}}=supabase.auth.onAuthStateChange(async(event,newSession)=>{
+        if(settled||!newSession)return;settled=true;subscription.unsubscribe();await finish(newSession);
+      });
+      setTimeout(async()=>{if(settled)return;const {data:{session:later}}=await supabase.auth.getSession();if(later){settled=true;subscription.unsubscribe();await finish(later)}else{fail('El enlace no es válido o ha caducado. Solicita uno nuevo.')}},1800);
+    }
+  </script>
+</body>
+</html>

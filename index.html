@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>STR-IG</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red:#e30613; --red-dark:#b9000b; --red-soft:#fff0f1;
+      --black:#161616; --grey:#6e6e73; --light:#f5f5f7; --white:#fff;
+    }
+    html, body { width:100%; overflow-x:hidden; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--light);
+      color: var(--black);
+      padding-bottom: calc(96px + env(safe-area-inset-bottom));
+    }
+    button,input { font-family:inherit; }
+
+    .hero {
+      background:url("Imagen portada STR APP.png") center center / cover no-repeat;
+      color:white;
+      padding:24px 20px 34px;
+      min-height:520px;
+      border-radius:0 0 30px 30px;
+    }
+    .topbar { max-width:1100px; margin:auto; display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+    .menu { font-size:28px; line-height:1; }
+    .hero-content { max-width:1100px; margin:auto; }
+    .brand-line { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+    .logo-text { font-size:42px; font-weight:900; letter-spacing:-3px; }
+    .brand-name { border-left:2px solid rgba(255,255,255,.5); padding-left:14px; }
+    .brand-name strong { display:block; font-size:22px; }
+    .brand-name span { font-size:14px; opacity:.9; }
+    .claim { font-style:italic; font-size:16px; margin-bottom:22px; opacity:.95; }
+    .hero h1 { font-size:clamp(32px,5vw,52px); max-width:560px; line-height:1.02; margin-bottom:12px; }
+    .hero-description { font-size:18px; line-height:1.5; max-width:540px; opacity:.96; margin-bottom:25px; }
+    .searchbox { width:100%; max-width:700px; border:0; outline:none; padding:18px 22px; border-radius:999px; font-size:16px; box-shadow:0 12px 30px rgba(0,0,0,.16); }
+
+    main { max-width:1100px; margin:auto; padding:28px 18px; }
+    .section { margin-bottom:34px; }
+    .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .section-header h2 { font-size:23px; }
+    .section-header a { color:var(--red); text-decoration:none; font-weight:700; font-size:14px; }
+
+    .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .quick-card {
+      background:white; border-radius:20px; padding:20px; min-height:155px;
+      box-shadow:0 5px 18px rgba(0,0,0,.07); display:flex; flex-direction:column;
+      justify-content:space-between; transition:.2s ease; cursor:pointer;
+    }
+    .quick-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.11); }
+    .icon { width:48px; height:48px; border-radius:14px; background:var(--red); color:white; display:grid; place-items:center; font-size:24px; }
+    .quick-card strong { font-size:18px; line-height:1.15; }
+    .quick-card small { color:var(--grey); font-size:13px; line-height:1.4; margin-top:8px; }
+
+    .payroll-card {
+      position:relative;
+      min-height:155px;
+      padding:0;
+      overflow:hidden;
+      color:white;
+      background:
+        linear-gradient(90deg,rgba(112,0,9,.92) 0%,rgba(172,0,14,.76) 43%,rgba(105,0,8,.08) 72%),
+        url("revisa-tu-nomina-bg.webp") center / cover no-repeat;
+      box-shadow:none;
+      cursor:default;
+    }
+    .payroll-card:hover { transform:none; box-shadow:none; }
+    .payroll-copy {
+      position:relative;
+      z-index:2;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:flex-start;
+      width:62%;
+      height:100%;
+      padding:20px;
+    }
+    .payroll-card h3 {
+      max-width:220px;
+      font-size:clamp(23px,2.6vw,35px);
+      line-height:1;
+      letter-spacing:-.6px;
+      text-shadow:0 2px 8px rgba(0,0,0,.18);
+    }
+    .coming-soon {
+      display:inline-block;
+      margin-top:11px;
+      padding:6px 9px;
+      border-radius:999px;
+      color:var(--red-dark);
+      background:rgba(255,255,255,.94);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+    .card-lock {
+      position:absolute;
+      right:13px;
+      bottom:13px;
+      z-index:3;
+      width:54px;
+      height:54px;
+      border:3px solid white;
+      border-radius:50%;
+      background:#075b46;
+      box-shadow:0 4px 12px rgba(0,0,0,.22);
+    }
+    .card-lock::before {
+      position:absolute;
+      top:12px;
+      left:16px;
+      width:16px;
+      height:15px;
+      border:4px solid white;
+      border-bottom:0;
+      border-radius:11px 11px 0 0;
+      content:"";
+    }
+    .card-lock::after {
+      position:absolute;
+      left:12px;
+      bottom:10px;
+      width:24px;
+      height:21px;
+      border-radius:4px;
+      background:white;
+      content:"";
+    }
+
+    .scroll-row { display:flex; gap:14px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory; }
+    .scroll-row::-webkit-scrollbar { height:6px; }
+    .scroll-row::-webkit-scrollbar-thumb { background:#d7d7d7; border-radius:20px; }
+    .permit-card { background:white; min-width:190px; width:190px; border-radius:20px; padding:18px; box-shadow:0 5px 16px rgba(0,0,0,.07); scroll-snap-align:start; }
+    .permit-card .icon { margin-bottom:20px; }
+    .permit-card h3 { font-size:16px; min-height:42px; margin-bottom:14px; }
+    .tag { display:inline-block; color:var(--red-dark); background:var(--red-soft); border-radius:999px; padding:7px 10px; font-size:12px; font-weight:700; }
+
+    .news-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .news-card { background:white; border-radius:20px; overflow:hidden; box-shadow:0 5px 18px rgba(0,0,0,.07); }
+    .news-image { height:105px; background:linear-gradient(135deg,rgba(227,6,19,.85),rgba(176,0,12,.65)),#ddd; display:flex; align-items:end; padding:15px; color:white; font-weight:800; }
+    .news-content { padding:17px; }
+    .news-content h3 { font-size:17px; margin-bottom:8px; }
+    .news-content p { color:var(--grey); line-height:1.45; font-size:14px; }
+
+    .list { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .list-item { background:white; padding:17px; border-radius:18px; display:flex; align-items:center; gap:15px; box-shadow:0 4px 15px rgba(0,0,0,.055); }
+    .list-icon { flex:0 0 48px; width:48px; height:48px; border-radius:50%; display:grid; place-items:center; background:var(--red); color:white; font-size:22px; }
+    .list-text { flex:1; }
+    .list-text strong { display:block; font-size:16px; margin-bottom:4px; }
+    .list-text span { color:var(--grey); font-size:13px; line-height:1.35; }
+    .arrow { color:#999; font-size:20px; }
+
+    .join { background:linear-gradient(135deg,var(--red-dark),var(--red)); border-radius:24px; padding:24px; color:white; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .join h2 { margin-bottom:6px; }
+    .join p { opacity:.94; line-height:1.45; }
+    .join-button { background:white; color:var(--red); text-decoration:none; border-radius:999px; padding:14px 22px; font-weight:800; white-space:nowrap; }
+
+    .bottom-nav {
+      position:fixed !important;
+      left:0 !important;
+      right:0 !important;
+      bottom:0 !important;
+      transform:none !important;
+      width:100% !important;
+      max-width:none !important;
+      min-height:76px;
+      height:calc(76px + env(safe-area-inset-bottom));
+      padding-bottom:env(safe-area-inset-bottom);
+      background:#fff;
+      border-top:1px solid #e5e5e5;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      z-index:9999 !important;
+      box-shadow:0 -3px 14px rgba(0,0,0,.08);
+      -webkit-transform:translateZ(0);
+      transform:translateZ(0) !important;
+    }
+    .bottom-nav a { text-decoration:none; color:#666; text-align:center; font-size:11px; min-width:58px; }
+    .bottom-nav a b { display:block; font-size:21px; margin-bottom:4px; }
+    .bottom-nav a.active { color:var(--red); font-weight:800; }
+
+    .permit-detail { display:none; }
+    .permit-detail:target { display:block; }
+    #permisos { display:none; }
+    #permisos:target { display:block; }
+
+    @media (max-width:700px) {
+      .hero { border-radius:0 0 24px 24px; padding:18px 17px 28px; }
+      .brand-line { margin-bottom:12px; }
+      .logo-text { font-size:34px; }
+      .brand-name strong { font-size:18px; }
+      .hero h1 { font-size:34px; }
+      .hero-description { font-size:15px; }
+      main { padding:24px 14px; }
+      .quick-grid { grid-template-columns:repeat(2,1fr); }
+      .quick-card { min-height:135px; padding:16px; }
+      .quick-card strong { font-size:16px; }
+      .payroll-card { min-height:135px; padding:0; }
+      .payroll-copy { width:68%; padding:14px; }
+      .payroll-card h3 { max-width:145px; font-size:21px; }
+      .coming-soon { margin-top:8px; padding:5px 7px; font-size:8px; }
+      .card-lock { right:9px; bottom:9px; transform:scale(.78); transform-origin:right bottom; }
+      .news-grid { display:flex; overflow-x:auto; gap:12px; }
+      .news-card { min-width:245px; }
+      .list { grid-template-columns:1fr; }
+      .join { flex-direction:column; align-items:flex-start; }
+      .join-button { width:100%; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hero"></header>
+
+<main>
+  <section class="section">
+    <div class="quick-grid">
+      <a href="permisos.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;">
+        <img src="permisos-retribuidos.png" alt="Permisos retribuidos" style="width:100%; height:100%; object-fit:cover; display:block;">
+      </a>
+
+      <a href="menu-comedor.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;">
+        <img src="menu-comedor.png" alt="Menú comedor" style="width:100%; height:100%; object-fit:cover; display:block;">
+      </a>
+
+      <a href="acceso-privado.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;">
+        <img src="calcula-tu-v.png" alt="Calcula tu V" style="width:100%; height:100%; object-fit:cover; display:block;">
+      </a>
+
+      <article class="quick-card payroll-card" aria-label="Revisa tu nómina, próximamente">
+        <div class="payroll-copy">
+          <h3>Revisa tu nómina</h3>
+          <span class="coming-soon">Próximamente</span>
+        </div>
+        <span class="card-lock" aria-hidden="true"></span>
+      </article>
+
+      <article class="quick-card">
+        <div class="icon">📅</div>
+        <div><strong>Calendarios laborales</strong><small>Turnos, festivos y horarios.</small></div>
+      </article>
+
+      <article class="quick-card">
+        <div class="icon">💬</div>
+        <div><strong>Contacta con STR-IG</strong><small>Escríbenos, estamos aquí.</small></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="permisos" class="section">
+    <div class="section-header"><h2>Permisos retribuidos</h2><a href="#">Ver todos →</a></div>
+    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; width:100%;">
+      <a href="#hospitalizacion-primer-grado" class="permit-link" style="display:block; width:100%;"><img src="boton-hospitalizacion-primer-grado.png" alt="Hospitalización familiar primer grado" style="width:100%; height:auto; display:block; border-radius:18px;"></a>
+      <a href="#hospitalizacion-segundo-grado" class="permit-link" style="display:block; width:100%;"><img src="card-hospitalizacion-familiar-segundo-grado.png" alt="Hospitalización familiar segundo grado" style="width:100%; aspect-ratio:1.45/1; object-fit:contain; display:block; border-radius:18px;"></a>
+      <a href="#intervencion-familiar-sin-ingreso-primer-grado" class="permit-link" style="display:block; width:100%;"><img src="intervencion-familiar-sin-ingreso-primer-grado.png" alt="Intervención familiar sin ingreso 1er grado" style="width:100%; aspect-ratio:1.45/1; object-fit:contain; display:block; border-radius:18px;"></a>
+      <article class="permit-card"><div class="icon">🕊️</div><h3>Fallecimiento familiar</h3><span class="tag">Ver permiso</span></article>
+      <article class="permit-card"><div class="icon">💍</div><h3>Matrimonio</h3><span class="tag">15 días</span></article>
+      <article class="permit-card"><div class="icon">🩺</div><h3>Intervención quirúrgica</h3><span class="tag">Ver permiso</span></article>
+      <article class="permit-card"><div class="icon">📄</div><h3>Deber inexcusable</h3><span class="tag">Ver permiso</span></article>
+      <article class="permit-card"><div class="icon">⚠️</div><h3>Fuerza mayor</h3><span class="tag">Ver permiso</span></article>
+    </div>
+  </section>
+
+  <section id="hospitalizacion-primer-grado" class="section permit-detail">
+    <div class="section-header"><h2>Hospitalización familiar de primer grado</h2></div>
+    <img src="Hospitalizacion familiar primer grado.png" alt="Ficha Hospitalización familiar de primer grado" style="width:100%; height:auto; border-radius:20px; display:block;">
+  </section>
+
+  <section id="hospitalizacion-segundo-grado" class="section permit-detail">
+    <div class="section-header"><h2>Hospitalización familiar de segundo grado</h2></div>
+    <img src="ficha-hospitalizacion-segundo-grado.png" alt="Ficha hospitalización familiar de segundo grado" style="width:100%; height:auto; border-radius:20px; display:block;">
+  </section>
+
+  <section id="intervencion-familiar-sin-ingreso-primer-grado" class="section permit-detail">
+    <div class="section-header"><h2>Intervención familiar sin ingreso 1er grado</h2></div>
+    <img src="ficha-intervencion-familiar-sin-ingreso-primer-grado.png" alt="Ficha Intervención familiar sin ingreso 1er grado" style="width:100%; height:auto; border-radius:20px; display:block;">
+  </section>
+
+  <section id="menu" class="section permit-detail">
+    <div class="section-header"><h2>Menú del comedor</h2></div>
+    <img src="menu-semana-1.png" alt="Menú semana 1" style="width:100%; height:auto; border-radius:20px; display:block; margin-bottom:20px;">
+    <img src="menu-semana-2.png" alt="Menú semana 2" style="width:100%; height:auto; border-radius:20px; display:block; margin-bottom:20px;">
+    <img src="menu-semana-3.png" alt="Menú semana 3" style="width:100%; height:auto; border-radius:20px; display:block; margin-bottom:20px;">
+    <img src="menu-semana-4.png" alt="Menú semana 4" style="width:100%; height:auto; border-radius:20px; display:block; margin-bottom:20px;">
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2>Actualidad STR-IG</h2><a href="#">Ver todas →</a></div>
+    <div class="news-grid">
+      <article class="news-card"><div class="news-image">STR-IG</div><div class="news-content"><h3>Actividad de la sección sindical</h3><p>Conoce en qué estamos trabajando y las novedades de STR-IG.</p></div></article>
+      <article class="news-card"><div class="news-image">Información</div><div class="news-content"><h3>Información para la plantilla</h3><p>Comunicaciones y cuestiones laborales de interés.</p></div></article>
+      <article class="news-card"><div class="news-image">Derechos</div><div class="news-content"><h3>Nuevos contenidos</h3><p>Seguimos ampliando nuestra guía de derechos laborales.</p></div></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2>Nuestras secciones</h2></div>
+    <div class="list">
+      <article class="list-item"><div class="list-icon">⚖️</div><div class="list-text"><strong>Derechos laborales</strong><span>Información y herramientas sobre tus derechos.</span></div><div class="arrow">›</div></article>
+      <article class="list-item"><div class="list-icon">📅</div><div class="list-text"><strong>Calendarios</strong><span>Turnos, festivos, horarios y planificación anual.</span></div><div class="arrow">›</div></article>
+      <article class="list-item"><div class="list-icon">📰</div><div class="list-text"><strong>Actualidad STR-IG</strong><span>Noticias, comunicados y actividad de tu sección.</span></div><div class="arrow">›</div></article>
+      <article class="list-item"><div class="list-icon">👥</div><div class="list-text"><strong>El sindicato</strong><span>Conoce STR, nuestro proyecto y nuestros valores.</span></div><div class="arrow">›</div></article>
+      <article class="list-item"><div class="list-icon">❤️</div><div class="list-text"><strong>Afíliate</strong><span>Ventajas de afiliarte y cómo hacerlo.</span></div><div class="arrow">›</div></article>
+      <article class="list-item"><div class="list-icon">☎️</div><div class="list-text"><strong>Contacto</strong><span>Estamos para ayudarte. Escríbenos o llámanos.</span></div><div class="arrow">›</div></article>
+    </div>
+  </section>
+
+  <section class="join">
+    <div><h2>Afíliate a STR-IG</h2><p>Juntos somos más fuertes. Defendemos tus derechos.</p></div>
+    <a class="join-button" href="#">Quiero afiliarme →</a>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <a class="active" href="index.html"><b>⌂</b>Inicio</a>
+  <a href="#"><b>⚖</b>Derechos</a>
+  <a href="#"><b>📰</b>Actualidad</a>
+  <a href="#"><b>👥</b>Sindicato</a>
+  <a href="#"><b>♡</b>Afíliate</a>
+  <a href="#"><b>☎</b>Contacto</a>
+</nav>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('./service-worker.js', { updateViaCache:'none' });
+      registration.update();
+      let refreshing=false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing=true;
+        window.location.reload();
+      });
+    } catch (error) {
+      console.error('Error al registrar el Service Worker:', error);
+    }
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e30613">
+  <title>Acceso privado · STR-IG</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:#f5f5f7;color:#18181b;font-family:Arial,Helvetica,sans-serif}.topbar{display:flex;align-items:center;gap:14px;min-height:68px;padding:12px 18px;background:#fff;border-bottom:1px solid #e5e5e7}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;color:#18181b;background:#f0f0f2;text-decoration:none;font-size:25px}.topbar strong{font-size:18px}main{width:min(100% - 28px,480px);margin:0 auto;padding:32px 0 48px}.lock{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 20px;border-radius:22px;color:#fff;background:linear-gradient(145deg,#e30613,#b9000b);box-shadow:0 12px 28px rgba(227,6,19,.24);font-size:32px}h1{margin:0 0 10px;text-align:center;font-size:30px}.intro{margin:0 auto 26px;max-width:390px;color:#6e6e73;text-align:center;font-size:16px;line-height:1.5}.panel{padding:24px 20px;border:1px solid rgba(0,0,0,.04);border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.07)}label{display:block;margin-bottom:9px;font-size:14px;font-weight:800}input{width:100%;min-height:54px;padding:14px 16px;border:1px solid #cfcfd3;border-radius:14px;outline:none;font:inherit;font-size:16px}input:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.12)}button{width:100%;min-height:54px;margin-top:16px;border:0;border-radius:999px;color:#fff;background:#e30613;font:inherit;font-weight:800;font-size:16px;cursor:pointer}button:disabled{opacity:.65;cursor:wait}.help{margin:16px 2px 0;color:#6e6e73;font-size:13px;line-height:1.45}.status{display:none;margin-top:14px;padding:12px 14px;border-radius:12px;background:#eef7f1;color:#205b35;font-size:13px;line-height:1.45}.status.show{display:block}.privacy{display:flex;gap:10px;margin:18px 4px 0;color:#6e6e73;font-size:12px;line-height:1.45}
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a><strong>Área privada</strong></header>
+  <main>
+    <div class="lock" aria-hidden="true">🔒</div>
+    <h1>Acceso para afiliados</h1>
+    <p class="intro">Introduce el correo personal que facilitaste a STR. Te enviaremos un enlace de acceso seguro.</p>
+    <section class="panel">
+      <form id="email-form">
+        <label for="email">Correo electrónico personal</label>
+        <input id="email" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+        <button id="send" type="submit">Recibir enlace de acceso</button>
+        <p class="help">Si el correo está autorizado por STR, recibirás un email con un botón para entrar. El enlace es temporal y de un solo uso.</p>
+        <p id="status" class="status"></p>
+      </form>
+    </section>
+    <p class="privacy"><span aria-hidden="true">🛡️</span><span>El acceso es personal. STR no solicitará tu contraseña del correo electrónico.</span></p>
+  </main>
+  <script>
+    const ENDPOINT='https://icneigdnuntzugisexaz.supabase.co/functions/v1/request-private-otp';
+    const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const form=document.getElementById('email-form');
+    const button=document.getElementById('send');
+    const status=document.getElementById('status');
+    form.addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const email=document.getElementById('email').value.trim().toLowerCase();
+      button.disabled=true; button.textContent='Enviando…'; status.classList.remove('show');
+      try{
+        await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email})});
+        status.textContent='Si el correo está autorizado, recibirás un enlace de acceso. Abre el email y pulsa “Entrar en APP STR”.';
+        status.classList.add('show');
+      }catch(_){
+        status.textContent='No se ha podido completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.';
+        status.classList.add('show');
+      }finally{button.disabled=false;button.textContent='Recibir enlace de acceso'}
+    });
+  </script>
+</body>
+</html>
