@@ -7,7 +7,7 @@
   <title>Prueba OTP · STR-IG Lab</title>
   <link rel="icon" type="image/png" href="icono-str-ig.png">
   <style>
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#f4f7f7;color:#17201f;font-family:Arial,Helvetica,sans-serif}.labbar{padding:11px 16px;background:#0f766e;color:#fff;text-align:center;font-size:13px;font-weight:900;letter-spacing:.5px}.topbar{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 16px;background:#fff;border-bottom:1px solid #e2e8e7}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#edf2f1;color:#17201f;text-decoration:none;font-size:25px}.topbar strong{font-size:18px}main{width:min(100% - 28px,500px);margin:0 auto;padding:26px 0 48px}.hero{text-align:center;margin-bottom:22px}.flask{font-size:42px}.hero h1{margin:8px 0 7px;font-size:28px}.hero p{margin:0;color:#66706e;line-height:1.45}.panel{padding:20px;border-radius:22px;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.07);margin-bottom:16px}.step{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:8px;border-radius:50%;background:#0f766e;color:#fff;font-weight:900}.panel h2{display:flex;align-items:center;margin:0 0 15px;font-size:18px}label{display:block;margin:12px 0 7px;font-size:13px;font-weight:800}input{width:100%;min-height:52px;padding:13px 15px;border:1px solid #cbd4d2;border-radius:13px;outline:none;font:inherit;font-size:16px}input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.12)}#code{text-align:center;font-size:28px;font-weight:900;letter-spacing:9px}button{width:100%;min-height:52px;margin-top:14px;border:0;border-radius:999px;background:#0f766e;color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}button.secondary{background:#e8efee;color:#23413e}button:disabled{opacity:.55;cursor:wait}.result{display:none;margin-top:14px;padding:13px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word}.result.show{display:block}.ok{background:#eaf7ef;color:#185c35}.bad{background:#fff0f0;color:#8a1d24}.info{background:#eef6f6;color:#285a56}.note{margin:14px 2px 0;color:#697572;font-size:12px;line-height:1.45}.session{display:none}.session.show{display:block}.session strong{color:#126b42}.tiny{font-size:12px;color:#75807e;margin-top:8px}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#f4f7f7;color:#17201f;font-family:Arial,Helvetica,sans-serif}.labbar{padding:11px 16px;background:#0f766e;color:#fff;text-align:center;font-size:13px;font-weight:900;letter-spacing:.5px}.topbar{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 16px;background:#fff;border-bottom:1px solid #e2e8e7}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#edf2f1;color:#17201f;text-decoration:none;font-size:25px}.topbar strong{font-size:18px}main{width:min(100% - 28px,500px);margin:0 auto;padding:26px 0 48px}.hero{text-align:center;margin-bottom:22px}.flask{font-size:42px}.hero h1{margin:8px 0 7px;font-size:28px}.hero p{margin:0;color:#66706e;line-height:1.45}.panel{padding:20px;border-radius:22px;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.07);margin-bottom:16px}.step{display:inline-grid;place-items:center;width:29px;height:29px;margin-right:8px;border-radius:50%;background:#0f766e;color:#fff;font-weight:900}.panel h2{display:flex;align-items:center;margin:0 0 15px;font-size:18px}label{display:block;margin:12px 0 7px;font-size:13px;font-weight:800}input{width:100%;min-height:52px;padding:13px 15px;border:1px solid #cbd4d2;border-radius:13px;outline:none;font:inherit;font-size:16px}input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.12)}#code{text-align:center;font-size:28px;font-weight:900;letter-spacing:9px}button{width:100%;min-height:52px;margin-top:14px;border:0;border-radius:999px;background:#0f766e;color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}button.secondary{background:#e8efee;color:#23413e}button.direct{background:#193a37}button:disabled{opacity:.55;cursor:wait}.result{display:none;margin-top:14px;padding:13px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word}.result.show{display:block}.ok{background:#eaf7ef;color:#185c35}.bad{background:#fff0f0;color:#8a1d24}.info{background:#eef6f6;color:#285a56}.note{margin:14px 2px 0;color:#697572;font-size:12px;line-height:1.45}.session{display:none}.session.show{display:block}.session strong{color:#126b42}.tiny{font-size:12px;color:#75807e;margin-top:8px}.method{margin-top:14px;padding-top:14px;border-top:1px solid #e4ebea}.method:first-of-type{margin-top:0;padding-top:0;border-top:0}.method-title{font-size:13px;font-weight:900;color:#40504e}
   </style>
 </head>
 <body>
@@ -17,7 +17,7 @@
     <section class="hero">
       <div class="flask">🧪</div>
       <h1>Prueba de acceso por código</h1>
-      <p>Esta pantalla existe solo para diagnosticar el código de 6 cifras sin modificar la app real.</p>
+      <p>Comparamos dos formas de verificar el mismo código sin modificar la app real.</p>
     </section>
 
     <section class="panel">
@@ -26,21 +26,33 @@
       <input id="email" type="email" autocomplete="email" placeholder="nombre@correo.com">
       <button id="send">Enviar código de prueba</button>
       <div id="send-result" class="result"></div>
-      <p class="note">Por seguridad, la función devuelve un mensaje genérico aunque un correo no esté autorizado. Comprueba si el email llega antes de continuar.</p>
+      <p class="note">Usa siempre el último código recibido. Pedir uno nuevo invalida los anteriores.</p>
     </section>
 
     <section class="panel">
       <h2><span class="step">2</span>Verificar 6 cifras</h2>
       <label for="code">Código recibido</label>
       <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000">
-      <button id="verify">Comprobar código</button>
-      <div id="verify-result" class="result"></div>
       <p class="tiny" id="timing"></p>
+
+      <div class="method">
+        <div class="method-title">Método A · supabase-js</div>
+        <button id="verify-sdk">Comprobar con supabase-js</button>
+        <div id="sdk-result" class="result"></div>
+      </div>
+
+      <div class="method">
+        <div class="method-title">Método B · HTTP directo</div>
+        <button id="verify-direct" class="direct">Comprobar con HTTP directo</button>
+        <div id="direct-result" class="result"></div>
+      </div>
+
+      <p class="note">Prueba primero un método. Si falla, puedes probar el segundo con el mismo código mientras siga siendo válido.</p>
     </section>
 
     <section id="session-box" class="panel session">
       <h2>✅ Sesión iniciada</h2>
-      <p><strong>El OTP ha funcionado.</strong> La sesión de Supabase se ha creado correctamente.</p>
+      <p><strong>El OTP ha funcionado.</strong> La sesión se ha creado correctamente.</p>
       <button id="logout" class="secondary">Cerrar sesión de prueba</button>
     </section>
   </main>
@@ -51,14 +63,17 @@
     const URL='https://icneigdnuntzugisexaz.supabase.co';
     const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
     const ENDPOINT=URL+'/functions/v1/request-private-otp';
+    const VERIFY_URL=URL+'/auth/v1/verify';
     const supabase=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 
     const emailInput=document.getElementById('email');
     const codeInput=document.getElementById('code');
     const sendButton=document.getElementById('send');
-    const verifyButton=document.getElementById('verify');
+    const sdkButton=document.getElementById('verify-sdk');
+    const directButton=document.getElementById('verify-direct');
     const sendResult=document.getElementById('send-result');
-    const verifyResult=document.getElementById('verify-result');
+    const sdkResult=document.getElementById('sdk-result');
+    const directResult=document.getElementById('direct-result');
     const sessionBox=document.getElementById('session-box');
     const timing=document.getElementById('timing');
     let requestedAt=null;
@@ -67,8 +82,21 @@
       el.textContent=text;
       el.className='result show '+type;
     }
-
     function cleanCode(value){return value.replace(/\D/g,'').slice(0,6)}
+    function values(){return {email:emailInput.value.trim().toLowerCase(),token:cleanCode(codeInput.value)}}
+    function validate(email,token,result){
+      if(!email || !email.includes('@')){show(result,'Falta un correo válido.','bad');return false}
+      if(token.length!==6){show(result,'El código debe tener exactamente 6 cifras.','bad');return false}
+      const seconds=requestedAt?Math.round((Date.now()-requestedAt)/1000):null;
+      timing.textContent=seconds===null?'No se registró el momento de solicitud en esta pantalla.':`Han pasado aproximadamente ${seconds} segundos desde que se pidió el código.`;
+      return true;
+    }
+    async function saveDirectSession(payload){
+      if(!payload?.access_token || !payload?.refresh_token) return false;
+      const {error}=await supabase.auth.setSession({access_token:payload.access_token,refresh_token:payload.refresh_token});
+      return !error;
+    }
+
     codeInput.addEventListener('input',()=>{codeInput.value=cleanCode(codeInput.value)});
 
     sendButton.addEventListener('click',async()=>{
@@ -81,40 +109,52 @@
         const elapsed=Math.round(performance.now()-started);
         requestedAt=Date.now();
         show(sendResult,`Solicitud enviada. HTTP ${response.status}. Tiempo: ${elapsed} ms. Si el correo está autorizado, debería llegar un código nuevo.`,'ok');
-        codeInput.focus();
+        codeInput.value=''; codeInput.focus();
+        sdkResult.className='result'; directResult.className='result'; sessionBox.classList.remove('show');
       }catch(error){
         show(sendResult,'Error de red al solicitar el código: '+(error?.message||'desconocido'),'bad');
       }finally{sendButton.disabled=false;sendButton.textContent='Enviar código de prueba'}
     });
 
-    verifyButton.addEventListener('click',async()=>{
-      const email=emailInput.value.trim().toLowerCase();
-      const token=cleanCode(codeInput.value);
-      if(!email || !email.includes('@')){show(verifyResult,'Falta un correo válido.','bad');return}
-      if(token.length!==6){show(verifyResult,'El código debe tener exactamente 6 cifras.','bad');return}
-      verifyButton.disabled=true;verifyButton.textContent='Comprobando…';
-      const seconds=requestedAt?Math.round((Date.now()-requestedAt)/1000):null;
-      timing.textContent=seconds===null?'No se registró el momento de solicitud en esta pantalla.':`Han pasado aproximadamente ${seconds} segundos desde que se pidió el código.`;
+    sdkButton.addEventListener('click',async()=>{
+      const {email,token}=values();
+      if(!validate(email,token,sdkResult)) return;
+      sdkButton.disabled=true;sdkButton.textContent='Comprobando…';
       try{
         const {data,error}=await supabase.auth.verifyOtp({email,token,type:'email'});
-        if(error){
-          show(verifyResult,`Supabase rechazó el código. ${error.message} · status: ${error.status ?? 'sin status'} · code: ${error.code ?? 'sin código'}`,'bad');
-          sessionBox.classList.remove('show');
-          return;
+        if(error){show(sdkResult,`Resultado SDK: ${error.message} · status: ${error.status ?? 'sin status'} · code: ${error.code ?? 'sin código'}`,'bad');sessionBox.classList.remove('show');return}
+        if(!data?.session){show(sdkResult,'Resultado SDK: sin error, pero sin sesión.','bad');return}
+        show(sdkResult,'Resultado SDK: código aceptado y sesión creada.','ok');sessionBox.classList.add('show');
+      }catch(error){show(sdkResult,'Resultado SDK: error de red o navegador: '+(error?.message||'desconocido'),'bad')}
+      finally{sdkButton.disabled=false;sdkButton.textContent='Comprobar con supabase-js'}
+    });
+
+    directButton.addEventListener('click',async()=>{
+      const {email,token}=values();
+      if(!validate(email,token,directResult)) return;
+      directButton.disabled=true;directButton.textContent='Comprobando…';
+      try{
+        const response=await fetch(VERIFY_URL,{
+          method:'POST',
+          headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY},
+          body:JSON.stringify({email,token,type:'email'})
+        });
+        let payload={};
+        try{payload=await response.json()}catch(_){payload={}}
+        if(!response.ok){
+          const msg=payload?.msg||payload?.message||payload?.error_description||payload?.error||'sin mensaje';
+          const code=payload?.code||payload?.error_code||'sin código';
+          show(directResult,`Resultado HTTP: ${response.status} · ${msg} · code: ${code}`,'bad');sessionBox.classList.remove('show');return;
         }
-        if(!data?.session){show(verifyResult,'Supabase no devolvió error, pero tampoco creó una sesión.','bad');return}
-        show(verifyResult,'Código aceptado. Supabase creó una sesión correctamente.','ok');
-        sessionBox.classList.add('show');
-      }catch(error){
-        show(verifyResult,'Error inesperado al verificar: '+(error?.message||'desconocido'),'bad');
-      }finally{verifyButton.disabled=false;verifyButton.textContent='Comprobar código'}
+        const saved=await saveDirectSession(payload);
+        show(directResult,`Resultado HTTP: ${response.status}. Código aceptado.${saved?' Sesión guardada correctamente.':' Respuesta válida, pero no se pudo guardar la sesión.'}`,saved?'ok':'info');
+        if(saved) sessionBox.classList.add('show');
+      }catch(error){show(directResult,'Resultado HTTP: error de red antes de recibir respuesta: '+(error?.message||'desconocido'),'bad')}
+      finally{directButton.disabled=false;directButton.textContent='Comprobar con HTTP directo'}
     });
 
     document.getElementById('logout').addEventListener('click',async()=>{
-      await supabase.auth.signOut();
-      sessionBox.classList.remove('show');
-      codeInput.value='';
-      show(verifyResult,'Sesión de prueba cerrada.','info');
+      await supabase.auth.signOut();sessionBox.classList.remove('show');codeInput.value='';show(sdkResult,'Sesión de prueba cerrada.','info');
     });
 
     const {data:{session}}=await supabase.auth.getSession();
