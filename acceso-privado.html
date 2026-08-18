@@ -4,50 +4,178 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#e30613">
-  <title>Acceso privado · STR-IG</title>
+  <title>Acceso privado · STR-IG LAB</title>
   <link rel="icon" type="image/png" href="icono-str-ig.png">
   <link rel="apple-touch-icon" href="icono-str-ig.png">
   <link rel="manifest" href="manifest.json">
   <style>
-    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:#f5f5f7;color:#18181b;font-family:Arial,Helvetica,sans-serif}.topbar{display:flex;align-items:center;gap:14px;min-height:68px;padding:12px 18px;background:#fff;border-bottom:1px solid #e5e5e7}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;color:#18181b;background:#f0f0f2;text-decoration:none;font-size:25px}.topbar strong{font-size:18px}main{width:min(100% - 28px,480px);margin:0 auto;padding:32px 0 48px}.lock{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 20px;border-radius:22px;color:#fff;background:linear-gradient(145deg,#e30613,#b9000b);box-shadow:0 12px 28px rgba(227,6,19,.24);font-size:32px}h1{margin:0 0 10px;text-align:center;font-size:30px}.intro{margin:0 auto 26px;max-width:390px;color:#6e6e73;text-align:center;font-size:16px;line-height:1.5}.panel{padding:24px 20px;border:1px solid rgba(0,0,0,.04);border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.07)}label{display:block;margin-bottom:9px;font-size:14px;font-weight:800}input{width:100%;min-height:54px;padding:14px 16px;border:1px solid #cfcfd3;border-radius:14px;outline:none;font:inherit;font-size:16px}input:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.12)}button{width:100%;min-height:54px;margin-top:16px;border:0;border-radius:999px;color:#fff;background:#e30613;font:inherit;font-weight:800;font-size:16px;cursor:pointer}button:disabled{opacity:.65;cursor:wait}.help{margin:16px 2px 0;color:#6e6e73;font-size:13px;line-height:1.45}.status{display:none;margin-top:14px;padding:12px 14px;border-radius:12px;background:#eef7f1;color:#205b35;font-size:13px;line-height:1.45}.status.show{display:block}.privacy{display:flex;gap:10px;margin:18px 4px 0;color:#6e6e73;font-size:12px;line-height:1.45}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:#f5f5f7;color:#18181b;font-family:Arial,Helvetica,sans-serif}.labbar{padding:10px 16px;background:#0f766e;color:#fff;text-align:center;font-size:12px;font-weight:900;letter-spacing:.5px}.topbar{display:flex;align-items:center;gap:14px;min-height:68px;padding:12px 18px;background:#fff;border-bottom:1px solid #e5e5e7}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;color:#18181b;background:#f0f0f2;text-decoration:none;font-size:25px}.topbar strong{font-size:18px}main{width:min(100% - 28px,480px);margin:0 auto;padding:32px 0 48px}.lock{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 20px;border-radius:22px;color:#fff;background:linear-gradient(145deg,#e30613,#b9000b);box-shadow:0 12px 28px rgba(227,6,19,.24);font-size:32px}h1{margin:0 0 10px;text-align:center;font-size:30px}.intro{margin:0 auto 26px;max-width:390px;color:#6e6e73;text-align:center;font-size:16px;line-height:1.5}.panel{padding:24px 20px;border:1px solid rgba(0,0,0,.04);border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.07)}.step{display:none}.step.active{display:block}label{display:block;margin-bottom:9px;font-size:14px;font-weight:800}input{width:100%;min-height:54px;padding:14px 16px;border:1px solid #cfcfd3;border-radius:14px;outline:none;font:inherit;font-size:16px}input:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.12)}#code{text-align:center;letter-spacing:8px;font-size:27px;font-weight:800}button{width:100%;min-height:54px;margin-top:16px;border:0;border-radius:999px;color:#fff;background:#e30613;font:inherit;font-weight:800;font-size:16px;cursor:pointer}button.secondary{color:#18181b;background:#fff;border:1px solid #cfcfd3}button:disabled{opacity:.65;cursor:wait}.help{margin:16px 2px 0;color:#6e6e73;font-size:13px;line-height:1.45}.status{display:none;margin-top:14px;padding:12px 14px;border-radius:12px;background:#fff5e6;color:#6a4300;font-size:13px;line-height:1.45}.status.show{display:block}.status.ok{background:#eef7f1;color:#205b35}.status.bad{background:#fff0f0;color:#8a1d24}.privacy{display:flex;gap:10px;margin:18px 4px 0;color:#6e6e73;font-size:12px;line-height:1.45}
   </style>
 </head>
 <body>
+  <div class="labbar">🧪 STR-IG LABORATORIO · NO ES PRODUCCIÓN</div>
   <header class="topbar"><a class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a><strong>Área privada</strong></header>
   <main>
     <div class="lock" aria-hidden="true">🔒</div>
     <h1>Acceso para afiliados</h1>
-    <p class="intro">Introduce el correo personal que facilitaste a STR. Te enviaremos un enlace de acceso seguro.</p>
-    <section class="panel">
-      <form id="email-form">
+    <p id="intro" class="intro">Introduce el correo personal que facilitaste a STR. Te enviaremos un código temporal de 6 cifras.</p>
+
+    <section class="panel" aria-live="polite">
+      <form id="email-form" class="step active">
         <label for="email">Correo electrónico personal</label>
         <input id="email" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
-        <button id="send" type="submit">Recibir enlace de acceso</button>
-        <p class="help">Si el correo está autorizado por STR, recibirás un email con un botón para entrar. El enlace es temporal y de un solo uso.</p>
-        <p id="status" class="status"></p>
+        <button id="send" type="submit">Recibir código de acceso</button>
+        <p class="help">Si el correo está autorizado por STR, recibirás un código válido durante 5 minutos. Revisa también correo no deseado.</p>
+        <p id="send-status" class="status"></p>
+      </form>
+
+      <form id="code-form" class="step">
+        <label for="code">Código de 6 cifras</label>
+        <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
+        <button id="verify" type="submit">Entrar</button>
+        <p class="help">El código es personal y de un solo uso. Hay un máximo de 5 intentos.</p>
+        <p id="verify-status" class="status"></p>
+        <button id="change-email" class="secondary" type="button">Usar otro correo</button>
       </form>
     </section>
+
     <p class="privacy"><span aria-hidden="true">🛡️</span><span>El acceso es personal. STR no solicitará tu contraseña del correo electrónico.</span></p>
   </main>
-  <script>
-    const ENDPOINT='https://icneigdnuntzugisexaz.supabase.co/functions/v1/request-private-otp';
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const URL='https://icneigdnuntzugisexaz.supabase.co';
     const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
-    const form=document.getElementById('email-form');
-    const button=document.getElementById('send');
-    const status=document.getElementById('status');
-    form.addEventListener('submit',async(e)=>{
+    const REQUEST=URL+'/functions/v1/lab-request-custom-otp';
+    const VERIFY=URL+'/functions/v1/lab-verify-custom-otp';
+    const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+
+    const emailForm=document.getElementById('email-form');
+    const codeForm=document.getElementById('code-form');
+    const emailInput=document.getElementById('email');
+    const codeInput=document.getElementById('code');
+    const sendButton=document.getElementById('send');
+    const verifyButton=document.getElementById('verify');
+    const sendStatus=document.getElementById('send-status');
+    const verifyStatus=document.getElementById('verify-status');
+    const intro=document.getElementById('intro');
+    let pendingEmail='';
+
+    function showStatus(el,text,type=''){
+      el.textContent=text;
+      el.className='status show'+(type?' '+type:'');
+    }
+    function clearStatus(el){el.className='status';el.textContent=''}
+    function cleanCode(v){return String(v).replace(/\D/g,'').slice(0,6)}
+    function showEmailStep(){
+      pendingEmail='';
+      sessionStorage.removeItem('strLabPendingEmail');
+      emailForm.classList.add('active');
+      codeForm.classList.remove('active');
+      intro.textContent='Introduce el correo personal que facilitaste a STR. Te enviaremos un código temporal de 6 cifras.';
+      codeInput.value='';
+      clearStatus(verifyStatus);
+    }
+    function showCodeStep(email){
+      pendingEmail=email;
+      sessionStorage.setItem('strLabPendingEmail',email);
+      emailForm.classList.remove('active');
+      codeForm.classList.add('active');
+      intro.textContent='Introduce el código de 6 cifras que hemos enviado a tu correo.';
+      codeInput.value='';
+      codeInput.focus();
+    }
+    async function authorized(){
+      const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
+      return !error && data===true;
+    }
+
+    codeInput.addEventListener('input',()=>{codeInput.value=cleanCode(codeInput.value)});
+
+    emailForm.addEventListener('submit',async(e)=>{
       e.preventDefault();
-      const email=document.getElementById('email').value.trim().toLowerCase();
-      button.disabled=true; button.textContent='Enviando…'; status.classList.remove('show');
+      const email=emailInput.value.trim().toLowerCase();
+      if(!email || !email.includes('@')) return;
+      sendButton.disabled=true;
+      sendButton.textContent='Enviando…';
+      clearStatus(sendStatus);
       try{
-        await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email})});
-        status.textContent='Si el correo está autorizado, recibirás un enlace de acceso. Abre el email y pulsa “Entrar en APP STR”.';
-        status.classList.add('show');
+        await fetch(REQUEST,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email})});
+        showStatus(sendStatus,'Si el correo está autorizado, recibirás un código de acceso.','ok');
+        setTimeout(()=>showCodeStep(email),350);
       }catch(_){
-        status.textContent='No se ha podido completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.';
-        status.classList.add('show');
-      }finally{button.disabled=false;button.textContent='Recibir enlace de acceso'}
+        showStatus(sendStatus,'No se ha podido completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.','bad');
+      }finally{
+        sendButton.disabled=false;
+        sendButton.textContent='Recibir código de acceso';
+      }
     });
+
+    codeForm.addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const code=cleanCode(codeInput.value);
+      if(!pendingEmail || code.length!==6) return;
+      verifyButton.disabled=true;
+      verifyButton.textContent='Verificando…';
+      clearStatus(verifyStatus);
+
+      try{
+        const response=await fetch(VERIFY,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email:pendingEmail,code})});
+        const result=await response.json().catch(()=>({}));
+
+        if(!result?.ok || !result?.verified || !result?.token_hash){
+          const msg=result?.reason==='locked'
+            ? 'Código bloqueado por exceso de intentos. Solicita uno nuevo.'
+            : result?.reason==='not_allowed'
+              ? 'Este correo ya no tiene acceso al área privada. Ponte en contacto con tu delegado sindical.'
+              : 'El código no es correcto, ya se ha usado o ha caducado.';
+          showStatus(verifyStatus,msg,'bad');
+          return;
+        }
+
+        const {data,error}=await supabase.auth.verifyOtp({
+          token_hash:result.token_hash,
+          type:result.token_type || 'magiclink'
+        });
+
+        if(error || !data?.session){
+          showStatus(verifyStatus,'El código era correcto, pero no se pudo iniciar la sesión. Inténtalo de nuevo.','bad');
+          return;
+        }
+
+        if(!(await authorized())){
+          await supabase.auth.signOut();
+          showStatus(verifyStatus,'Este correo no tiene acceso al área privada. Ponte en contacto con tu delegado sindical.','bad');
+          return;
+        }
+
+        sessionStorage.removeItem('strLabPendingEmail');
+        showStatus(verifyStatus,'Acceso correcto. Entrando en el área privada…','ok');
+        window.location.replace('area-privada.html');
+      }catch(_){
+        showStatus(verifyStatus,'No se ha podido completar la verificación. Comprueba tu conexión.','bad');
+      }finally{
+        verifyButton.disabled=false;
+        verifyButton.textContent='Entrar';
+      }
+    });
+
+    document.getElementById('change-email').addEventListener('click',showEmailStep);
+
+    const {data:{session}}=await supabase.auth.getSession();
+    if(session && await authorized()){
+      window.location.replace('area-privada.html');
+    }else if(session){
+      await supabase.auth.signOut();
+      showEmailStep();
+    }else{
+      const saved=sessionStorage.getItem('strLabPendingEmail');
+      if(saved){
+        emailInput.value=saved;
+        showCodeStep(saved);
+      }
+    }
   </script>
 </body>
 </html>
