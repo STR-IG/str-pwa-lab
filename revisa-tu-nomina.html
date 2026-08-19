@@ -396,6 +396,145 @@
       margin-top: 13px;
     }
 
+    .work-mode-section {
+      margin-top: 22px;
+    }
+
+    .work-mode-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 2px 10px;
+    }
+
+    .work-mode-heading h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .work-mode-heading span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .work-mode-grid {
+      display: grid;
+      gap: 11px;
+    }
+
+    .work-mode-card {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 16px;
+      border: 2px solid #dedee2;
+      border-radius: 19px;
+      color: var(--ink);
+      background: var(--surface);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .04);
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .work-mode-card:active { transform: scale(.992); }
+
+    .work-mode-card.selected {
+      border-color: #8fd1ad;
+      background: #fbfffc;
+    }
+
+    .work-mode-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      color: var(--red-dark);
+      background: #fff0f1;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .work-mode-card.selected .work-mode-icon {
+      color: #17603d;
+      background: #e4f5eb;
+    }
+
+    .work-mode-copy strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .work-mode-copy small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .work-mode-status {
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: #707076;
+      background: #eeeeef;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+    }
+
+    .work-mode-card.selected .work-mode-status {
+      color: #17603d;
+      background: #dff3e7;
+    }
+
+    .work-mode-note {
+      margin: 10px 3px 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .work-mode-config {
+      margin-top: 12px;
+      border-color: #a9d9bf;
+      background: #fbfffc;
+    }
+
+    .work-mode-config-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .work-mode-config-badge {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: #17603d;
+      background: #dff3e7;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .documents-section {
+      animation: reveal-section .22s ease-out;
+    }
+
+    @keyframes reveal-section {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .documents-heading {
       display: flex;
       align-items: center;
@@ -832,6 +971,16 @@
       border-top: 1px solid #dedee2;
     }
 
+    .salary-simulator summary {
+      color: var(--red-dark);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.4;
+    }
+
+    .salary-simulator[open] summary { margin-bottom: 8px; }
+
     .salary-results {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1156,6 +1305,21 @@
     @media (max-width: 390px) {
       .document-line { display: block; }
       .status-pill { display: inline-block; margin-top: 7px; }
+      .work-mode-card {
+        grid-template-columns: 43px 1fr;
+        padding: 14px;
+      }
+      .work-mode-icon { width: 43px; height: 43px; }
+      .work-mode-status {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: -5px;
+      }
+      .work-mode-config-header { display: block; }
+      .work-mode-config-badge {
+        display: inline-block;
+        margin-top: 9px;
+      }
       .actions { grid-template-columns: 1fr; }
       .analysis-actions { grid-template-columns: 1fr; }
       .schedule-grid,
@@ -1218,47 +1382,151 @@
         </button>
       </section>
 
-      <div class="documents-heading">
-        <h2>Documentos</h2>
-        <span id="document-count" class="document-count">0 de 2 guardados</span>
-      </div>
-
-      <article id="timesheet-card" class="document-card">
-        <div class="document-card-top">
-          <span class="document-icon" aria-hidden="true">🗓️</span>
-          <div class="document-info">
-            <div class="document-line">
-              <h3 id="timesheet-card-title" class="document-title">Registro de jornada</h3>
-              <span id="timesheet-status" class="status-pill">Pendiente</span>
-            </div>
-            <p class="document-help">Resumen de variables del mes.</p>
-          </div>
+      <section class="work-mode-section" aria-labelledby="work-mode-title">
+        <div class="work-mode-heading">
+          <h2 id="work-mode-title">¿Qué jornada tuviste?</h2>
+          <span id="work-mode-selection-summary">Elige una opción</span>
         </div>
-        <button id="open-timesheet" class="card-button" type="button">Añadir imagen</button>
-      </article>
 
-      <article id="payroll-card" class="document-card locked">
-        <div class="document-card-top">
-          <span class="document-icon" aria-hidden="true">🧾</span>
-          <div class="document-info">
-            <div class="document-line">
-              <h3 id="payroll-card-title" class="document-title">Nómina</h3>
-              <span id="payroll-status" class="status-pill">Bloqueada</span>
-            </div>
-            <p id="payroll-help" class="document-help">Completa primero el registro de jornada.</p>
-          </div>
+        <div class="work-mode-grid" role="group" aria-label="Tipo de jornada del periodo">
+          <button id="work-mode-full" class="work-mode-card" type="button" aria-pressed="false">
+            <span class="work-mode-icon" aria-hidden="true">100%</span>
+            <span class="work-mode-copy">
+              <strong>Jornada completa · 100 %</strong>
+              <small>Sin reducción de jornada durante este mes.</small>
+            </span>
+            <span id="work-mode-full-status" class="work-mode-status">Elegir</span>
+          </button>
+
+          <button id="work-mode-reduced" class="work-mode-card" type="button" aria-pressed="false">
+            <span class="work-mode-icon" aria-hidden="true">↘%</span>
+            <span class="work-mode-copy">
+              <strong>Jornada reducida</strong>
+              <small>Con porcentaje reducido todo el mes o solo durante unos días.</small>
+            </span>
+            <span id="work-mode-reduced-status" class="work-mode-status">Elegir</span>
+          </button>
         </div>
-        <button id="open-payroll" class="card-button" type="button" disabled>Completa primero la jornada</button>
-      </article>
 
-      <section id="completion-panel" class="completion-panel" hidden>
-        <strong>✓ Los dos documentos están guardados</strong>
-        <p>Ya puedes comprobar los datos detectados en el registro de jornada.</p>
-        <button id="start-analysis" class="primary" type="button">Analizar periodo</button>
-        <p id="analysis-ready-status" class="final-status" role="status" hidden></p>
+        <p class="work-mode-note">Esta elección adapta los cálculos. Puedes cambiarla sin borrar las imágenes guardadas.</p>
+
+        <section id="reduction-setup" class="schedule-panel work-mode-config" aria-labelledby="schedule-title" hidden>
+          <input id="schedule-type" type="hidden" value="">
+          <div class="work-mode-config-header">
+            <div>
+              <h2 id="schedule-title">Configura tu reducción</h2>
+              <p>Indica el porcentaje de ocupación y si se aplicó durante todo el mes o solo una parte.</p>
+            </div>
+            <span class="work-mode-config-badge">Jornada reducida</span>
+          </div>
+
+          <div class="schedule-grid">
+            <div id="percentage-field" class="schedule-field">
+              <label for="work-percentage">Porcentaje de ocupación</label>
+              <input id="work-percentage" type="text" inputmode="decimal" placeholder="Ejemplo: 86,20" autocomplete="off">
+            </div>
+
+            <div id="duration-field" class="schedule-field">
+              <label for="reduction-duration">Duración</label>
+              <select id="reduction-duration">
+                <option value="whole">Todo el mes</option>
+                <option value="partial">Solo una parte del mes</option>
+              </select>
+            </div>
+
+            <div id="reduction-dates" class="schedule-field full" hidden>
+              <div class="schedule-grid">
+                <div class="schedule-field">
+                  <label for="reduction-start">Desde</label>
+                  <input id="reduction-start" type="date">
+                </div>
+                <div class="schedule-field">
+                  <label for="reduction-end">Hasta</label>
+                  <input id="reduction-end" type="date">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p id="schedule-equivalence" class="schedule-equivalence" hidden></p>
+
+          <details class="salary-simulator">
+            <summary>Comparar cuánto cobrarías al 100 %</summary>
+            <p>Simulación opcional del salario bruto fijo. Los pluses variables se revisan aparte con las cantidades reales.</p>
+
+            <div class="schedule-grid">
+              <div class="schedule-field">
+                <label for="salary-source">Cantidad que conoces</label>
+                <select id="salary-source">
+                  <option value="full">Bruto fijo mensual al 100 %</option>
+                  <option value="current">Bruto fijo mensual actual</option>
+                </select>
+              </div>
+              <div class="schedule-field">
+                <label for="salary-amount">Importe bruto fijo</label>
+                <input id="salary-amount" type="text" inputmode="decimal" placeholder="Ejemplo: 2.834,00 €" autocomplete="off">
+              </div>
+            </div>
+
+            <div id="salary-results" class="salary-results" hidden>
+              <div class="salary-result">
+                <small>Jornada completa · 100 %</small>
+                <strong id="full-salary-result">—</strong>
+              </div>
+              <div class="salary-result highlight">
+                <small id="current-salary-label">Tu jornada actual</small>
+                <strong id="current-salary-result">—</strong>
+              </div>
+              <div id="salary-difference" class="salary-difference"></div>
+            </div>
+            <p class="salary-note">Estimación orientativa antes de IRPF y cotizaciones. Si la reducción solo afectó a parte del mes, se prorratea por los días indicados.</p>
+          </details>
+        </section>
       </section>
 
-      <p class="local-note"><span aria-hidden="true">🛡️</span><span>Las imágenes se guardan en un espacio privado asociado a tu cuenta y no tienen enlaces públicos. Podrás recuperarlas al volver a elegir el mismo mes.</span></p>
+      <div id="documents-section" class="documents-section" hidden>
+        <div class="documents-heading">
+          <h2>Documentos</h2>
+          <span id="document-count" class="document-count">0 de 2 guardados</span>
+        </div>
+
+        <article id="timesheet-card" class="document-card">
+          <div class="document-card-top">
+            <span class="document-icon" aria-hidden="true">🗓️</span>
+            <div class="document-info">
+              <div class="document-line">
+                <h3 id="timesheet-card-title" class="document-title">Registro de jornada</h3>
+                <span id="timesheet-status" class="status-pill">Pendiente</span>
+              </div>
+              <p class="document-help">Resumen de variables del mes.</p>
+            </div>
+          </div>
+          <button id="open-timesheet" class="card-button" type="button">Añadir imagen</button>
+        </article>
+
+        <article id="payroll-card" class="document-card locked">
+          <div class="document-card-top">
+            <span class="document-icon" aria-hidden="true">🧾</span>
+            <div class="document-info">
+              <div class="document-line">
+                <h3 id="payroll-card-title" class="document-title">Nómina</h3>
+                <span id="payroll-status" class="status-pill">Bloqueada</span>
+              </div>
+              <p id="payroll-help" class="document-help">Completa primero el registro de jornada.</p>
+            </div>
+          </div>
+          <button id="open-payroll" class="card-button" type="button" disabled>Completa primero la jornada</button>
+        </article>
+
+        <section id="completion-panel" class="completion-panel" hidden>
+          <strong>✓ Los dos documentos están guardados</strong>
+          <p>Ya puedes comprobar los datos detectados en el registro de jornada.</p>
+          <button id="start-analysis" class="primary" type="button">Analizar periodo</button>
+          <p id="analysis-ready-status" class="final-status" role="status" hidden></p>
+        </section>
+
+        <p class="local-note"><span aria-hidden="true">🛡️</span><span>Las imágenes se guardan en un espacio privado asociado a tu cuenta y no tienen enlaces públicos. Podrás recuperarlas al volver a elegir el mismo mes.</span></p>
+      </div>
     </section>
 
     <section id="history-screen" aria-labelledby="history-screen-title" hidden>
@@ -1320,80 +1588,6 @@
 
           <div id="analysis-fields" class="analysis-fields"></div>
 
-          <section class="schedule-panel" aria-labelledby="schedule-title">
-            <h2 id="schedule-title">Tu jornada este mes</h2>
-            <p>Indica si tuviste reducción para que la futura revisión no compare tu nómina con una jornada completa.</p>
-
-            <div class="schedule-grid">
-              <div class="schedule-field full">
-                <label for="schedule-type">Situación durante el mes</label>
-                <select id="schedule-type">
-                  <option value="full">Jornada completa</option>
-                  <option value="reduced">Jornada reducida</option>
-                </select>
-              </div>
-
-              <div id="percentage-field" class="schedule-field" hidden>
-                <label for="work-percentage">Porcentaje de ocupación</label>
-                <input id="work-percentage" type="text" inputmode="decimal" placeholder="Ejemplo: 86,20" autocomplete="off">
-              </div>
-
-              <div id="duration-field" class="schedule-field" hidden>
-                <label for="reduction-duration">Duración</label>
-                <select id="reduction-duration">
-                  <option value="whole">Todo el mes</option>
-                  <option value="partial">Solo una parte del mes</option>
-                </select>
-              </div>
-
-              <div id="reduction-dates" class="schedule-field full" hidden>
-                <div class="schedule-grid">
-                  <div class="schedule-field">
-                    <label for="reduction-start">Desde</label>
-                    <input id="reduction-start" type="date">
-                  </div>
-                  <div class="schedule-field">
-                    <label for="reduction-end">Hasta</label>
-                    <input id="reduction-end" type="date">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p id="schedule-equivalence" class="schedule-equivalence" hidden></p>
-
-            <div class="salary-simulator">
-              <h3>¿Cuánto cobrarías con otra jornada?</h3>
-              <p>Simulación opcional del salario bruto fijo. Los pluses variables se revisarán aparte con las cantidades reales.</p>
-
-              <div class="schedule-grid">
-                <div class="schedule-field">
-                  <label for="salary-source">Cantidad que conoces</label>
-                  <select id="salary-source">
-                    <option value="full">Bruto fijo mensual al 100 %</option>
-                    <option value="current">Bruto fijo mensual actual</option>
-                  </select>
-                </div>
-                <div class="schedule-field">
-                  <label for="salary-amount">Importe bruto fijo</label>
-                  <input id="salary-amount" type="text" inputmode="decimal" placeholder="Ejemplo: 2.834,00 €" autocomplete="off">
-                </div>
-              </div>
-
-              <div id="salary-results" class="salary-results" hidden>
-                <div class="salary-result">
-                  <small>Jornada completa · 100 %</small>
-                  <strong id="full-salary-result">—</strong>
-                </div>
-                <div class="salary-result highlight">
-                  <small id="current-salary-label">Tu jornada actual</small>
-                  <strong id="current-salary-result">—</strong>
-                </div>
-                <div id="salary-difference" class="salary-difference"></div>
-              </div>
-              <p class="salary-note">Estimación orientativa antes de IRPF y cotizaciones. Si la reducción solo afectó a parte del mes, se prorratea por los días indicados.</p>
-            </div>
-          </section>
           <p id="analysis-error" class="error" role="alert" hidden></p>
 
           <div class="analysis-actions">
@@ -1500,6 +1694,13 @@
 
     const month = document.getElementById('month');
     const year = document.getElementById('year');
+    const workModeFull = document.getElementById('work-mode-full');
+    const workModeReduced = document.getElementById('work-mode-reduced');
+    const workModeFullStatus = document.getElementById('work-mode-full-status');
+    const workModeReducedStatus = document.getElementById('work-mode-reduced-status');
+    const workModeSelectionSummary = document.getElementById('work-mode-selection-summary');
+    const reductionSetup = document.getElementById('reduction-setup');
+    const documentsSection = document.getElementById('documents-section');
     const periodScreen = document.getElementById('period-screen');
     const historyScreen = document.getElementById('history-screen');
     const analysisScreen = document.getElementById('analysis-screen');
@@ -1597,7 +1798,10 @@
       {
         key: 'rotation',
         label: 'Plus rotatividad',
-        patterns: [/PLUS\s+ROT[A-Z]*VIDAD/],
+        patterns: [
+          /PLUS\s+ROT[A-Z0-9]*VIDAD/,
+          /P(?:L)?U[S5]\s*ROT[A-Z0-9]*V[A-Z0-9]*D[A-Z0-9]?D/
+        ],
         max: 31,
         wholeNumber: true
       },
@@ -1611,7 +1815,10 @@
       {
         key: 'night',
         label: 'Plus nocturno',
-        patterns: [/PLUS\s+NOCTUR[NM]/],
+        patterns: [
+          /PLUS\s+NOCTUR[NM]/,
+          /P(?:L)?U[S5]\s*NOCT[A-Z0-9]{2,10}/
+        ],
         max: 200
       },
       {
@@ -1623,7 +1830,10 @@
       {
         key: 'holiday',
         label: 'Plus festivo',
-        patterns: [/PLUS(?:ES)?\s+FESTIVO/],
+        patterns: [
+          /PLUS(?:ES)?\s+FESTIVO/,
+          /P(?:L)?U[S5](?:E[S5])?\s*FEST[A-Z0-9]{2,8}/
+        ],
         max: 200
       },
       {
@@ -1651,14 +1861,20 @@
       {
         key: 'holidayDiets',
         label: 'Dietas festivos',
-        patterns: [/DIETAS?\s+FESTIVOS?/],
+        patterns: [
+          /DIETAS?\s+FESTIVOS?/,
+          /DIET[A-Z0-9]{1,5}\s*FEST[A-Z0-9]{2,8}/
+        ],
         max: 31,
         wholeNumber: true
       },
       {
         key: 'vacation',
         label: 'Pluses vacaciones',
-        patterns: [/PLUS(?:ES)?\s+VACACIONES?/],
+        patterns: [
+          /PLUS(?:ES)?\s+VACACIONES?/,
+          /P(?:L)?U[S5](?:E[S5])?\s*VAC[A-Z0-9]{3,14}/
+        ],
         max: 31,
         wholeNumber: true
       }
@@ -1818,6 +2034,32 @@
       salaryResults.hidden = false;
     }
 
+    function renderWorkModeSelection() {
+      const selected = scheduleType.value;
+      const isFull = selected === 'full';
+      const isReduced = selected === 'reduced';
+
+      workModeFull.classList.toggle('selected', isFull);
+      workModeReduced.classList.toggle('selected', isReduced);
+      workModeFull.setAttribute('aria-pressed', String(isFull));
+      workModeReduced.setAttribute('aria-pressed', String(isReduced));
+      workModeFullStatus.textContent = isFull ? 'Seleccionada' : 'Elegir';
+      workModeReducedStatus.textContent = isReduced ? 'Seleccionada' : 'Elegir';
+      reductionSetup.hidden = !isReduced;
+      documentsSection.hidden = !isFull && !isReduced;
+
+      if (isFull) {
+        workModeSelectionSummary.textContent = 'Completa · 100 %';
+      } else if (isReduced) {
+        const percentage = Number(String(workPercentage.value || '').replace(',', '.'));
+        workModeSelectionSummary.textContent = Number.isFinite(percentage) && percentage > 0 && percentage < 100
+          ? `Reducida · ${String(percentage).replace('.', ',')} %`
+          : 'Reducción pendiente';
+      } else {
+        workModeSelectionSummary.textContent = 'Elige una opción';
+      }
+    }
+
     function updateScheduleUI() {
       const reduced = scheduleType.value === 'reduced';
       const partial = reduced && reductionDuration.value === 'partial';
@@ -1846,6 +2088,7 @@
         scheduleEquivalence.hidden = true;
         scheduleEquivalence.textContent = '';
       }
+      renderWorkModeSelection();
       updateSalaryComparison();
     }
 
@@ -1853,7 +2096,26 @@
       analysisConfirmed.hidden = true;
       confirmAnalysisButton.dataset.action = 'confirm';
       confirmAnalysisButton.textContent = 'Confirmar datos';
+      confirmedTimesheetAnalyses.delete(periodKey());
       updateScheduleUI();
+      if (scheduleType.value === 'full' || scheduleType.value === 'reduced') {
+        saveWorkSchedule(currentScheduleSettings());
+      }
+      updatePeriodCards();
+    }
+
+    function selectWorkMode(type) {
+      if (type !== 'full' && type !== 'reduced') return;
+      const changed = scheduleType.value !== type;
+      scheduleType.value = type;
+      if (changed) {
+        markScheduleDirty();
+      } else {
+        updateScheduleUI();
+        updatePeriodCards();
+      }
+      const target = type === 'reduced' ? reductionSetup : documentsSection;
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function saveWorkSchedule(settings) {
@@ -1872,7 +2134,7 @@
         } catch {}
       }
       settings ||= {
-        type: 'full',
+        type: '',
         percentage: '',
         duration: 'whole',
         start: '',
@@ -1880,7 +2142,7 @@
         salarySource: 'full',
         salaryAmount: ''
       };
-      scheduleType.value = settings.type || 'full';
+      scheduleType.value = ['full', 'reduced'].includes(settings.type) ? settings.type : '';
       workPercentage.value = settings.percentage === null || settings.percentage === undefined ? '' : String(settings.percentage);
       reductionDuration.value = settings.duration || 'whole';
       reductionStart.value = settings.start || '';
@@ -1927,6 +2189,7 @@
     async function loadStoredDocuments() {
       const requestVersion = ++storageLoadVersion;
       clearAllDocuments();
+      loadWorkSchedule();
 
       if (!currentUserId) {
         updatePeriodCards();
@@ -2447,7 +2710,10 @@
         .then(async () => {
           const worker = await getOcrWorker();
           if (worker.setParameters) {
-            await worker.setParameters({ tessedit_pageseg_mode: String(pageSegMode) });
+            await worker.setParameters({
+              tessedit_pageseg_mode: String(pageSegMode),
+              preserve_interword_spaces: '1'
+            });
           }
           const result = await worker.recognize(file);
           return result?.data?.text || '';
@@ -2489,7 +2755,7 @@
       });
     }
 
-    function createAnalysisCanvas(image, region, targetWidth) {
+    function createAnalysisCanvas(image, region, targetWidth, options = {}) {
       const sourceWidth = Math.max(1, Math.round(image.naturalWidth * region.width));
       const sourceHeight = Math.max(1, Math.round(image.naturalHeight * region.height));
       const sourceLeft = Math.round(image.naturalWidth * region.left);
@@ -2528,6 +2794,43 @@
         pixels.data[index + 1] = contrast;
         pixels.data[index + 2] = contrast;
       }
+
+      if (options.removeGridLines) {
+        const horizontalLines = new Uint8Array(canvas.height);
+        const verticalLines = new Uint8Array(canvas.width);
+        const horizontalThreshold = Math.max(40, Math.round(canvas.width * .42));
+        const verticalThreshold = Math.max(40, Math.round(canvas.height * .24));
+
+        for (let y = 0; y < canvas.height; y += 1) {
+          let darkPixels = 0;
+          for (let x = 0; x < canvas.width; x += 1) {
+            if (pixels.data[(y * canvas.width + x) * 4] < 105) darkPixels += 1;
+          }
+          if (darkPixels >= horizontalThreshold) horizontalLines[y] = 1;
+        }
+
+        for (let x = 0; x < canvas.width; x += 1) {
+          let darkPixels = 0;
+          for (let y = 0; y < canvas.height; y += 1) {
+            if (pixels.data[(y * canvas.width + x) * 4] < 105) darkPixels += 1;
+          }
+          if (darkPixels >= verticalThreshold) verticalLines[x] = 1;
+        }
+
+        for (let y = 0; y < canvas.height; y += 1) {
+          for (let x = 0; x < canvas.width; x += 1) {
+            let remove = false;
+            for (let offset = -2; offset <= 2 && !remove; offset += 1) {
+              remove = Boolean(horizontalLines[y + offset] || verticalLines[x + offset]);
+            }
+            if (!remove) continue;
+            const index = (y * canvas.width + x) * 4;
+            pixels.data[index] = 255;
+            pixels.data[index + 1] = 255;
+            pixels.data[index + 2] = 255;
+          }
+        }
+      }
       context.putImageData(pixels, 0, 0);
       return canvas;
     }
@@ -2535,19 +2838,34 @@
     async function createTimesheetOcrSources(blob) {
       const { image, imageUrl } = await loadImageForAnalysis(blob);
       try {
-        const sources = [createAnalysisCanvas(image, { left: 0, top: 0, width: 1, height: 1 }, 1600)];
+        const sources = [{
+          source: createAnalysisCanvas(image, { left: 0, top: 0, width: 1, height: 1 }, 1800),
+          pageSegMode: '11'
+        }];
         const ratio = image.naturalHeight / Math.max(1, image.naturalWidth);
         if (ratio >= .8) {
-          sources.push(createAnalysisCanvas(
-            image,
-            { left: 0, top: .5, width: .7, height: .48 },
-            1800
-          ));
-          sources.push(createAnalysisCanvas(
-            image,
-            { left: 0, top: .66, width: .62, height: .27 },
-            1900
-          ));
+          sources.push({
+            source: createAnalysisCanvas(
+              image,
+              { left: .02, top: .48, width: .92, height: .5 },
+              2200
+            ),
+            pageSegMode: '11'
+          });
+          sources.push({
+            source: createAnalysisCanvas(
+              image,
+              { left: .02, top: .61, width: .76, height: .36 },
+              2400,
+              { removeGridLines: true }
+            ),
+            pageSegMode: '6'
+          });
+        } else {
+          sources.push({
+            source: createAnalysisCanvas(image, { left: 0, top: 0, width: 1, height: 1 }, 2400),
+            pageSegMode: '6'
+          });
         }
         return sources;
       } finally {
@@ -2603,14 +2921,15 @@
         analysisFields.appendChild(field);
       });
 
-      analysisDetectedCount.textContent = `${detected} de ${TIMESHEET_VARIABLES.length} conceptos ${confirmed ? 'confirmados' : 'detectados'}`;
+      analysisDetectedCount.textContent = confirmed
+        ? `${detected} cantidades confirmadas`
+        : `${detected} cantidades leídas automáticamente`;
       analysisError.hidden = true;
       analysisError.textContent = '';
       analysisConfirmed.hidden = true;
       confirmAnalysisButton.disabled = false;
       confirmAnalysisButton.dataset.action = confirmed ? 'back' : 'confirm';
       confirmAnalysisButton.textContent = confirmed ? 'Volver al resumen' : 'Confirmar datos';
-      loadWorkSchedule();
       analysisForm.hidden = false;
     }
 
@@ -2671,7 +2990,9 @@
         }
         const sourcesToRead = texts.length && ocrSources.length > 1 ? ocrSources.slice(1) : ocrSources;
         for (const ocrSource of sourcesToRead) {
-          texts.push(await recognizeTextLocally(ocrSource, '11'));
+          const source = ocrSource?.source || ocrSource;
+          const pageSegMode = ocrSource?.pageSegMode || '11';
+          texts.push(await recognizeTextLocally(source, pageSegMode));
         }
         if (requestVersion !== analysisRunVersion) return;
 
@@ -2749,6 +3070,11 @@
       }
 
       const scheduleSettings = currentScheduleSettings();
+      if (scheduleSettings.type !== 'full' && scheduleSettings.type !== 'reduced') {
+        analysisError.textContent = 'Vuelve al inicio y elige «Jornada completa» o «Jornada reducida».';
+        analysisError.hidden = false;
+        return;
+      }
       const schedule = computeScheduleFactor(scheduleSettings);
       if (!schedule) {
         analysisError.textContent = scheduleSettings.duration === 'partial'
@@ -2943,6 +3269,7 @@
       analysisScreen.hidden = true;
       periodScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver a la pantalla principal');
+      updateScheduleUI();
       updatePeriodCards();
       window.scrollTo({ top: 0, behavior: 'auto' });
       document.getElementById('period-page-title').focus({ preventScroll: true });
@@ -3053,6 +3380,8 @@
 
     document.getElementById('open-timesheet').addEventListener('click', () => openDocument('timesheet'));
     document.getElementById('open-payroll').addEventListener('click', () => openDocument('payroll'));
+    workModeFull.addEventListener('click', () => selectWorkMode('full'));
+    workModeReduced.addEventListener('click', () => selectWorkMode('reduced'));
     startAnalysisButton.addEventListener('click', () => startTimesheetAnalysis());
     retryAnalysisButton.addEventListener('click', () => startTimesheetAnalysis(true));
     confirmAnalysisButton.addEventListener('click', handleAnalysisPrimaryAction);
@@ -3104,6 +3433,7 @@
     if (currentUserId) {
       await loadStoredDocuments();
     } else {
+      loadWorkSchedule();
       updatePeriodCards();
     }
   </script>
