@@ -1332,7 +1332,7 @@
     const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
     const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
     const PERSONAL_DATA_LABELS = [
-      /\bTRABAJADOR(?:A)?\b/,
+      /\bTRABAJADOR\s*(?:\/|\s)\s*A\b/,
       /\bNOMBRE(?:\s+Y\s+APELLIDOS)?\b/,
       /\bAPELLIDOS?\b/,
       /\b(?:DNI|NIE|NIF)\b/,
