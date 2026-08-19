@@ -1,9 +1,8 @@
 (() => {
   'use strict';
 
-  // LAB: el registro de jornada se lee por NOMBRE DE CONCEPTO, no por posición de fila.
-  // Así funciona aunque «Comidas Can Guasch» aparezca antes o después de «Plus rotatividad»
-  // y aunque un mes tenga menos filas que otro.
+  // LAB: primera versión centrada en jornada sin reducción.
+  // Leemos únicamente los 8 conceptos habituales del «Resumen de variables del mes».
   const TARGETS = [
     {
       key: 'rotation',
@@ -36,19 +35,7 @@
       key: 'holiday',
       id: 'analysis-holiday',
       max: 200,
-      labels: [/PLUS\s+FESTIVO(?!\s+TEOR)/, /PLUS\s+FESTIVO/]
-    },
-    {
-      key: 'unpaidNight',
-      id: 'analysis-unpaidNight',
-      max: 24,
-      labels: [/NOPAGA\s+P?NOCTURN.*TEOR/, /NOPAGA.*NOCTURN/]
-    },
-    {
-      key: 'unpaidHoliday',
-      id: 'analysis-unpaidHoliday',
-      max: 24,
-      labels: [/NOPAGA\s+P?FESTIVO.*TEOR/, /NOPAGA.*FESTIVO/]
+      labels: [/PLUS\s+FESTIVO/, /FESTIVO/]
     },
     {
       key: 'shift12',
@@ -73,6 +60,7 @@
     }
   ];
 
+  const LEGACY_REDUCTION_IDS = ['analysis-unpaidNight', 'analysis-unpaidHoliday'];
   let running = false;
   let doneForSrc = '';
 
@@ -86,9 +74,20 @@
       .trim();
   }
 
+  function hideReductionFields() {
+    LEGACY_REDUCTION_IDS.forEach((id) => {
+      const input = document.getElementById(id);
+      if (!input) return;
+      const wrapper = input.closest('.analysis-field, .field, .analysis-row, .variable-row') || input.parentElement;
+      if (wrapper) wrapper.style.display = 'none';
+    });
+  }
+
   function safeWording() {
-    document.querySelectorAll('input[id^="analysis-"]').forEach((input) => {
-      if (!input.value.trim()) input.placeholder = 'No leído automáticamente';
+    hideReductionFields();
+    TARGETS.forEach((target) => {
+      const input = document.getElementById(target.id);
+      if (input && !input.value.trim()) input.placeholder = 'No leído automáticamente';
     });
   }
 
@@ -106,7 +105,7 @@
   }
 
   function numericCandidates(value) {
-    return (normalize(value).match(/\d+(?:[.,]\d+)?/g) || []);
+    return normalize(value).match(/\d+(?:[.,]\d+)?/g) || [];
   }
 
   function findValueInLines(lines, target) {
@@ -115,17 +114,68 @@
       const pattern = target.labels.find((regex) => regex.test(line));
       if (!pattern) continue;
 
+      // Evitamos confundir «Plus de turno» con «Plus de turno 12 horas».
+      if (target.key === 'shift' && /TURNO\s*12|12\s*HORAS?/.test(line)) continue;
+
       const match = pattern.exec(line);
       const tail = match ? line.slice(match.index + match[0].length) : line;
-      // La cantidad está normalmente al final de la misma fila. Si Tesseract la
-      // separa, probamos también la línea siguiente.
       const candidates = [
         ...numericCandidates(tail),
         ...numericCandidates(lines[i + 1] || '')
       ];
       for (const raw of candidates) {
+        if (target.key === 'shift' && Number(String(raw).replace(',', '.')) === 12) continue;
         const value = parseNumber(raw, target);
         if (value !== '') return value;
+      }
+    }
+    return '';
+  }
+
+  function centerY(word) {
+    const box = word?.bbox || {};
+    return ((box.y0 || 0) + (box.y1 || 0)) / 2;
+  }
+
+  function centerX(word) {
+    const box = word?.bbox || {};
+    return ((box.x0 || 0) + (box.x1 || 0)) / 2;
+  }
+
+  // Segundo intento: usamos la posición real de las palabras reconocidas.
+  // Es especialmente útil cuando Tesseract ve «Plus de turno» y «15» pero los
+  // separa en líneas distintas en el texto plano.
+  function findValueByGeometry(result, target) {
+    const words = Array.isArray(result?.data?.words) ? result.data.words : [];
+    if (!words.length) return '';
+
+    const usable = words
+      .filter((word) => normalize(word.text))
+      .map((word) => ({ ...word, n: normalize(word.text), cy: centerY(word), cx: centerX(word) }));
+
+    for (const anchor of usable) {
+      if (!/TURNO|ROTATIVIDAD|GUASCH|NOCTURNO|FESTIVO|VACACIONES?/.test(anchor.n)) continue;
+      const height = Math.max(10, (anchor.bbox?.y1 || 0) - (anchor.bbox?.y0 || 0));
+      const band = usable
+        .filter((word) => Math.abs(word.cy - anchor.cy) <= height * 0.8)
+        .sort((a, b) => a.cx - b.cx);
+      const rowText = band.map((word) => word.n).join(' ');
+      if (!target.labels.some((regex) => regex.test(rowText))) continue;
+      if (target.key === 'shift' && /TURNO\s*12|12\s*HORAS?/.test(rowText)) continue;
+
+      // La cantidad está en la columna derecha; priorizamos los números más a la derecha.
+      const numericWords = band
+        .filter((word) => /\d/.test(word.n))
+        .sort((a, b) => b.cx - a.cx);
+
+      for (const word of numericWords) {
+        const rawCandidates = numericCandidates(word.n);
+        for (const raw of rawCandidates) {
+          const numeric = Number(String(raw).replace(',', '.'));
+          if (target.key === 'shift' && numeric === 12) continue;
+          const value = parseNumber(raw, target);
+          if (value !== '') return value;
+        }
       }
     }
     return '';
@@ -148,7 +198,7 @@
     });
 
     const counter = document.getElementById('analysis-detected-count');
-    if (counter) counter.textContent = `${count} cantidades leídas automáticamente`;
+    if (counter) counter.textContent = `${count} de ${TARGETS.length} cantidades leídas automáticamente`;
     return count;
   }
 
@@ -160,9 +210,6 @@
 
     const rawText = result?.data?.text || '';
     const normalizedText = normalize(rawText);
-
-    // Solo damos por válida la lectura si reconocemos el bloque que nos interesa.
-    // Ignoramos TOTAL HORAS PERIODO, TEÓRICAS, AUSENCIAS y SALDOS.
     if (!/RESUMEN\s+DE\s+VARIABLES/.test(normalizedText) && !/PLUS\s+(?:DE\s+)?TURNO|COMIDAS?.*GUASCH|PLUS\s+ROTATIVIDAD/.test(normalizedText)) {
       return new Map();
     }
@@ -174,7 +221,8 @@
 
     const values = new Map();
     TARGETS.forEach((target) => {
-      const value = findValueInLines(lines, target);
+      let value = findValueInLines(lines, target);
+      if (value === '') value = findValueByGeometry(result, target);
       if (value !== '') values.set(target.key, value);
     });
     return values;
@@ -193,15 +241,15 @@
     const title = document.getElementById('analysis-progress-title');
     const message = document.getElementById('analysis-progress-message');
     if (title) title.textContent = 'Leyendo «Resumen de variables del mes»…';
-    if (message) message.textContent = 'Buscamos cada concepto por su nombre y leemos únicamente su cantidad. Ignoramos horas teóricas, ausencias y saldos.';
+    if (message) message.textContent = 'Buscamos los 8 conceptos habituales y hacemos una segunda lectura por posición cuando una cantidad no aparece en el texto.';
 
     try {
       const results = await readSummaryByConcept(src);
       const count = applyResults(results);
 
-      if (title) title.textContent = count ? 'Lectura terminada' : 'No hemos podido leer las variables';
+      if (title) title.textContent = count === TARGETS.length ? 'Lectura completa' : (count ? 'Lectura terminada' : 'No hemos podido leer las variables');
       if (message) message.textContent = count
-        ? `Se han leído ${count} cantidades del resumen mensual. Comprueba las cifras antes de confirmar.`
+        ? `Se han leído ${count} de ${TARGETS.length} cantidades del resumen mensual. Comprueba las cifras antes de confirmar.`
         : 'No hemos leído ninguna cantidad con suficiente seguridad. No se ha rellenado ningún valor dudoso.';
     } catch (_) {
       applyResults(new Map());
