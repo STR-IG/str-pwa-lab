@@ -952,6 +952,7 @@
     }
 
     .privacy-scan.blocked,
+    .privacy-scan.wrong-document,
     .privacy-scan.failed {
       border-color: #efb0b5;
       color: #841d25;
@@ -1348,19 +1349,35 @@
       /\bCENTRO\s+DE\s+TRABAJO\b/,
       /\bPOSICION\b/
     ];
+    const DOCUMENT_KIND_MARKERS = {
+      timesheet: [
+        /REGISTRO\s+DE\s+JORNADA/,
+        /RESUMEN\s+DE\s+VARIABLES/,
+        /TOTAL\s+HORAS\s+PERIODO/
+      ],
+      payroll: [
+        /DEVENGOS?\s+Y\s+DEDUCCIONES?/,
+        /LIQUIDO\s+TOTAL/,
+        /DESGLOSE\s+PAGOS?/,
+        /SALARIO\s+MIN(?:IMO)?\.?\s+GARANTIZADO/,
+        /TOTAL\s+COTIZ.*(?:SS|IRPF)/
+      ]
+    };
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     const TIMESHEET_VARIABLES = [
       {
         key: 'rotation',
         label: 'Plus rotatividad',
         patterns: [/PLUS\s+ROT[A-Z]*VIDAD/],
-        max: 31
+        max: 31,
+        wholeNumber: true
       },
       {
         key: 'meals',
         label: 'Comidas Can Guasch',
         patterns: [/COMIDAS?\s+CAN\s+GUA?SCH/],
-        max: 31
+        max: 31,
+        wholeNumber: true
       },
       {
         key: 'night',
@@ -1399,19 +1416,22 @@
         label: 'Plus de turno 12 horas',
         patterns: [/PLUS\s+(?:DE\s+)?TU(?:R[NM]|M)O\s+12\s+HORAS/],
         max: 31,
-        labelNumber: 12
+        labelNumber: 12,
+        wholeNumber: true
       },
       {
         key: 'holidayDiets',
         label: 'Dietas festivos',
         patterns: [/DIETAS?\s+FESTIVOS?/],
-        max: 31
+        max: 31,
+        wholeNumber: true
       },
       {
         key: 'vacation',
         label: 'Pluses vacaciones',
         patterns: [/PLUS(?:ES)?\s+VACACIONES?/],
-        max: 31
+        max: 31,
+        wholeNumber: true
       }
     ];
     const TIMESHEET_MATCH_ORDER = ['unpaidNight', 'unpaidHoliday', 'shift12', 'holidayDiets', 'vacation', 'rotation', 'meals', 'night', 'shift', 'holiday'];
@@ -1794,6 +1814,21 @@
         .trim();
     }
 
+    function detectDocumentKind(text) {
+      const normalized = normalizeOcrText(text);
+      if (!normalized) return '';
+      const scores = Object.fromEntries(
+        Object.entries(DOCUMENT_KIND_MARKERS).map(([kind, patterns]) => [
+          kind,
+          patterns.filter((pattern) => pattern.test(normalized)).length
+        ])
+      );
+      if (scores.timesheet === scores.payroll) return '';
+      if (scores.timesheet > scores.payroll) return 'timesheet';
+      if (scores.payroll > scores.timesheet) return 'payroll';
+      return '';
+    }
+
     function normalizeOcrLine(text) {
       return String(text || '')
         .normalize('NFD')
@@ -1856,6 +1891,7 @@
         inferredDecimal = true;
       }
       if (quantity > variable.max) return null;
+      if (variable.wholeNumber && !Number.isInteger(quantity)) return null;
 
       const rounded = Math.round(quantity * 100) / 100;
       return {
@@ -1881,6 +1917,7 @@
         .map(normalizeOcrLine)
         .filter(Boolean);
       const summaryIndex = allLines.findIndex((line) => /RESUMEN\s+DE\s+VARIABLES/.test(line));
+      if (summaryIndex < 0 && detectDocumentKind(text) === 'payroll') return new Map();
       const relevantLines = summaryIndex >= 0 ? allLines.slice(summaryIndex + 1) : allLines;
       const balancesIndex = relevantLines.findIndex((line) => /^SALDOS?$/.test(line));
       const lines = balancesIndex >= 0 ? relevantLines.slice(0, balancesIndex) : relevantLines;
@@ -1979,6 +2016,13 @@
           icon: '!',
           title: 'Posibles datos personales detectados',
           message: 'Recorta la imagen dejando únicamente los conceptos y cantidades. Esta imagen no se guardará.'
+        },
+        'wrong-document': {
+          icon: '!',
+          title: 'Documento equivocado',
+          message: activeKind === 'timesheet'
+            ? 'Esta imagen parece una nómina. Selecciona el registro de jornada del mes.'
+            : 'Esta imagen parece un registro de jornada. Selecciona la nómina del mes.'
         },
         failed: {
           icon: '!',
@@ -2093,6 +2137,11 @@
             { left: 0, top: .5, width: .7, height: .48 },
             1800
           ));
+          sources.push(createAnalysisCanvas(
+            image,
+            { left: 0, top: .66, width: .62, height: .27 },
+            1900
+          ));
         }
         return sources;
       } finally {
@@ -2135,6 +2184,7 @@
           status.className = `analysis-field-status${input.value.trim() ? ' detected' : ''}`;
           status.textContent = input.value.trim() ? 'Revisado' : 'Comprobar';
           analysisConfirmed.hidden = true;
+          confirmAnalysisButton.dataset.action = 'confirm';
           confirmAnalysisButton.textContent = 'Confirmar datos';
         });
         analysisInputs.set(variable.key, input);
@@ -2152,7 +2202,8 @@
       analysisError.textContent = '';
       analysisConfirmed.hidden = true;
       confirmAnalysisButton.disabled = false;
-      confirmAnalysisButton.textContent = confirmed ? 'Datos confirmados ✓' : 'Confirmar datos';
+      confirmAnalysisButton.dataset.action = confirmed ? 'back' : 'confirm';
+      confirmAnalysisButton.textContent = confirmed ? 'Volver al resumen' : 'Confirmar datos';
       analysisForm.hidden = false;
     }
 
@@ -2198,6 +2249,18 @@
       try {
         const source = documents.timesheet.blob || documents.timesheet.file;
         if (!source) throw new Error('Timesheet unavailable');
+        if (detectDocumentKind(documents.timesheet.ocrText) === 'payroll') {
+          renderTimesheetAnalysis(new Map());
+          confirmAnalysisButton.dataset.action = 'back';
+          confirmAnalysisButton.textContent = 'Volver al resumen';
+          setAnalysisProgress(
+            'failed',
+            '!',
+            'El documento guardado parece una nómina',
+            'Vuelve al resumen y sustituye el registro de jornada por la imagen correcta.'
+          );
+          return;
+        }
         const texts = [];
         if (documents.timesheet.ocrText) texts.push(documents.timesheet.ocrText);
         let ocrSources;
@@ -2263,6 +2326,12 @@
           input?.focus();
           return;
         }
+        if (variable.wholeNumber && !Number.isInteger(quantity)) {
+          analysisError.textContent = `«${variable.label}» debe ser una cantidad entera, no un importe en euros.`;
+          analysisError.hidden = false;
+          input?.focus();
+          return;
+        }
         const rounded = Math.round(quantity * 100) / 100;
         confirmed.set(variable.key, String(rounded).replace('.', ','));
       }
@@ -2275,9 +2344,10 @@
 
       confirmedTimesheetAnalyses.set(periodKey(), confirmed);
       renderTimesheetAnalysis(confirmed, true);
-      analysisConfirmed.textContent = '✓ Datos de la jornada confirmados para esta prueba. El siguiente desarrollo leerá los conceptos de la nómina.';
+      analysisConfirmed.textContent = '✓ Datos de la jornada confirmados. Pulsa «Volver al resumen» para regresar al periodo.';
       analysisConfirmed.hidden = false;
-      confirmAnalysisButton.textContent = 'Datos confirmados ✓';
+      confirmAnalysisButton.dataset.action = 'back';
+      confirmAnalysisButton.textContent = 'Volver al resumen';
       setAnalysisProgress(
         'ready',
         '✓',
@@ -2288,16 +2358,27 @@
       analysisConfirmed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    function handleAnalysisPrimaryAction() {
+      if (confirmAnalysisButton.dataset.action === 'back') {
+        showPeriodScreen();
+        return;
+      }
+      confirmTimesheetAnalysis();
+    }
+
     async function checkSelectedFilePrivacy(file, scanVersion) {
       try {
         const recognizedText = await recognizeTextLocally(file);
         if (scanVersion !== privacyScanVersion || workingFile !== file) return;
         workingOcrText = recognizedText;
         const readableCharacters = normalizeOcrText(recognizedText).replace(/[^A-Z0-9]/g, '').length;
+        const detectedKind = detectDocumentKind(recognizedText);
         setPrivacyScanState(
           readableCharacters < 8
             ? 'failed'
-            : (containsLikelyPersonalData(recognizedText) ? 'blocked' : 'passed')
+            : (containsLikelyPersonalData(recognizedText)
+              ? 'blocked'
+              : (detectedKind && detectedKind !== activeKind ? 'wrong-document' : 'passed'))
         );
       } catch {
         if (scanVersion !== privacyScanVersion || workingFile !== file) return;
@@ -2329,7 +2410,7 @@
       const hasImage = Boolean(workingUrl && (workingFile || workingSaved));
       const needsUpload = Boolean(workingFile && !workingSaved);
       const checkingPrivacy = needsUpload && privacyScanState === 'checking';
-      const privacyBlocked = needsUpload && ['blocked', 'failed'].includes(privacyScanState);
+      const privacyBlocked = needsUpload && ['blocked', 'wrong-document', 'failed'].includes(privacyScanState);
       const readyToUpload = needsUpload && privacyConfirmation.checked && privacyScanState === 'passed';
       preview.hidden = !hasImage;
       preview.classList.toggle('scan-blocked', privacyBlocked);
@@ -2546,7 +2627,7 @@
     document.getElementById('open-payroll').addEventListener('click', () => openDocument('payroll'));
     startAnalysisButton.addEventListener('click', () => startTimesheetAnalysis());
     retryAnalysisButton.addEventListener('click', () => startTimesheetAnalysis(true));
-    confirmAnalysisButton.addEventListener('click', confirmTimesheetAnalysis);
+    confirmAnalysisButton.addEventListener('click', handleAnalysisPrimaryAction);
     openHistoryButton.addEventListener('click', showHistoryScreen);
     refreshHistoryButton.addEventListener('click', loadPrivateHistory);
     document.getElementById('history-empty-action').addEventListener('click', showPeriodScreen);
