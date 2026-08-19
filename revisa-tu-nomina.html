@@ -15,6 +15,7 @@
       --red: #e30613;
       --red-dark: #b9000b;
       --green: #0f766e;
+      --green-soft: #edf8f3;
       --ink: #18181b;
       --muted: #6e6e73;
       --line: #e3e3e7;
@@ -22,6 +23,7 @@
       --background: #f5f5f7;
       --warning: #fff8df;
       --warning-ink: #684900;
+      --locked: #f1f1f3;
     }
 
     html, body { width: 100%; overflow-x: hidden; }
@@ -35,7 +37,7 @@
     }
 
     button, select, input { font: inherit; }
-
+    button { -webkit-tap-highlight-color: transparent; }
     [hidden] { display: none !important; }
 
     .labbar {
@@ -60,13 +62,17 @@
 
     .back {
       display: grid;
+      flex: 0 0 42px;
       place-items: center;
       width: 42px;
       height: 42px;
+      padding: 0;
+      border: 0;
       border-radius: 50%;
       color: var(--ink);
       background: #f0f0f2;
       text-decoration: none;
+      cursor: pointer;
       font-size: 25px;
       line-height: 1;
     }
@@ -108,7 +114,7 @@
     }
 
     .intro {
-      max-width: 430px;
+      max-width: 440px;
       margin: 0 auto 22px;
       color: var(--muted);
       text-align: center;
@@ -124,16 +130,35 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, .07);
     }
 
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 15px;
+    }
+
     .section-title {
-      margin: 0 0 13px;
-      font-size: 16px;
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    .step-label {
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: var(--red-dark);
+      background: #fff0f1;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .2px;
     }
 
     .date-grid {
       display: grid;
       grid-template-columns: 1.35fr .85fr;
       gap: 10px;
-      margin-bottom: 18px;
     }
 
     label.field-label {
@@ -155,135 +180,268 @@
       font-size: 16px;
     }
 
-    select:focus {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px rgba(227, 6, 19, .12);
-    }
-
-    .upload-card {
-      margin-top: 13px;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fff;
-    }
-
-    .upload-heading {
-      display: flex;
-      align-items: flex-start;
-      gap: 11px;
-      margin-bottom: 7px;
-    }
-
-    .upload-number {
-      display: grid;
-      flex: 0 0 34px;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      color: white;
-      background: var(--red);
-      font-size: 15px;
-      font-weight: 900;
-    }
-
-    .upload-heading strong {
-      display: block;
-      margin-top: 1px;
-      font-size: 15px;
-      line-height: 1.3;
-    }
-
-    .upload-heading span:not(.upload-number) {
-      display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .file-input {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-
-    .choose-file {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      min-height: 50px;
-      margin-top: 12px;
-      border: 2px dashed #d2a7aa;
-      border-radius: 14px;
-      color: var(--red-dark);
-      background: #fff6f7;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .file-input:focus + .choose-file {
+    select:focus,
+    button:focus-visible {
       outline: 3px solid rgba(227, 6, 19, .16);
       outline-offset: 2px;
     }
 
-    .preview {
-      position: relative;
-      margin-top: 12px;
-      padding: 9px;
-      border: 1px solid #b9dfc9;
-      border-radius: 14px;
-      background: #f0faf4;
+    .reset-note {
+      margin: 12px 0 0;
+      padding: 10px 12px;
+      border-radius: 11px;
+      color: #6b4d00;
+      background: #fff7d8;
+      font-size: 12px;
+      line-height: 1.4;
     }
 
-    .preview img {
-      display: block;
-      width: 100%;
-      max-height: 260px;
-      border-radius: 9px;
-      object-fit: contain;
-      background: white;
-    }
-
-    .preview-footer {
+    .documents-heading {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-top: 8px;
+      gap: 12px;
+      margin: 24px 2px 10px;
     }
 
-    .file-name {
-      min-width: 0;
-      overflow: hidden;
-      color: #28613f;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 12px;
-      font-weight: 700;
+    .documents-heading h2 {
+      margin: 0;
+      font-size: 17px;
     }
 
-    .remove-file {
-      flex: 0 0 auto;
-      padding: 6px 8px;
-      border: 0;
-      color: var(--red-dark);
-      background: transparent;
-      cursor: pointer;
+    .document-count {
+      color: var(--muted);
       font-size: 12px;
       font-weight: 800;
     }
 
+    .document-card {
+      margin-top: 12px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: var(--surface);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .045);
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .document-card.complete {
+      border-color: #a9d9bf;
+      background: #fbfffc;
+    }
+
+    .document-card.locked {
+      color: #78787d;
+      background: var(--locked);
+      box-shadow: none;
+    }
+
+    .document-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .document-icon {
+      display: grid;
+      flex: 0 0 42px;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      color: var(--red-dark);
+      background: #fff0f1;
+      font-size: 21px;
+    }
+
+    .complete .document-icon {
+      color: #17603d;
+      background: var(--green-soft);
+    }
+
+    .locked .document-icon {
+      color: #77777b;
+      background: #e3e3e7;
+    }
+
+    .document-info {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .document-line {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .document-title {
+      margin: 1px 0 0;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .document-help {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .status-pill {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: #66666c;
+      background: #eeeeef;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    .complete .status-pill {
+      color: #17603d;
+      background: #dff3e7;
+    }
+
+    .card-button,
+    .secondary,
+    .primary {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .card-button {
+      margin-top: 15px;
+      border: 1px solid #e8aeb2;
+      color: var(--red-dark);
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .card-button:disabled,
+    .primary:disabled,
+    .secondary:disabled {
+      cursor: not-allowed;
+      opacity: .46;
+    }
+
+    .locked .card-button {
+      border-color: #d3d3d6;
+      color: #77777b;
+      background: #e8e8eb;
+    }
+
+    .completion-panel {
+      margin-top: 17px;
+      padding: 16px;
+      border: 1px solid #a9d9bf;
+      border-radius: 18px;
+      background: var(--green-soft);
+    }
+
+    .completion-panel strong {
+      display: block;
+      color: #155c3a;
+      font-size: 15px;
+    }
+
+    .completion-panel p {
+      margin: 5px 0 0;
+      color: #32694d;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .primary {
+      margin-top: 17px;
+      border: 0;
+      color: white;
+      background: var(--red);
+      font-size: 16px;
+    }
+
+    .secondary {
+      border: 1px solid #d3d3d7;
+      color: var(--ink);
+      background: white;
+      font-size: 14px;
+    }
+
+    .final-status {
+      margin: 13px 0 0;
+      padding: 13px 14px;
+      border-radius: 13px;
+      color: #205b35;
+      background: #eef7f1;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .local-note {
+      display: flex;
+      gap: 9px;
+      margin: 17px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .document-screen-header {
+      margin-bottom: 17px;
+      text-align: center;
+    }
+
+    .document-screen-header .step-label {
+      display: inline-block;
+      margin-bottom: 11px;
+    }
+
+    .document-screen-header h1 {
+      margin-bottom: 7px;
+      font-size: 25px;
+    }
+
+    .document-period {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .instruction {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+      padding: 13px;
+      border-radius: 14px;
+      background: #f5f5f7;
+    }
+
+    .instruction-icon {
+      flex: 0 0 auto;
+      font-size: 23px;
+    }
+
+    .instruction strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .instruction p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.42;
+    }
+
     .privacy-warning {
-      margin-top: 16px;
       padding: 14px;
       border-left: 4px solid #e0a000;
       border-radius: 12px;
@@ -293,14 +451,24 @@
       line-height: 1.48;
     }
 
-    .privacy-warning strong { display: block; margin-bottom: 4px; }
+    .privacy-warning strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .privacy-list {
+      margin: 7px 0 0;
+      padding-left: 18px;
+    }
+
+    .privacy-list li + li { margin-top: 3px; }
 
     .confirmation {
       display: grid;
       grid-template-columns: 23px minmax(0, 1fr);
       gap: 10px;
       align-items: start;
-      margin-top: 15px;
+      margin-top: 16px;
       color: var(--ink);
       font-size: 13px;
       font-weight: 700;
@@ -315,152 +483,231 @@
       accent-color: var(--red);
     }
 
-    .primary {
-      width: 100%;
-      min-height: 54px;
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .select-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       margin-top: 17px;
-      border: 0;
-      border-radius: 999px;
-      color: white;
-      background: var(--red);
-      cursor: pointer;
-      font-weight: 800;
-      font-size: 16px;
+      border: 2px dashed #d2a7aa;
+      border-radius: 15px;
+      color: var(--red-dark);
+      background: #fff6f7;
     }
 
-    .primary:disabled {
-      cursor: not-allowed;
-      opacity: .42;
+    .select-image:disabled {
+      border-color: #d9d9dc;
+      color: #85858a;
+      background: #f1f1f3;
     }
 
-    .status {
-      display: none;
-      margin-top: 14px;
-      padding: 13px 14px;
-      border-radius: 13px;
-      color: #205b35;
-      background: #eef7f1;
-      font-size: 13px;
-      line-height: 1.45;
+    .select-hint {
+      margin: 8px 3px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.4;
     }
-
-    .status.show { display: block; }
 
     .error {
-      display: none;
-      margin-top: 9px;
+      margin: 10px 2px 0;
       color: #8a1d24;
       font-size: 12px;
       line-height: 1.4;
     }
 
-    .error.show { display: block; }
+    .preview {
+      margin-top: 17px;
+      padding: 10px;
+      border: 1px solid #b9dfc9;
+      border-radius: 16px;
+      background: #f0faf4;
+    }
 
-    .local-note {
+    .preview img {
+      display: block;
+      width: 100%;
+      max-height: 360px;
+      border-radius: 10px;
+      object-fit: contain;
+      background: white;
+    }
+
+    .preview-label {
       display: flex;
-      gap: 9px;
-      margin: 17px 4px 0;
-      color: var(--muted);
+      align-items: center;
+      gap: 7px;
+      margin-top: 9px;
+      color: #28613f;
       font-size: 12px;
-      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 10px;
+      margin-top: 17px;
+    }
+
+    .actions .primary,
+    .actions .secondary { margin: 0; }
+
+    @media (max-width: 390px) {
+      .document-line { display: block; }
+      .status-pill { display: inline-block; margin-top: 7px; }
+      .actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="labbar">🧪 STR-IG LABORATORIO · NO ES PRODUCCIÓN</div>
   <header class="topbar">
-    <a class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a>
+    <a id="top-back" class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a>
     <strong>Revisa tu nómina</strong>
   </header>
 
   <p id="auth-check" class="auth-check">Comprobando el acceso privado…</p>
 
   <main id="content" hidden>
-    <div class="tool-icon" aria-hidden="true">🔎</div>
-    <h1>Revisa tu nómina</h1>
-    <p class="intro">Prepara una imagen recortada de tu nómina y otra del resumen de tu hoja de trabajo.</p>
+    <section id="period-screen" aria-labelledby="period-page-title">
+      <div class="tool-icon" aria-hidden="true">🔎</div>
+      <h1 id="period-page-title" tabindex="-1">Revisa tu nómina</h1>
+      <p class="intro">Elige el periodo y prepara primero el registro de jornada y después la nómina.</p>
 
-    <section class="panel">
-      <h2 class="section-title">Mes que quieres revisar</h2>
-      <div class="date-grid">
-        <div>
-          <label class="field-label" for="month">Mes</label>
-          <select id="month" name="month">
-            <option value="0">Enero</option>
-            <option value="1">Febrero</option>
-            <option value="2">Marzo</option>
-            <option value="3">Abril</option>
-            <option value="4">Mayo</option>
-            <option value="5">Junio</option>
-            <option value="6">Julio</option>
-            <option value="7">Agosto</option>
-            <option value="8">Septiembre</option>
-            <option value="9">Octubre</option>
-            <option value="10">Noviembre</option>
-            <option value="11">Diciembre</option>
-          </select>
+      <section class="panel" aria-labelledby="period-title">
+        <div class="panel-header">
+          <h2 id="period-title" class="section-title">Periodo de revisión</h2>
+          <span class="step-label">PASO 1 DE 3</span>
         </div>
-        <div>
-          <label class="field-label" for="year">Año</label>
-          <select id="year" name="year"></select>
+        <div class="date-grid">
+          <div>
+            <label class="field-label" for="month">Mes</label>
+            <select id="month" name="month">
+              <option value="0">Enero</option>
+              <option value="1">Febrero</option>
+              <option value="2">Marzo</option>
+              <option value="3">Abril</option>
+              <option value="4">Mayo</option>
+              <option value="5">Junio</option>
+              <option value="6">Julio</option>
+              <option value="7">Agosto</option>
+              <option value="8">Septiembre</option>
+              <option value="9">Octubre</option>
+              <option value="10">Noviembre</option>
+              <option value="11">Diciembre</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="year">Año</label>
+            <select id="year" name="year"></select>
+          </div>
         </div>
+        <p id="period-reset-note" class="reset-note" role="status" hidden>Al cambiar el periodo se han retirado las imágenes seleccionadas.</p>
+      </section>
+
+      <div class="documents-heading">
+        <h2>Documentos</h2>
+        <span id="document-count" class="document-count">0 de 2 preparados</span>
       </div>
 
-      <article class="upload-card">
-        <div class="upload-heading">
-          <span class="upload-number">1</span>
-          <div>
-            <strong id="payroll-title">Nómina del mes</strong>
-            <span>Primera página: recorta el apartado «Devengos y deducciones».</span>
+      <article id="timesheet-card" class="document-card">
+        <div class="document-card-top">
+          <span class="document-icon" aria-hidden="true">🗓️</span>
+          <div class="document-info">
+            <div class="document-line">
+              <h3 id="timesheet-card-title" class="document-title">Registro de jornada</h3>
+              <span id="timesheet-status" class="status-pill">Pendiente</span>
+            </div>
+            <p class="document-help">Resumen de variables del mes.</p>
           </div>
         </div>
-        <input id="payroll-image" class="file-input" type="file" accept="image/*">
-        <label class="choose-file" for="payroll-image"><span aria-hidden="true">▣</span> Insertar imagen de la nómina</label>
-        <p id="payroll-error" class="error"></p>
-        <div id="payroll-preview" class="preview" hidden>
-          <img id="payroll-preview-image" alt="Vista previa de la nómina recortada">
-          <div class="preview-footer">
-            <span id="payroll-file-name" class="file-name"></span>
-            <button class="remove-file" type="button" data-remove="payroll">Eliminar</button>
-          </div>
-        </div>
+        <button id="open-timesheet" class="card-button" type="button">Añadir imagen</button>
       </article>
 
-      <article class="upload-card">
-        <div class="upload-heading">
-          <span class="upload-number">2</span>
-          <div>
-            <strong id="timesheet-title">Hoja de trabajo del mes</strong>
-            <span>Recorta el apartado «Resumen de variables del mes».</span>
+      <article id="payroll-card" class="document-card locked">
+        <div class="document-card-top">
+          <span class="document-icon" aria-hidden="true">🧾</span>
+          <div class="document-info">
+            <div class="document-line">
+              <h3 id="payroll-card-title" class="document-title">Nómina</h3>
+              <span id="payroll-status" class="status-pill">Bloqueada</span>
+            </div>
+            <p id="payroll-help" class="document-help">Completa primero el registro de jornada.</p>
           </div>
         </div>
-        <input id="timesheet-image" class="file-input" type="file" accept="image/*">
-        <label class="choose-file" for="timesheet-image"><span aria-hidden="true">▣</span> Insertar imagen de la hoja de trabajo</label>
-        <p id="timesheet-error" class="error"></p>
-        <div id="timesheet-preview" class="preview" hidden>
-          <img id="timesheet-preview-image" alt="Vista previa del resumen de la hoja de trabajo">
-          <div class="preview-footer">
-            <span id="timesheet-file-name" class="file-name"></span>
-            <button class="remove-file" type="button" data-remove="timesheet">Eliminar</button>
-          </div>
-        </div>
+        <button id="open-payroll" class="card-button" type="button" disabled>Completa primero la jornada</button>
       </article>
 
-      <div class="privacy-warning">
-        <strong>🔒 Protege tus datos personales</strong>
-        Antes de continuar, recorta las imágenes para que no aparezcan tu nombre y apellidos, DNI/NIE, número de empleado, número de la Seguridad Social, domicilio, cuenta bancaria, códigos QR o de barras ni ningún otro dato identificativo. Solo deben verse los conceptos y los datos numéricos necesarios.
-      </div>
+      <section id="completion-panel" class="completion-panel" hidden>
+        <strong>✓ Los dos documentos están preparados</strong>
+        <p>Ya puedes terminar esta primera prueba del proceso.</p>
+        <button id="finish" class="primary" type="button">Finalizar preparación</button>
+        <p id="final-status" class="final-status" role="status" hidden></p>
+      </section>
 
-      <label class="confirmation" for="privacy-confirmation">
-        <input id="privacy-confirmation" type="checkbox">
-        <span>He comprobado que las imágenes no contienen datos personales.</span>
-      </label>
-
-      <button id="continue" class="primary" type="button" disabled>Continuar</button>
-      <p id="status" class="status" role="status"></p>
+      <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba las imágenes solo se muestran en tu dispositivo: no se envían ni se guardan. El historial mensual privado se activará junto con el análisis.</span></p>
     </section>
 
-    <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba las imágenes solo se muestran en tu dispositivo. Cuando activemos el análisis, se guardarán de forma privada en tu historial mensual para poder comparar meses anteriores.</span></p>
+    <section id="document-screen" aria-labelledby="document-screen-title" hidden>
+      <div class="document-screen-header">
+        <span id="document-step" class="step-label">PASO 2 DE 3</span>
+        <h1 id="document-screen-title" tabindex="-1">Registro de jornada</h1>
+        <p id="document-period" class="document-period"></p>
+      </div>
+
+      <section class="panel">
+        <div class="instruction">
+          <span id="instruction-icon" class="instruction-icon" aria-hidden="true">🗓️</span>
+          <div>
+            <strong>Qué parte necesitamos</strong>
+            <p id="instruction-text">Recorta la zona «Resumen de variables del mes».</p>
+          </div>
+        </div>
+
+        <div class="privacy-warning">
+          <strong>🔒 Antes de seleccionar la imagen</strong>
+          Recórtala o tapa cualquier dato que permita identificarte.
+          <ul class="privacy-list">
+            <li>No deben verse nombre, DNI/NIE, número de empleado ni Seguridad Social.</li>
+            <li>Oculta domicilio, cuenta bancaria, códigos QR o de barras.</li>
+            <li>Deja visibles solo los conceptos y datos numéricos necesarios.</li>
+          </ul>
+        </div>
+
+        <label class="confirmation" for="privacy-confirmation">
+          <input id="privacy-confirmation" type="checkbox">
+          <span>Acepto y confirmo que la imagen no contiene datos personales.</span>
+        </label>
+
+        <input id="document-image" class="file-input" type="file" accept="image/*">
+        <button id="select-image" class="secondary select-image" type="button" disabled><span aria-hidden="true">▣</span> Seleccionar imagen</button>
+        <p id="select-hint" class="select-hint">Marca primero la casilla de aceptación.</p>
+        <p id="file-error" class="error" role="alert" hidden></p>
+
+        <div id="image-preview" class="preview" hidden>
+          <img id="preview-image" alt="Vista previa de la imagen seleccionada">
+          <div class="preview-label"><span aria-hidden="true">✓</span><span>Imagen preparada en este dispositivo</span></div>
+        </div>
+
+        <div id="document-actions" class="actions" hidden>
+          <button id="change-image" class="secondary" type="button">Cambiar imagen</button>
+          <button id="confirm-image" class="primary" type="button" disabled>Confirmar imagen</button>
+        </div>
+      </section>
+
+      <p class="local-note"><span aria-hidden="true">ℹ️</span><span>Al confirmar volverás al resumen para continuar con el siguiente documento.</span></p>
+    </section>
   </main>
 
   <script type="module">
@@ -493,16 +740,46 @@
 
     const month = document.getElementById('month');
     const year = document.getElementById('year');
+    const periodScreen = document.getElementById('period-screen');
+    const documentScreen = document.getElementById('document-screen');
+    const topBack = document.getElementById('top-back');
     const privacyConfirmation = document.getElementById('privacy-confirmation');
-    const continueButton = document.getElementById('continue');
-    const status = document.getElementById('status');
+    const fileInput = document.getElementById('document-image');
+    const selectImageButton = document.getElementById('select-image');
+    const selectHint = document.getElementById('select-hint');
+    const preview = document.getElementById('image-preview');
+    const previewImage = document.getElementById('preview-image');
+    const fileError = document.getElementById('file-error');
+    const documentActions = document.getElementById('document-actions');
+    const changeImageButton = document.getElementById('change-image');
+    const confirmImageButton = document.getElementById('confirm-image');
     const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    const files = { payroll: null, timesheet: null };
-    const objectUrls = { payroll: '', timesheet: '' };
+    const documents = {
+      timesheet: { file: null, url: '', confirmed: false },
+      payroll: { file: null, url: '', confirmed: false }
+    };
+    const documentCopy = {
+      timesheet: {
+        title: 'Registro de jornada',
+        step: 'PASO 2 DE 3',
+        icon: '🗓️',
+        instruction: 'Recorta la zona «Resumen de variables del mes».'
+      },
+      payroll: {
+        title: 'Nómina',
+        step: 'PASO 3 DE 3',
+        icon: '🧾',
+        instruction: 'Usa la primera página y recorta el apartado «Devengos y deducciones».'
+      }
+    };
+
+    let activeKind = '';
+    let workingFile = null;
+    let workingUrl = '';
 
     const now = new Date();
-    for (let value = now.getFullYear() + 1; value >= now.getFullYear() - 3; value -= 1) {
+    for (let value = now.getFullYear() + 1; value >= now.getFullYear() - 4; value -= 1) {
       const option = document.createElement('option');
       option.value = String(value);
       option.textContent = String(value);
@@ -511,87 +788,215 @@
     month.value = String(now.getMonth());
     year.value = String(now.getFullYear());
 
-    function updateTitles() {
-      const selectedMonth = monthNames[Number(month.value)];
-      document.getElementById('payroll-title').textContent = `Nómina de ${selectedMonth} de ${year.value}`;
-      document.getElementById('timesheet-title').textContent = `Hoja de trabajo de ${selectedMonth} de ${year.value}`;
-      status.classList.remove('show');
+    function periodLabel() {
+      return `${monthNames[Number(month.value)]} de ${year.value}`;
     }
 
-    function updateButton() {
-      continueButton.disabled = !(files.payroll && files.timesheet && privacyConfirmation.checked);
-      if (continueButton.disabled) status.classList.remove('show');
+    function revokeWorkingUrlIfTemporary() {
+      const storedUrl = activeKind ? documents[activeKind].url : '';
+      if (workingUrl && workingUrl !== storedUrl) URL.revokeObjectURL(workingUrl);
+      workingUrl = '';
+      workingFile = null;
     }
 
-    function clearFile(kind) {
-      if (objectUrls[kind]) URL.revokeObjectURL(objectUrls[kind]);
-      objectUrls[kind] = '';
-      files[kind] = null;
-      document.getElementById(`${kind}-image`).value = '';
-      document.getElementById(`${kind}-preview`).hidden = true;
-      document.getElementById(`${kind}-preview-image`).removeAttribute('src');
-      document.getElementById(`${kind}-file-name`).textContent = '';
-      document.getElementById(`${kind}-error`).classList.remove('show');
-      updateButton();
+    function clearAllDocuments() {
+      revokeWorkingUrlIfTemporary();
+      Object.values(documents).forEach((document) => {
+        if (document.url) URL.revokeObjectURL(document.url);
+        document.file = null;
+        document.url = '';
+        document.confirmed = false;
+      });
+      activeKind = '';
     }
 
-    function showFile(kind, file) {
-      const error = document.getElementById(`${kind}-error`);
-      error.classList.remove('show');
-      error.textContent = '';
+    function updatePeriodCards() {
+      const label = periodLabel();
+      const timesheetCard = document.getElementById('timesheet-card');
+      const payrollCard = document.getElementById('payroll-card');
+      const openTimesheet = document.getElementById('open-timesheet');
+      const openPayroll = document.getElementById('open-payroll');
+      const timesheetComplete = documents.timesheet.confirmed;
+      const payrollComplete = documents.payroll.confirmed;
+
+      document.getElementById('timesheet-card-title').textContent = `Registro de jornada · ${label}`;
+      document.getElementById('payroll-card-title').textContent = `Nómina · ${label}`;
+
+      timesheetCard.classList.toggle('complete', timesheetComplete);
+      document.getElementById('timesheet-status').textContent = timesheetComplete ? 'Preparada' : 'Pendiente';
+      openTimesheet.textContent = timesheetComplete ? 'Revisar imagen' : 'Añadir imagen';
+
+      payrollCard.classList.toggle('complete', payrollComplete);
+      payrollCard.classList.toggle('locked', !timesheetComplete);
+      openPayroll.disabled = !timesheetComplete;
+
+      if (payrollComplete) {
+        document.getElementById('payroll-status').textContent = 'Preparada';
+        document.getElementById('payroll-help').textContent = 'Primera página: devengos y deducciones.';
+        openPayroll.textContent = 'Revisar imagen';
+      } else if (timesheetComplete) {
+        document.getElementById('payroll-status').textContent = 'Pendiente';
+        document.getElementById('payroll-help').textContent = 'Primera página: devengos y deducciones.';
+        openPayroll.textContent = 'Añadir imagen';
+      } else {
+        document.getElementById('payroll-status').textContent = 'Bloqueada';
+        document.getElementById('payroll-help').textContent = 'Completa primero el registro de jornada.';
+        openPayroll.textContent = 'Completa primero la jornada';
+      }
+
+      const completed = Number(timesheetComplete) + Number(payrollComplete);
+      document.getElementById('document-count').textContent = `${completed} de 2 preparados`;
+      document.getElementById('completion-panel').hidden = completed !== 2;
+      if (completed !== 2) document.getElementById('final-status').hidden = true;
+    }
+
+    function resetDocumentScreen() {
+      privacyConfirmation.checked = false;
+      fileInput.value = '';
+      selectImageButton.disabled = true;
+      selectHint.textContent = 'Marca primero la casilla de aceptación.';
+      fileError.hidden = true;
+      fileError.textContent = '';
+      confirmImageButton.disabled = true;
+    }
+
+    function renderWorkingPreview() {
+      const hasImage = Boolean(workingFile && workingUrl);
+      preview.hidden = !hasImage;
+      documentActions.hidden = !hasImage;
+      changeImageButton.disabled = !privacyConfirmation.checked;
+      confirmImageButton.disabled = !(hasImage && privacyConfirmation.checked);
+
+      if (hasImage) {
+        previewImage.src = workingUrl;
+      } else {
+        previewImage.removeAttribute('src');
+      }
+    }
+
+    function openDocument(kind) {
+      if (kind === 'payroll' && !documents.timesheet.confirmed) return;
+      activeKind = kind;
+      workingFile = documents[kind].file;
+      workingUrl = documents[kind].url;
+      resetDocumentScreen();
+
+      const copy = documentCopy[kind];
+      document.getElementById('document-step').textContent = copy.step;
+      document.getElementById('document-screen-title').textContent = copy.title;
+      document.getElementById('document-period').textContent = periodLabel();
+      document.getElementById('instruction-icon').textContent = copy.icon;
+      document.getElementById('instruction-text').textContent = copy.instruction;
+      renderWorkingPreview();
+
+      periodScreen.hidden = true;
+      documentScreen.hidden = false;
+      topBack.setAttribute('aria-label', 'Volver al resumen de documentos');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.getElementById('document-screen-title').focus({ preventScroll: true });
+    }
+
+    function showPeriodScreen() {
+      revokeWorkingUrlIfTemporary();
+      activeKind = '';
+      documentScreen.hidden = true;
+      periodScreen.hidden = false;
+      topBack.setAttribute('aria-label', 'Volver a la pantalla principal');
+      updatePeriodCards();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.getElementById('period-page-title').focus({ preventScroll: true });
+    }
+
+    function handlePeriodChange() {
+      const hadImages = Object.values(documents).some((document) => document.file);
+      if (hadImages) {
+        clearAllDocuments();
+        document.getElementById('period-reset-note').hidden = false;
+      }
+      document.getElementById('final-status').hidden = true;
+      updatePeriodCards();
+    }
+
+    function chooseImage() {
+      if (!privacyConfirmation.checked) return;
+      fileInput.value = '';
+      fileInput.click();
+    }
+
+    function showSelectedFile(file) {
+      fileError.hidden = true;
+      fileError.textContent = '';
 
       if (!file || !file.type.startsWith('image/')) {
-        clearFile(kind);
-        error.textContent = 'Selecciona una imagen válida.';
-        error.classList.add('show');
+        fileError.textContent = 'Selecciona una imagen válida.';
+        fileError.hidden = false;
         return;
       }
 
       if (file.size > MAX_IMAGE_BYTES) {
-        clearFile(kind);
-        error.textContent = 'La imagen es demasiado grande. Elige una de menos de 15 MB.';
-        error.classList.add('show');
+        fileError.textContent = 'La imagen es demasiado grande. Elige una de menos de 15 MB.';
+        fileError.hidden = false;
         return;
       }
 
-      if (objectUrls[kind]) URL.revokeObjectURL(objectUrls[kind]);
-      files[kind] = file;
-      objectUrls[kind] = URL.createObjectURL(file);
-      document.getElementById(`${kind}-preview-image`).src = objectUrls[kind];
-      document.getElementById(`${kind}-file-name`).textContent = file.name || 'Imagen seleccionada';
-      document.getElementById(`${kind}-preview`).hidden = false;
-      updateButton();
+      const storedUrl = documents[activeKind].url;
+      if (workingUrl && workingUrl !== storedUrl) URL.revokeObjectURL(workingUrl);
+      workingFile = file;
+      workingUrl = URL.createObjectURL(file);
+      renderWorkingPreview();
+      preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    document.getElementById('payroll-image').addEventListener('change', (event) => {
-      showFile('payroll', event.target.files[0]);
+    function confirmImage() {
+      if (!activeKind || !workingFile || !workingUrl || !privacyConfirmation.checked) return;
+      const document = documents[activeKind];
+      if (document.url && document.url !== workingUrl) URL.revokeObjectURL(document.url);
+      document.file = workingFile;
+      document.url = workingUrl;
+      document.confirmed = true;
+      workingFile = null;
+      workingUrl = '';
+      showPeriodScreen();
+    }
+
+    privacyConfirmation.addEventListener('change', () => {
+      selectImageButton.disabled = !privacyConfirmation.checked;
+      selectHint.textContent = privacyConfirmation.checked
+        ? 'Puedes seleccionar una imagen JPG, PNG o similar de hasta 15 MB.'
+        : 'Marca primero la casilla de aceptación.';
+      renderWorkingPreview();
     });
 
-    document.getElementById('timesheet-image').addEventListener('change', (event) => {
-      showFile('timesheet', event.target.files[0]);
+    document.getElementById('open-timesheet').addEventListener('click', () => openDocument('timesheet'));
+    document.getElementById('open-payroll').addEventListener('click', () => openDocument('payroll'));
+    selectImageButton.addEventListener('click', chooseImage);
+    changeImageButton.addEventListener('click', chooseImage);
+    fileInput.addEventListener('change', (event) => showSelectedFile(event.target.files[0]));
+    confirmImageButton.addEventListener('click', confirmImage);
+    month.addEventListener('change', handlePeriodChange);
+    year.addEventListener('change', handlePeriodChange);
+
+    topBack.addEventListener('click', (event) => {
+      if (documentScreen.hidden) return;
+      event.preventDefault();
+      showPeriodScreen();
     });
 
-    document.querySelectorAll('[data-remove]').forEach((button) => {
-      button.addEventListener('click', () => clearFile(button.dataset.remove));
-    });
-
-    month.addEventListener('change', updateTitles);
-    year.addEventListener('change', updateTitles);
-    privacyConfirmation.addEventListener('change', updateButton);
-
-    continueButton.addEventListener('click', () => {
-      if (continueButton.disabled) return;
-      status.textContent = 'Primera pantalla completada. En esta prueba no se han enviado las imágenes. El guardado privado por meses se activará junto con el análisis.';
-      status.classList.add('show');
-      status.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('finish').addEventListener('click', () => {
+      const finalStatus = document.getElementById('final-status');
+      finalStatus.textContent = 'Preparación completada. En este prototipo las imágenes siguen únicamente en tu dispositivo y no se han enviado ni guardado.';
+      finalStatus.hidden = false;
+      finalStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
     window.addEventListener('beforeunload', () => {
-      Object.values(objectUrls).forEach((url) => { if (url) URL.revokeObjectURL(url); });
+      revokeWorkingUrlIfTemporary();
+      Object.values(documents).forEach((document) => {
+        if (document.url) URL.revokeObjectURL(document.url);
+      });
     });
 
-    updateTitles();
-    updateButton();
+    updatePeriodCards();
   </script>
 </body>
 </html>
