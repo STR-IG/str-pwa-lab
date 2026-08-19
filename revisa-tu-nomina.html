@@ -751,6 +751,133 @@
       line-height: 1.45;
     }
 
+    .schedule-panel {
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid #d8d8dc;
+      border-radius: 16px;
+      background: #f8f8fa;
+    }
+
+    .schedule-panel h2,
+    .salary-simulator h3 {
+      margin: 0 0 5px;
+      font-size: 17px;
+    }
+
+    .schedule-panel > p,
+    .salary-simulator > p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+      margin-top: 14px;
+    }
+
+    .schedule-field.full { grid-column: 1 / -1; }
+
+    .schedule-field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .schedule-field input,
+    .schedule-field select {
+      width: 100%;
+      min-height: 47px;
+      padding: 10px 12px;
+      border: 1px solid #cacace;
+      border-radius: 11px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .schedule-field input:focus,
+    .schedule-field select:focus {
+      border-color: var(--red);
+      outline: 3px solid rgba(227, 6, 19, .12);
+    }
+
+    .schedule-equivalence {
+      margin: 11px 0 0;
+      padding: 10px 12px;
+      border-radius: 11px;
+      color: #5d4708;
+      background: #fff4ca;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .salary-simulator {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #dedee2;
+    }
+
+    .salary-results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .salary-result {
+      padding: 12px;
+      border-radius: 13px;
+      background: white;
+      border: 1px solid #dedee2;
+    }
+
+    .salary-result.highlight {
+      border-color: #a8dbc0;
+      background: #eff9f3;
+    }
+
+    .salary-result small {
+      display: block;
+      min-height: 30px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .salary-result strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 18px;
+    }
+
+    .salary-difference {
+      grid-column: 1 / -1;
+      padding: 12px 13px;
+      border-radius: 13px;
+      color: #205b35;
+      background: #e8f6ed;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .salary-note {
+      margin: 11px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
     .primary {
       margin-top: 17px;
       border: 0;
@@ -1025,6 +1152,9 @@
       .status-pill { display: inline-block; margin-top: 7px; }
       .actions { grid-template-columns: 1fr; }
       .analysis-actions { grid-template-columns: 1fr; }
+      .schedule-grid,
+      .salary-results { grid-template-columns: 1fr; }
+      .salary-difference { grid-column: auto; }
     }
   </style>
 </head>
@@ -1182,6 +1312,81 @@
           </div>
 
           <div id="analysis-fields" class="analysis-fields"></div>
+
+          <section class="schedule-panel" aria-labelledby="schedule-title">
+            <h2 id="schedule-title">Tu jornada este mes</h2>
+            <p>Indica si tuviste reducción para que la futura revisión no compare tu nómina con una jornada completa.</p>
+
+            <div class="schedule-grid">
+              <div class="schedule-field full">
+                <label for="schedule-type">Situación durante el mes</label>
+                <select id="schedule-type">
+                  <option value="full">Jornada completa</option>
+                  <option value="reduced">Jornada reducida</option>
+                </select>
+              </div>
+
+              <div id="percentage-field" class="schedule-field" hidden>
+                <label for="work-percentage">Porcentaje de ocupación</label>
+                <input id="work-percentage" type="text" inputmode="decimal" placeholder="Ejemplo: 86,20" autocomplete="off">
+              </div>
+
+              <div id="duration-field" class="schedule-field" hidden>
+                <label for="reduction-duration">Duración</label>
+                <select id="reduction-duration">
+                  <option value="whole">Todo el mes</option>
+                  <option value="partial">Solo una parte del mes</option>
+                </select>
+              </div>
+
+              <div id="reduction-dates" class="schedule-field full" hidden>
+                <div class="schedule-grid">
+                  <div class="schedule-field">
+                    <label for="reduction-start">Desde</label>
+                    <input id="reduction-start" type="date">
+                  </div>
+                  <div class="schedule-field">
+                    <label for="reduction-end">Hasta</label>
+                    <input id="reduction-end" type="date">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p id="schedule-equivalence" class="schedule-equivalence" hidden></p>
+
+            <div class="salary-simulator">
+              <h3>¿Cuánto cobrarías con otra jornada?</h3>
+              <p>Simulación opcional del salario bruto fijo. Los pluses variables se revisarán aparte con las cantidades reales.</p>
+
+              <div class="schedule-grid">
+                <div class="schedule-field">
+                  <label for="salary-source">Cantidad que conoces</label>
+                  <select id="salary-source">
+                    <option value="full">Bruto fijo mensual al 100 %</option>
+                    <option value="current">Bruto fijo mensual actual</option>
+                  </select>
+                </div>
+                <div class="schedule-field">
+                  <label for="salary-amount">Importe bruto fijo</label>
+                  <input id="salary-amount" type="text" inputmode="decimal" placeholder="Ejemplo: 2.834,00 €" autocomplete="off">
+                </div>
+              </div>
+
+              <div id="salary-results" class="salary-results" hidden>
+                <div class="salary-result">
+                  <small>Jornada completa · 100 %</small>
+                  <strong id="full-salary-result">—</strong>
+                </div>
+                <div class="salary-result highlight">
+                  <small id="current-salary-label">Tu jornada actual</small>
+                  <strong id="current-salary-result">—</strong>
+                </div>
+                <div id="salary-difference" class="salary-difference"></div>
+              </div>
+              <p class="salary-note">Estimación orientativa antes de IRPF y cotizaciones. Si la reducción solo afectó a parte del mes, se prorratea por los días indicados.</p>
+            </div>
+          </section>
           <p id="analysis-error" class="error" role="alert" hidden></p>
 
           <div class="analysis-actions">
@@ -1314,6 +1519,22 @@
     const retryAnalysisButton = document.getElementById('retry-analysis');
     const confirmAnalysisButton = document.getElementById('confirm-analysis');
     const analysisConfirmed = document.getElementById('analysis-confirmed');
+    const scheduleType = document.getElementById('schedule-type');
+    const percentageField = document.getElementById('percentage-field');
+    const workPercentage = document.getElementById('work-percentage');
+    const durationField = document.getElementById('duration-field');
+    const reductionDuration = document.getElementById('reduction-duration');
+    const reductionDates = document.getElementById('reduction-dates');
+    const reductionStart = document.getElementById('reduction-start');
+    const reductionEnd = document.getElementById('reduction-end');
+    const scheduleEquivalence = document.getElementById('schedule-equivalence');
+    const salarySource = document.getElementById('salary-source');
+    const salaryAmount = document.getElementById('salary-amount');
+    const salaryResults = document.getElementById('salary-results');
+    const fullSalaryResult = document.getElementById('full-salary-result');
+    const currentSalaryLabel = document.getElementById('current-salary-label');
+    const currentSalaryResult = document.getElementById('current-salary-result');
+    const salaryDifference = document.getElementById('salary-difference');
     const privacyConfirmation = document.getElementById('privacy-confirmation');
     const fileInput = document.getElementById('document-image');
     const selectImageButton = document.getElementById('select-image');
@@ -1467,6 +1688,7 @@
     let analysisRunning = false;
     let analysisInputs = new Map();
     const confirmedTimesheetAnalyses = new Map();
+    const workSchedules = new Map();
     let privacyScanState = 'idle';
     let privacyScanVersion = 0;
     let workingOcrText = '';
@@ -1495,6 +1717,169 @@
     function periodKey() {
       const selectedMonth = String(Number(month.value) + 1).padStart(2, '0');
       return `${year.value}-${selectedMonth}`;
+    }
+
+    function scheduleStorageKey() {
+      return `strLabSchedule:${currentUserId}:${periodKey()}`;
+    }
+
+    function selectedMonthRange() {
+      const selectedYear = Number(year.value);
+      const selectedMonth = Number(month.value);
+      const lastDay = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+      const monthPart = String(selectedMonth + 1).padStart(2, '0');
+      return {
+        days: lastDay,
+        min: `${selectedYear}-${monthPart}-01`,
+        max: `${selectedYear}-${monthPart}-${String(lastDay).padStart(2, '0')}`
+      };
+    }
+
+    function parseLocalizedMoney(raw) {
+      let value = String(raw || '').trim().replace(/\s|€/g, '').replace(/[^0-9,.-]/g, '');
+      if (!value) return null;
+      const comma = value.lastIndexOf(',');
+      const dot = value.lastIndexOf('.');
+      if (comma >= 0 && dot >= 0) {
+        const decimalSeparator = comma > dot ? ',' : '.';
+        const thousandsSeparator = decimalSeparator === ',' ? /\./g : /,/g;
+        value = value.replace(thousandsSeparator, '').replace(decimalSeparator, '.');
+      } else if (comma >= 0) {
+        value = value.replace(/\./g, '').replace(',', '.');
+      } else if ((value.match(/\./g) || []).length > 1 || /^\d+\.\d{3}$/.test(value)) {
+        value = value.replace(/\./g, '');
+      }
+      const amount = Number(value);
+      return Number.isFinite(amount) && amount > 0 ? amount : null;
+    }
+
+    function formatEuro(amount) {
+      return Number(amount).toLocaleString('es-ES', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function computeScheduleFactor(settings) {
+      if (!settings || settings.type !== 'reduced') return { factor: 1, reducedDays: 0 };
+      const percentage = Number(settings.percentage);
+      if (!Number.isFinite(percentage) || percentage <= 0 || percentage >= 100) return null;
+      if (settings.duration !== 'partial') return { factor: percentage / 100, reducedDays: selectedMonthRange().days };
+
+      const range = selectedMonthRange();
+      if (!settings.start || !settings.end || settings.start < range.min || settings.end > range.max || settings.start > settings.end) return null;
+      const start = Date.parse(`${settings.start}T00:00:00Z`);
+      const end = Date.parse(`${settings.end}T00:00:00Z`);
+      const reducedDays = Math.round((end - start) / 86400000) + 1;
+      const factor = ((range.days - reducedDays) + (reducedDays * percentage / 100)) / range.days;
+      return { factor, reducedDays };
+    }
+
+    function currentScheduleSettings() {
+      const percentageText = String(workPercentage.value || '').trim().replace(',', '.');
+      return {
+        type: scheduleType.value,
+        percentage: percentageText ? Number(percentageText) : null,
+        duration: reductionDuration.value,
+        start: reductionStart.value,
+        end: reductionEnd.value,
+        salarySource: salarySource.value,
+        salaryAmount: salaryAmount.value.trim()
+      };
+    }
+
+    function updateSalaryComparison() {
+      const settings = currentScheduleSettings();
+      const schedule = computeScheduleFactor(settings);
+      const knownAmount = parseLocalizedMoney(settings.salaryAmount);
+      if (!schedule || !knownAmount) {
+        salaryResults.hidden = true;
+        return;
+      }
+
+      const currentGross = settings.salarySource === 'current' ? knownAmount : knownAmount * schedule.factor;
+      const fullGross = settings.salarySource === 'current' ? knownAmount / schedule.factor : knownAmount;
+      const monthlyDifference = fullGross - currentGross;
+      const effectivePercentage = schedule.factor * 100;
+      fullSalaryResult.textContent = formatEuro(fullGross);
+      currentSalaryLabel.textContent = `Tu jornada estimada · ${String(Math.round(effectivePercentage * 100) / 100).replace('.', ',')} %`;
+      currentSalaryResult.textContent = formatEuro(currentGross);
+      salaryDifference.textContent = `Diferencia: ${formatEuro(monthlyDifference)} ese mes · ${formatEuro(monthlyDifference * 12)} si la misma situación se repitiera 12 meses`;
+      salaryResults.hidden = false;
+    }
+
+    function updateScheduleUI() {
+      const reduced = scheduleType.value === 'reduced';
+      const partial = reduced && reductionDuration.value === 'partial';
+      percentageField.hidden = !reduced;
+      durationField.hidden = !reduced;
+      reductionDates.hidden = !partial;
+
+      const range = selectedMonthRange();
+      reductionStart.min = range.min;
+      reductionStart.max = range.max;
+      reductionEnd.min = range.min;
+      reductionEnd.max = range.max;
+      if (partial && !reductionStart.value) reductionStart.value = range.min;
+      if (partial && !reductionEnd.value) reductionEnd.value = range.max;
+
+      const settings = currentScheduleSettings();
+      const schedule = computeScheduleFactor(settings);
+      if (reduced && schedule) {
+        const reduction = Math.round((100 - settings.percentage) * 100) / 100;
+        const base = `Realizas el ${String(settings.percentage).replace('.', ',')} % de jornada · reducción del ${String(reduction).replace('.', ',')} %.`;
+        scheduleEquivalence.textContent = partial
+          ? `${base} Aplicada ${schedule.reducedDays} días, la jornada media estimada del mes es del ${String(Math.round(schedule.factor * 10000) / 100).replace('.', ',')} %.`
+          : base;
+        scheduleEquivalence.hidden = false;
+      } else {
+        scheduleEquivalence.hidden = true;
+        scheduleEquivalence.textContent = '';
+      }
+      updateSalaryComparison();
+    }
+
+    function markScheduleDirty() {
+      analysisConfirmed.hidden = true;
+      confirmAnalysisButton.dataset.action = 'confirm';
+      confirmAnalysisButton.textContent = 'Confirmar datos';
+      updateScheduleUI();
+    }
+
+    function saveWorkSchedule(settings) {
+      workSchedules.set(periodKey(), settings);
+      try {
+        globalThis.localStorage?.setItem(scheduleStorageKey(), JSON.stringify(settings));
+      } catch {}
+    }
+
+    function loadWorkSchedule() {
+      let settings = workSchedules.get(periodKey());
+      if (!settings) {
+        try {
+          const stored = globalThis.localStorage?.getItem(scheduleStorageKey());
+          if (stored) settings = JSON.parse(stored);
+        } catch {}
+      }
+      settings ||= {
+        type: 'full',
+        percentage: '',
+        duration: 'whole',
+        start: '',
+        end: '',
+        salarySource: 'full',
+        salaryAmount: ''
+      };
+      scheduleType.value = settings.type || 'full';
+      workPercentage.value = settings.percentage === null || settings.percentage === undefined ? '' : String(settings.percentage);
+      reductionDuration.value = settings.duration || 'whole';
+      reductionStart.value = settings.start || '';
+      reductionEnd.value = settings.end || '';
+      salarySource.value = settings.salarySource || 'full';
+      salaryAmount.value = settings.salaryAmount || '';
+      updateScheduleUI();
     }
 
     function storagePath(kind) {
@@ -2204,6 +2589,7 @@
       confirmAnalysisButton.disabled = false;
       confirmAnalysisButton.dataset.action = confirmed ? 'back' : 'confirm';
       confirmAnalysisButton.textContent = confirmed ? 'Volver al resumen' : 'Confirmar datos';
+      loadWorkSchedule();
       analysisForm.hidden = false;
     }
 
@@ -2342,7 +2728,25 @@
         return;
       }
 
+      const scheduleSettings = currentScheduleSettings();
+      const schedule = computeScheduleFactor(scheduleSettings);
+      if (!schedule) {
+        analysisError.textContent = scheduleSettings.duration === 'partial'
+          ? 'Revisa las fechas de la reducción: deben pertenecer al mes seleccionado.'
+          : 'Indica un porcentaje de jornada válido, superior a 0 e inferior a 100.';
+        analysisError.hidden = false;
+        (scheduleSettings.duration === 'partial' ? reductionStart : workPercentage).focus();
+        return;
+      }
+      if (scheduleSettings.salaryAmount && !parseLocalizedMoney(scheduleSettings.salaryAmount)) {
+        analysisError.textContent = 'Revisa el importe del simulador de salario.';
+        analysisError.hidden = false;
+        salaryAmount.focus();
+        return;
+      }
+
       confirmedTimesheetAnalyses.set(periodKey(), confirmed);
+      saveWorkSchedule(scheduleSettings);
       renderTimesheetAnalysis(confirmed, true);
       analysisConfirmed.textContent = '✓ Datos de la jornada confirmados. Pulsa «Volver al resumen» para regresar al periodo.';
       analysisConfirmed.hidden = false;
@@ -2628,6 +3032,13 @@
     startAnalysisButton.addEventListener('click', () => startTimesheetAnalysis());
     retryAnalysisButton.addEventListener('click', () => startTimesheetAnalysis(true));
     confirmAnalysisButton.addEventListener('click', handleAnalysisPrimaryAction);
+    scheduleType.addEventListener('change', markScheduleDirty);
+    workPercentage.addEventListener('input', markScheduleDirty);
+    reductionDuration.addEventListener('change', markScheduleDirty);
+    reductionStart.addEventListener('change', markScheduleDirty);
+    reductionEnd.addEventListener('change', markScheduleDirty);
+    salarySource.addEventListener('change', markScheduleDirty);
+    salaryAmount.addEventListener('input', markScheduleDirty);
     openHistoryButton.addEventListener('click', showHistoryScreen);
     refreshHistoryButton.addEventListener('click', loadPrivateHistory);
     document.getElementById('history-empty-action').addEventListener('click', showPeriodScreen);
