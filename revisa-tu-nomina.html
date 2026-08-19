@@ -36,12 +36,24 @@
       font-family: Arial, Helvetica, sans-serif;
     }
 
+    body::before {
+      content: '';
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: env(safe-area-inset-top);
+      background: var(--green);
+      pointer-events: none;
+    }
+
     button, select, input { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; }
     [hidden] { display: none !important; }
 
     .labbar {
-      padding: 10px 16px;
+      padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
       background: var(--green);
       color: white;
       text-align: center;
@@ -194,6 +206,11 @@
       background: #fff7d8;
       font-size: 12px;
       line-height: 1.4;
+    }
+
+    .reset-note.error {
+      color: #8a1d24;
+      background: #fff0f1;
     }
 
     .documents-heading {
@@ -613,12 +630,12 @@
             <select id="year" name="year"></select>
           </div>
         </div>
-        <p id="period-reset-note" class="reset-note" role="status" hidden>Al cambiar el periodo se han retirado las imágenes seleccionadas.</p>
+        <p id="period-reset-note" class="reset-note" role="status" hidden></p>
       </section>
 
       <div class="documents-heading">
         <h2>Documentos</h2>
-        <span id="document-count" class="document-count">0 de 2 preparados</span>
+        <span id="document-count" class="document-count">0 de 2 guardados</span>
       </div>
 
       <article id="timesheet-card" class="document-card">
@@ -650,13 +667,13 @@
       </article>
 
       <section id="completion-panel" class="completion-panel" hidden>
-        <strong>✓ Los dos documentos están preparados</strong>
-        <p>Ya puedes terminar esta primera prueba del proceso.</p>
+        <strong>✓ Los dos documentos están guardados</strong>
+        <p>Ya están disponibles en tu historial mensual privado.</p>
         <button id="finish" class="primary" type="button">Finalizar preparación</button>
         <p id="final-status" class="final-status" role="status" hidden></p>
       </section>
 
-      <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba las imágenes solo se muestran en tu dispositivo: no se envían ni se guardan. El historial mensual privado se activará junto con el análisis.</span></p>
+      <p class="local-note"><span aria-hidden="true">🛡️</span><span>Las imágenes se guardan en un espacio privado asociado a tu cuenta y no tienen enlaces públicos. Podrás recuperarlas al volver a elegir el mismo mes.</span></p>
     </section>
 
     <section id="document-screen" aria-labelledby="document-screen-title" hidden>
@@ -690,14 +707,14 @@
           <span>Acepto y confirmo que la imagen no contiene datos personales.</span>
         </label>
 
-        <input id="document-image" class="file-input" type="file" accept="image/*">
+        <input id="document-image" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
         <button id="select-image" class="secondary select-image" type="button" disabled><span aria-hidden="true">▣</span> Seleccionar imagen</button>
         <p id="select-hint" class="select-hint">Marca primero la casilla de aceptación.</p>
         <p id="file-error" class="error" role="alert" hidden></p>
 
         <div id="image-preview" class="preview" hidden>
           <img id="preview-image" alt="Vista previa de la imagen seleccionada">
-          <div class="preview-label"><span aria-hidden="true">✓</span><span>Imagen preparada en este dispositivo</span></div>
+          <div class="preview-label"><span aria-hidden="true">✓</span><span id="preview-status-text">Imagen lista para guardar</span></div>
         </div>
 
         <div id="document-actions" class="actions" hidden>
@@ -706,7 +723,7 @@
         </div>
       </section>
 
-      <p class="local-note"><span aria-hidden="true">ℹ️</span><span>Al confirmar volverás al resumen para continuar con el siguiente documento.</span></p>
+      <p class="local-note"><span aria-hidden="true">ℹ️</span><span>Al guardar volverás al resumen para continuar con el siguiente documento.</span></p>
     </section>
   </main>
 
@@ -738,6 +755,9 @@
       content.hidden = false;
     }
 
+    const currentUserId = session?.user?.id || '';
+    const STORAGE_BUCKET = 'payroll-documents';
+
     const month = document.getElementById('month');
     const year = document.getElementById('year');
     const periodScreen = document.getElementById('period-screen');
@@ -753,11 +773,14 @@
     const documentActions = document.getElementById('document-actions');
     const changeImageButton = document.getElementById('change-image');
     const confirmImageButton = document.getElementById('confirm-image');
+    const previewStatusText = document.getElementById('preview-status-text');
+    const periodMessage = document.getElementById('period-reset-note');
     const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+    const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     const documents = {
-      timesheet: { file: null, url: '', confirmed: false },
-      payroll: { file: null, url: '', confirmed: false }
+      timesheet: { file: null, url: '', confirmed: false, saved: false, path: '' },
+      payroll: { file: null, url: '', confirmed: false, saved: false, path: '' }
     };
     const documentCopy = {
       timesheet: {
@@ -777,6 +800,10 @@
     let activeKind = '';
     let workingFile = null;
     let workingUrl = '';
+    let workingSaved = false;
+    let loadingDocuments = false;
+    let savingDocument = false;
+    let storageLoadVersion = 0;
 
     const now = new Date();
     for (let value = now.getFullYear() + 1; value >= now.getFullYear() - 4; value -= 1) {
@@ -792,11 +819,27 @@
       return `${monthNames[Number(month.value)]} de ${year.value}`;
     }
 
+    function periodFolder() {
+      const selectedMonth = String(Number(month.value) + 1).padStart(2, '0');
+      return `${currentUserId}/${year.value}/${selectedMonth}`;
+    }
+
+    function storagePath(kind) {
+      return `${periodFolder()}/${kind}`;
+    }
+
+    function showPeriodMessage(message = '', isError = false) {
+      periodMessage.textContent = message;
+      periodMessage.classList.toggle('error', isError);
+      periodMessage.hidden = !message;
+    }
+
     function revokeWorkingUrlIfTemporary() {
       const storedUrl = activeKind ? documents[activeKind].url : '';
       if (workingUrl && workingUrl !== storedUrl) URL.revokeObjectURL(workingUrl);
       workingUrl = '';
       workingFile = null;
+      workingSaved = false;
     }
 
     function clearAllDocuments() {
@@ -806,8 +849,75 @@
         document.file = null;
         document.url = '';
         document.confirmed = false;
+        document.saved = false;
+        document.path = '';
       });
       activeKind = '';
+    }
+
+    async function loadStoredDocuments() {
+      const requestVersion = ++storageLoadVersion;
+      clearAllDocuments();
+
+      if (!currentUserId) {
+        updatePeriodCards();
+        return;
+      }
+
+      loadingDocuments = true;
+      showPeriodMessage('Cargando tu historial privado…');
+      updatePeriodCards();
+
+      const folder = periodFolder();
+      const { data: storedFiles, error: listError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .list(folder, {
+          limit: 10,
+          offset: 0,
+          sortBy: { column: 'name', order: 'asc' }
+        });
+
+      if (requestVersion !== storageLoadVersion) return;
+
+      if (listError) {
+        loadingDocuments = false;
+        showPeriodMessage('No hemos podido recuperar el historial. Comprueba la conexión e inténtalo de nuevo.', true);
+        updatePeriodCards();
+        return;
+      }
+
+      const storedKinds = ['timesheet', 'payroll'].filter((kind) =>
+        storedFiles?.some((item) => item.id && item.name === kind)
+      );
+
+      const downloads = await Promise.all(storedKinds.map(async (kind) => {
+        const path = `${folder}/${kind}`;
+        const { data: blob, error } = await supabase.storage.from(STORAGE_BUCKET).download(path);
+        return { kind, path, blob, error };
+      }));
+
+      if (requestVersion !== storageLoadVersion) return;
+
+      let downloadFailed = false;
+      downloads.forEach(({ kind, path, blob, error }) => {
+        if (error || !blob) {
+          downloadFailed = true;
+          return;
+        }
+
+        documents[kind].file = null;
+        documents[kind].url = URL.createObjectURL(blob);
+        documents[kind].confirmed = true;
+        documents[kind].saved = true;
+        documents[kind].path = path;
+      });
+
+      loadingDocuments = false;
+      showPeriodMessage(
+        downloadFailed ? 'Alguna imagen no se ha podido recuperar. Vuelve a intentarlo.' : '',
+        downloadFailed
+      );
+      updatePeriodCards();
     }
 
     function updatePeriodCards() {
@@ -822,8 +932,27 @@
       document.getElementById('timesheet-card-title').textContent = `Registro de jornada · ${label}`;
       document.getElementById('payroll-card-title').textContent = `Nómina · ${label}`;
 
+      if (loadingDocuments) {
+        timesheetCard.classList.remove('complete');
+        timesheetCard.classList.add('locked');
+        payrollCard.classList.remove('complete');
+        payrollCard.classList.add('locked');
+        document.getElementById('timesheet-status').textContent = 'Buscando';
+        document.getElementById('payroll-status').textContent = 'Buscando';
+        document.getElementById('payroll-help').textContent = 'Consultando tu historial privado.';
+        openTimesheet.disabled = true;
+        openPayroll.disabled = true;
+        openTimesheet.textContent = 'Cargando…';
+        openPayroll.textContent = 'Cargando…';
+        document.getElementById('document-count').textContent = 'Cargando historial…';
+        document.getElementById('completion-panel').hidden = true;
+        return;
+      }
+
       timesheetCard.classList.toggle('complete', timesheetComplete);
-      document.getElementById('timesheet-status').textContent = timesheetComplete ? 'Preparada' : 'Pendiente';
+      timesheetCard.classList.remove('locked');
+      document.getElementById('timesheet-status').textContent = timesheetComplete ? 'Guardada' : 'Pendiente';
+      openTimesheet.disabled = false;
       openTimesheet.textContent = timesheetComplete ? 'Revisar imagen' : 'Añadir imagen';
 
       payrollCard.classList.toggle('complete', payrollComplete);
@@ -831,7 +960,7 @@
       openPayroll.disabled = !timesheetComplete;
 
       if (payrollComplete) {
-        document.getElementById('payroll-status').textContent = 'Preparada';
+        document.getElementById('payroll-status').textContent = 'Guardada';
         document.getElementById('payroll-help').textContent = 'Primera página: devengos y deducciones.';
         openPayroll.textContent = 'Revisar imagen';
       } else if (timesheetComplete) {
@@ -845,12 +974,13 @@
       }
 
       const completed = Number(timesheetComplete) + Number(payrollComplete);
-      document.getElementById('document-count').textContent = `${completed} de 2 preparados`;
+      document.getElementById('document-count').textContent = `${completed} de 2 guardados`;
       document.getElementById('completion-panel').hidden = completed !== 2;
       if (completed !== 2) document.getElementById('final-status').hidden = true;
     }
 
     function resetDocumentScreen() {
+      savingDocument = false;
       privacyConfirmation.checked = false;
       fileInput.value = '';
       selectImageButton.disabled = true;
@@ -858,28 +988,41 @@
       fileError.hidden = true;
       fileError.textContent = '';
       confirmImageButton.disabled = true;
+      confirmImageButton.textContent = 'Guardar imagen';
     }
 
     function renderWorkingPreview() {
-      const hasImage = Boolean(workingFile && workingUrl);
+      const hasImage = Boolean(workingUrl && (workingFile || workingSaved));
+      const needsUpload = Boolean(workingFile && !workingSaved);
       preview.hidden = !hasImage;
       documentActions.hidden = !hasImage;
-      changeImageButton.disabled = !privacyConfirmation.checked;
-      confirmImageButton.disabled = !(hasImage && privacyConfirmation.checked);
+      changeImageButton.disabled = savingDocument || !privacyConfirmation.checked;
+      confirmImageButton.disabled = savingDocument || !hasImage || (needsUpload && !privacyConfirmation.checked);
+      confirmImageButton.textContent = savingDocument
+        ? 'Guardando…'
+        : (needsUpload ? 'Guardar imagen' : 'Volver al resumen');
 
       if (hasImage) {
         previewImage.src = workingUrl;
+        previewStatusText.textContent = workingSaved
+          ? 'Imagen guardada en tu historial privado'
+          : 'Imagen lista para guardar de forma privada';
       } else {
         previewImage.removeAttribute('src');
       }
     }
 
     function openDocument(kind) {
-      if (kind === 'payroll' && !documents.timesheet.confirmed) return;
+      if (loadingDocuments || (kind === 'payroll' && !documents.timesheet.confirmed)) return;
       activeKind = kind;
       workingFile = documents[kind].file;
       workingUrl = documents[kind].url;
+      workingSaved = documents[kind].saved;
       resetDocumentScreen();
+
+      if (workingSaved) {
+        selectHint.textContent = 'La imagen ya está guardada. Marca la casilla solo si quieres sustituirla.';
+      }
 
       const copy = documentCopy[kind];
       document.getElementById('document-step').textContent = copy.step;
@@ -907,14 +1050,9 @@
       document.getElementById('period-page-title').focus({ preventScroll: true });
     }
 
-    function handlePeriodChange() {
-      const hadImages = Object.values(documents).some((document) => document.file);
-      if (hadImages) {
-        clearAllDocuments();
-        document.getElementById('period-reset-note').hidden = false;
-      }
+    async function handlePeriodChange() {
       document.getElementById('final-status').hidden = true;
-      updatePeriodCards();
+      await loadStoredDocuments();
     }
 
     function chooseImage() {
@@ -927,8 +1065,8 @@
       fileError.hidden = true;
       fileError.textContent = '';
 
-      if (!file || !file.type.startsWith('image/')) {
-        fileError.textContent = 'Selecciona una imagen válida.';
+      if (!file || !ALLOWED_IMAGE_TYPES.has(file.type)) {
+        fileError.textContent = 'Selecciona una imagen JPG, PNG, WEBP o HEIC.';
         fileError.hidden = false;
         return;
       }
@@ -943,27 +1081,64 @@
       if (workingUrl && workingUrl !== storedUrl) URL.revokeObjectURL(workingUrl);
       workingFile = file;
       workingUrl = URL.createObjectURL(file);
+      workingSaved = false;
       renderWorkingPreview();
       preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function confirmImage() {
-      if (!activeKind || !workingFile || !workingUrl || !privacyConfirmation.checked) return;
+    async function confirmImage() {
+      if (!activeKind || savingDocument) return;
+
+      if (workingSaved && !workingFile) {
+        showPeriodScreen();
+        return;
+      }
+
+      if (!currentUserId || !workingFile || !workingUrl || !privacyConfirmation.checked) return;
+
+      savingDocument = true;
+      fileError.hidden = true;
+      selectImageButton.disabled = true;
+      renderWorkingPreview();
+
+      const path = storagePath(activeKind);
+      const { error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(path, workingFile, {
+          cacheControl: '0',
+          contentType: workingFile.type,
+          upsert: true
+        });
+
+      if (error) {
+        savingDocument = false;
+        fileError.textContent = 'No se ha podido guardar la imagen. Comprueba la conexión e inténtalo de nuevo.';
+        fileError.hidden = false;
+        selectImageButton.disabled = !privacyConfirmation.checked;
+        renderWorkingPreview();
+        return;
+      }
+
       const document = documents[activeKind];
       if (document.url && document.url !== workingUrl) URL.revokeObjectURL(document.url);
-      document.file = workingFile;
+      document.file = null;
       document.url = workingUrl;
       document.confirmed = true;
+      document.saved = true;
+      document.path = path;
       workingFile = null;
-      workingUrl = '';
+      workingSaved = true;
+      savingDocument = false;
       showPeriodScreen();
     }
 
     privacyConfirmation.addEventListener('change', () => {
-      selectImageButton.disabled = !privacyConfirmation.checked;
+      selectImageButton.disabled = savingDocument || !privacyConfirmation.checked;
       selectHint.textContent = privacyConfirmation.checked
-        ? 'Puedes seleccionar una imagen JPG, PNG o similar de hasta 15 MB.'
-        : 'Marca primero la casilla de aceptación.';
+        ? 'Puedes seleccionar una imagen JPG, PNG, WEBP o HEIC de hasta 15 MB.'
+        : (workingSaved
+          ? 'La imagen ya está guardada. Marca la casilla solo si quieres sustituirla.'
+          : 'Marca primero la casilla de aceptación.');
       renderWorkingPreview();
     });
 
@@ -979,12 +1154,13 @@
     topBack.addEventListener('click', (event) => {
       if (documentScreen.hidden) return;
       event.preventDefault();
+      if (savingDocument) return;
       showPeriodScreen();
     });
 
     document.getElementById('finish').addEventListener('click', () => {
       const finalStatus = document.getElementById('final-status');
-      finalStatus.textContent = 'Preparación completada. En este prototipo las imágenes siguen únicamente en tu dispositivo y no se han enviado ni guardado.';
+      finalStatus.textContent = `Preparación completada. Los documentos de ${periodLabel()} están guardados en tu historial privado.`;
       finalStatus.hidden = false;
       finalStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
@@ -996,7 +1172,11 @@
       });
     });
 
-    updatePeriodCards();
+    if (currentUserId) {
+      await loadStoredDocuments();
+    } else {
+      updatePeriodCards();
+    }
   </script>
 </body>
 </html>
