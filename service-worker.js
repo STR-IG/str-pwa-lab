@@ -1,4 +1,4 @@
-const CACHE_NAME = 'str-ig-cache-v30';
+const CACHE_NAME = 'str-ig-cache-v31';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -18,28 +18,29 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-async function injectPayrollLabPatch(response, requestUrl) {
-  const url = new URL(requestUrl);
+async function withLabPatches(response, request) {
+  const url = new URL(request.url);
   if (!url.pathname.endsWith('/revisa-tu-nomina.html')) return response;
+  const type = response.headers.get('content-type') || '';
+  if (!type.includes('text/html')) return response;
 
-  try {
-    const html = await response.clone().text();
-    if (html.includes('payroll-lab-patch.js')) return response;
-    const patched = html.replace(
-      '</body>',
-      '<script src="payroll-lab-patch.js?v=1"></script>\n</body>'
-    );
-    const headers = new Headers(response.headers);
-    headers.set('content-type', 'text/html; charset=utf-8');
-    headers.delete('content-length');
-    return new Response(patched, {
-      status: response.status,
-      statusText: response.statusText,
-      headers
-    });
-  } catch {
-    return response;
-  }
+  const html = await response.text();
+  const scripts = [
+    '<script src="timesheet-lab-patch.js?v=31"></script>',
+    '<script src="payroll-lab-patch.js?v=31"></script>'
+  ].join('');
+  const patched = html.includes('timesheet-lab-patch.js')
+    ? html
+    : html.replace('</body>', `${scripts}</body>`);
+
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+  headers.set('cache-control', 'no-store');
+  return new Response(patched, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
 }
 
 self.addEventListener('fetch', (event) => {
@@ -49,21 +50,21 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then(async (response) => {
-          const patchedResponse = await injectPayrollLabPatch(response, event.request.url);
-          const copy = patchedResponse.clone();
+          const patched = await withLabPatches(response, event.request);
+          const copy = patched.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          return patchedResponse;
+          return patched;
         })
         .catch(async () => {
           const cached = await caches.match(event.request);
-          return cached ? injectPayrollLabPatch(cached, event.request.url) : cached;
+          return cached ? withLabPatches(cached, event.request) : cached;
         })
     );
     return;
   }
 
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: 'no-store' })
       .then((response) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
