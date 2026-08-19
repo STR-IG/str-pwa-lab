@@ -213,6 +213,189 @@
       background: #fff0f1;
     }
 
+    .history-launch {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 16px;
+      padding: 13px 14px;
+      border: 1px solid #b9dfc9;
+      border-radius: 15px;
+      color: #174f34;
+      background: var(--green-soft);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .history-launch-icon {
+      display: grid;
+      flex: 0 0 39px;
+      place-items: center;
+      width: 39px;
+      height: 39px;
+      border-radius: 12px;
+      background: #d8f0e2;
+      font-size: 20px;
+    }
+
+    .history-launch-copy {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .history-launch-copy strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .history-launch-copy small {
+      display: block;
+      color: #41705a;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .history-launch-arrow {
+      flex: 0 0 auto;
+      font-size: 27px;
+      line-height: 1;
+    }
+
+    .history-summary {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .history-summary h2 {
+      margin: 0 0 3px;
+      font-size: 17px;
+    }
+
+    .history-summary p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .history-refresh {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 7px 11px;
+      border: 1px solid #d3d3d7;
+      border-radius: 999px;
+      color: var(--ink);
+      background: white;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .history-state {
+      margin: 4px 0 0;
+      padding: 18px 12px;
+      border-radius: 14px;
+      color: var(--muted);
+      background: #f5f5f7;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .history-state.error {
+      color: #841d25;
+      background: #fff1f2;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 11px;
+    }
+
+    .history-card {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--ink);
+      background: white;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .history-card.complete {
+      border-color: #a9d9bf;
+      background: #fbfffc;
+    }
+
+    .history-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .history-period-title {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .history-period-status {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: #765500;
+      background: #fff3c4;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .25px;
+    }
+
+    .history-card.complete .history-period-status {
+      color: #17603d;
+      background: #dff3e7;
+    }
+
+    .history-document-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 11px;
+    }
+
+    .history-document-chip {
+      padding: 6px 8px;
+      border-radius: 9px;
+      color: #737378;
+      background: #eeeeef;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .history-document-chip.saved {
+      color: #205b38;
+      background: #e5f5eb;
+    }
+
+    .history-open-label {
+      display: block;
+      margin-top: 12px;
+      color: var(--red-dark);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .history-empty-action {
+      margin-top: 13px;
+    }
+
     .documents-heading {
       display: flex;
       align-items: center;
@@ -694,6 +877,14 @@
           </div>
         </div>
         <p id="period-reset-note" class="reset-note" role="status" hidden></p>
+        <button id="open-history" class="history-launch" type="button">
+          <span class="history-launch-icon" aria-hidden="true">🗂️</span>
+          <span class="history-launch-copy">
+            <strong>Mi historial</strong>
+            <small>Consulta todos tus meses y abre sus documentos guardados.</small>
+          </span>
+          <span class="history-launch-arrow" aria-hidden="true">›</span>
+        </button>
       </section>
 
       <div class="documents-heading">
@@ -737,6 +928,34 @@
       </section>
 
       <p class="local-note"><span aria-hidden="true">🛡️</span><span>Las imágenes se guardan en un espacio privado asociado a tu cuenta y no tienen enlaces públicos. Podrás recuperarlas al volver a elegir el mismo mes.</span></p>
+    </section>
+
+    <section id="history-screen" aria-labelledby="history-screen-title" hidden>
+      <div class="document-screen-header">
+        <span class="step-label">HISTORIAL PRIVADO</span>
+        <h1 id="history-screen-title" tabindex="-1">Mi historial</h1>
+        <p class="document-period">Tus periodos guardados, del más reciente al más antiguo.</p>
+      </div>
+
+      <section class="panel">
+        <div class="history-summary">
+          <div>
+            <h2>Meses guardados</h2>
+            <p id="history-count">Consultando tu espacio privado…</p>
+          </div>
+          <button id="refresh-history" class="history-refresh" type="button">Actualizar</button>
+        </div>
+
+        <p id="history-loading" class="history-state" role="status">Cargando historial…</p>
+        <p id="history-error" class="history-state error" role="alert" hidden></p>
+        <div id="history-list" class="history-list" hidden></div>
+        <div id="history-empty" class="history-state" hidden>
+          Todavía no tienes ningún mes guardado.
+          <button id="history-empty-action" class="secondary history-empty-action" type="button">Preparar mi primer mes</button>
+        </div>
+      </section>
+
+      <p class="local-note"><span aria-hidden="true">🔒</span><span>Solo se muestran los periodos asociados a tu cuenta. Las imágenes continúan siendo privadas.</span></p>
     </section>
 
     <section id="document-screen" aria-labelledby="document-screen-title" hidden>
@@ -833,8 +1052,16 @@
     const month = document.getElementById('month');
     const year = document.getElementById('year');
     const periodScreen = document.getElementById('period-screen');
+    const historyScreen = document.getElementById('history-screen');
     const documentScreen = document.getElementById('document-screen');
     const topBack = document.getElementById('top-back');
+    const openHistoryButton = document.getElementById('open-history');
+    const refreshHistoryButton = document.getElementById('refresh-history');
+    const historyCount = document.getElementById('history-count');
+    const historyLoading = document.getElementById('history-loading');
+    const historyError = document.getElementById('history-error');
+    const historyList = document.getElementById('history-list');
+    const historyEmpty = document.getElementById('history-empty');
     const privacyConfirmation = document.getElementById('privacy-confirmation');
     const fileInput = document.getElementById('document-image');
     const selectImageButton = document.getElementById('select-image');
@@ -897,6 +1124,8 @@
     let loadingDocuments = false;
     let savingDocument = false;
     let storageLoadVersion = 0;
+    let historyLoadVersion = 0;
+    let historyEntries = [];
     let privacyScanState = 'idle';
     let privacyScanVersion = 0;
     let ocrWorkerPromise = null;
@@ -1015,6 +1244,147 @@
         downloadFailed
       );
       updatePeriodCards();
+    }
+
+    async function listAllStorageItems(path) {
+      const items = [];
+      const pageSize = 100;
+      let offset = 0;
+
+      while (true) {
+        const { data, error } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .list(path, {
+            limit: pageSize,
+            offset,
+            sortBy: { column: 'name', order: 'asc' }
+          });
+
+        if (error) throw error;
+        const page = data || [];
+        items.push(...page);
+        if (page.length < pageSize) break;
+        offset += page.length;
+      }
+
+      return items;
+    }
+
+    function createHistoryChip(label, saved) {
+      const chip = document.createElement('span');
+      chip.className = `history-document-chip${saved ? ' saved' : ''}`;
+      chip.textContent = `${saved ? '✓' : '–'} ${label}`;
+      return chip;
+    }
+
+    function renderPrivateHistory() {
+      historyList.textContent = '';
+      historyCount.textContent = historyEntries.length === 1
+        ? '1 periodo guardado'
+        : `${historyEntries.length} periodos guardados`;
+      historyLoading.hidden = true;
+      historyError.hidden = true;
+      historyList.hidden = historyEntries.length === 0;
+      historyEmpty.hidden = historyEntries.length !== 0;
+
+      historyEntries.forEach((entry) => {
+        const complete = entry.timesheet && entry.payroll;
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `history-card${complete ? ' complete' : ''}`;
+        card.setAttribute('aria-label', `Abrir ${monthNames[entry.month - 1]} de ${entry.year}`);
+
+        const top = document.createElement('span');
+        top.className = 'history-card-top';
+
+        const title = document.createElement('strong');
+        title.className = 'history-period-title';
+        title.textContent = `${monthNames[entry.month - 1][0].toUpperCase()}${monthNames[entry.month - 1].slice(1)} de ${entry.year}`;
+
+        const status = document.createElement('span');
+        status.className = 'history-period-status';
+        status.textContent = complete ? 'Completo' : '1 de 2';
+
+        top.appendChild(title);
+        top.appendChild(status);
+
+        const chips = document.createElement('span');
+        chips.className = 'history-document-chips';
+        chips.appendChild(createHistoryChip('Registro de jornada', entry.timesheet));
+        chips.appendChild(createHistoryChip('Nómina', entry.payroll));
+
+        const openLabel = document.createElement('span');
+        openLabel.className = 'history-open-label';
+        openLabel.textContent = 'Abrir periodo ›';
+
+        card.appendChild(top);
+        card.appendChild(chips);
+        card.appendChild(openLabel);
+        card.addEventListener('click', () => openHistoryPeriod(entry.year, entry.month));
+        historyList.appendChild(card);
+      });
+    }
+
+    async function loadPrivateHistory() {
+      const requestVersion = ++historyLoadVersion;
+      historyEntries = [];
+      historyCount.textContent = 'Consultando tu espacio privado…';
+      historyLoading.hidden = false;
+      historyError.hidden = true;
+      historyList.hidden = true;
+      historyEmpty.hidden = true;
+      refreshHistoryButton.disabled = true;
+
+      if (!currentUserId) {
+        historyLoading.hidden = true;
+        historyError.textContent = 'No se ha podido identificar tu cuenta.';
+        historyError.hidden = false;
+        refreshHistoryButton.disabled = false;
+        return;
+      }
+
+      try {
+        const rootItems = await listAllStorageItems(currentUserId);
+        const years = rootItems
+          .filter((item) => item.id == null && /^\d{4}$/.test(item.name))
+          .map((item) => Number(item.name));
+
+        const yearResults = await Promise.all(years.map(async (savedYear) => ({
+          year: savedYear,
+          items: await listAllStorageItems(`${currentUserId}/${savedYear}`)
+        })));
+
+        const months = yearResults.flatMap(({ year: savedYear, items }) =>
+          items
+            .filter((item) => item.id == null && /^(0[1-9]|1[0-2])$/.test(item.name))
+            .map((item) => ({ year: savedYear, month: Number(item.name) }))
+        );
+
+        const entries = await Promise.all(months.map(async ({ year: savedYear, month: savedMonth }) => {
+          const folder = `${currentUserId}/${savedYear}/${String(savedMonth).padStart(2, '0')}`;
+          const files = await listAllStorageItems(folder);
+          return {
+            year: savedYear,
+            month: savedMonth,
+            timesheet: files.some((item) => Boolean(item.id) && item.name === 'timesheet'),
+            payroll: files.some((item) => Boolean(item.id) && item.name === 'payroll')
+          };
+        }));
+
+        if (requestVersion !== historyLoadVersion) return;
+        historyEntries = entries
+          .filter((entry) => entry.timesheet || entry.payroll)
+          .sort((a, b) => (b.year - a.year) || (b.month - a.month));
+        renderPrivateHistory();
+      } catch {
+        if (requestVersion !== historyLoadVersion) return;
+        historyLoading.hidden = true;
+        historyCount.textContent = 'Historial no disponible';
+        historyError.textContent = 'No hemos podido cargar tu historial. Comprueba la conexión e inténtalo de nuevo.';
+        historyError.hidden = false;
+      } finally {
+        if (requestVersion === historyLoadVersion) refreshHistoryButton.disabled = false;
+      }
     }
 
     function updatePeriodCards() {
@@ -1258,12 +1628,42 @@
       document.getElementById('document-screen-title').focus({ preventScroll: true });
     }
 
+    function ensureYearOption(savedYear) {
+      const value = String(savedYear);
+      const exists = Array.from(year.children).some((option) => option.value === value);
+      if (exists) return;
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      year.appendChild(option);
+    }
+
+    async function showHistoryScreen() {
+      periodScreen.hidden = true;
+      documentScreen.hidden = true;
+      historyScreen.hidden = false;
+      topBack.setAttribute('aria-label', 'Volver al periodo seleccionado');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.getElementById('history-screen-title').focus({ preventScroll: true });
+      await loadPrivateHistory();
+    }
+
+    async function openHistoryPeriod(savedYear, savedMonth) {
+      ensureYearOption(savedYear);
+      year.value = String(savedYear);
+      month.value = String(savedMonth - 1);
+      showPeriodScreen();
+      await loadStoredDocuments();
+    }
+
     function showPeriodScreen() {
+      historyLoadVersion += 1;
       privacyScanVersion += 1;
       setPrivacyScanState('idle');
       revokeWorkingUrlIfTemporary();
       activeKind = '';
       documentScreen.hidden = true;
+      historyScreen.hidden = true;
       periodScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver a la pantalla principal');
       updatePeriodCards();
@@ -1373,6 +1773,9 @@
 
     document.getElementById('open-timesheet').addEventListener('click', () => openDocument('timesheet'));
     document.getElementById('open-payroll').addEventListener('click', () => openDocument('payroll'));
+    openHistoryButton.addEventListener('click', showHistoryScreen);
+    refreshHistoryButton.addEventListener('click', loadPrivateHistory);
+    document.getElementById('history-empty-action').addEventListener('click', showPeriodScreen);
     selectImageButton.addEventListener('click', chooseImage);
     changeImageButton.addEventListener('click', chooseImage);
     fileInput.addEventListener('change', (event) => showSelectedFile(event.target.files[0]));
@@ -1381,6 +1784,11 @@
     year.addEventListener('change', handlePeriodChange);
 
     topBack.addEventListener('click', (event) => {
+      if (!historyScreen.hidden) {
+        event.preventDefault();
+        showPeriodScreen();
+        return;
+      }
       if (documentScreen.hidden) return;
       event.preventDefault();
       if (savingDocument) return;
