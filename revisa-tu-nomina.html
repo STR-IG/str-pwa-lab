@@ -558,6 +558,199 @@
       line-height: 1.45;
     }
 
+    .analysis-progress {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      padding: 14px;
+      border: 1px solid #d8d8dc;
+      border-radius: 14px;
+      color: #45454a;
+      background: #f5f5f7;
+    }
+
+    .analysis-progress.checking .analysis-progress-icon {
+      animation: privacy-pulse 1.15s ease-in-out infinite;
+    }
+
+    .analysis-progress.ready {
+      border-color: #a8ddbf;
+      color: #205b38;
+      background: #eef9f3;
+    }
+
+    .analysis-progress.warning,
+    .analysis-progress.failed {
+      border-color: #ebd38a;
+      color: #684900;
+      background: #fff8df;
+    }
+
+    .analysis-progress-icon {
+      flex: 0 0 auto;
+      width: 24px;
+      text-align: center;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .analysis-progress strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .analysis-progress p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .analysis-form {
+      margin-top: 17px;
+    }
+
+    .analysis-reference {
+      margin-top: 13px;
+      padding: 11px 12px;
+      border: 1px solid #dedee2;
+      border-radius: 13px;
+      background: #fbfbfc;
+    }
+
+    .analysis-reference summary {
+      color: var(--red-dark);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .analysis-reference img {
+      display: block;
+      width: 100%;
+      max-height: 390px;
+      margin-top: 11px;
+      border-radius: 10px;
+      object-fit: contain;
+      background: white;
+    }
+
+    .analysis-form-heading {
+      margin-bottom: 13px;
+    }
+
+    .analysis-form-heading h2 {
+      margin: 0 0 5px;
+      font-size: 17px;
+    }
+
+    .analysis-form-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .analysis-detected-count {
+      display: inline-block;
+      margin-top: 9px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: #2c6547;
+      background: #e7f5ec;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .analysis-fields {
+      display: grid;
+      gap: 10px;
+    }
+
+    .analysis-field {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfbfc;
+    }
+
+    .analysis-field-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .analysis-field label {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .analysis-field-status {
+      flex: 0 0 auto;
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: #6c5206;
+      background: #fff1bd;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+    }
+
+    .analysis-field-status.detected {
+      color: #17603d;
+      background: #dff3e7;
+    }
+
+    .analysis-field input {
+      width: 100%;
+      min-height: 47px;
+      padding: 10px 12px;
+      border: 1px solid #cacace;
+      border-radius: 11px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .analysis-field input:focus {
+      border-color: var(--red);
+      outline: 3px solid rgba(227, 6, 19, .12);
+    }
+
+    .analysis-field small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .analysis-actions {
+      display: grid;
+      grid-template-columns: .9fr 1.25fr;
+      gap: 10px;
+      margin-top: 17px;
+    }
+
+    .analysis-actions .primary,
+    .analysis-actions .secondary { margin: 0; }
+
+    .analysis-confirmed {
+      margin: 13px 0 0;
+      padding: 13px 14px;
+      border-radius: 13px;
+      color: #205b35;
+      background: #eef7f1;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     .primary {
       margin-top: 17px;
       border: 0;
@@ -830,6 +1023,7 @@
       .document-line { display: block; }
       .status-pill { display: inline-block; margin-top: 7px; }
       .actions { grid-template-columns: 1fr; }
+      .analysis-actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -922,9 +1116,9 @@
 
       <section id="completion-panel" class="completion-panel" hidden>
         <strong>✓ Los dos documentos están guardados</strong>
-        <p>Ya están disponibles en tu historial mensual privado.</p>
-        <button id="finish" class="primary" type="button">Finalizar preparación</button>
-        <p id="final-status" class="final-status" role="status" hidden></p>
+        <p>Ya puedes comprobar los datos detectados en el registro de jornada.</p>
+        <button id="start-analysis" class="primary" type="button">Analizar periodo</button>
+        <p id="analysis-ready-status" class="final-status" role="status" hidden></p>
       </section>
 
       <p class="local-note"><span aria-hidden="true">🛡️</span><span>Las imágenes se guardan en un espacio privado asociado a tu cuenta y no tienen enlaces públicos. Podrás recuperarlas al volver a elegir el mismo mes.</span></p>
@@ -956,6 +1150,48 @@
       </section>
 
       <p class="local-note"><span aria-hidden="true">🔒</span><span>Solo se muestran los periodos asociados a tu cuenta. Las imágenes continúan siendo privadas.</span></p>
+    </section>
+
+    <section id="analysis-screen" aria-labelledby="analysis-screen-title" hidden>
+      <div class="document-screen-header">
+        <span class="step-label">PASO 2 DE 3</span>
+        <h1 id="analysis-screen-title" tabindex="-1">Datos del registro de jornada</h1>
+        <p id="analysis-period" class="document-period"></p>
+      </div>
+
+      <section class="panel">
+        <div id="analysis-progress" class="analysis-progress checking" role="status" aria-live="polite">
+          <span id="analysis-progress-icon" class="analysis-progress-icon" aria-hidden="true">🔎</span>
+          <div>
+            <strong id="analysis-progress-title">Preparando la lectura…</strong>
+            <p id="analysis-progress-message">La imagen se analizará en este dispositivo.</p>
+          </div>
+        </div>
+
+        <details class="analysis-reference">
+          <summary>Ver el registro de jornada guardado</summary>
+          <img id="analysis-reference-image" alt="Registro de jornada usado para comprobar las cantidades">
+        </details>
+
+        <div id="analysis-form" class="analysis-form" hidden>
+          <div class="analysis-form-heading">
+            <h2>Conceptos y cantidades</h2>
+            <p>Comprueba cada cifra y corrige lo que no se haya leído bien. Deja vacío un concepto que no aparezca ese mes.</p>
+            <span id="analysis-detected-count" class="analysis-detected-count">0 conceptos detectados</span>
+          </div>
+
+          <div id="analysis-fields" class="analysis-fields"></div>
+          <p id="analysis-error" class="error" role="alert" hidden></p>
+
+          <div class="analysis-actions">
+            <button id="retry-analysis" class="secondary" type="button">Volver a leer</button>
+            <button id="confirm-analysis" class="primary" type="button">Confirmar datos</button>
+          </div>
+          <p id="analysis-confirmed" class="analysis-confirmed" role="status" hidden></p>
+        </div>
+      </section>
+
+      <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba solo se muestran conceptos y cantidades. Los datos confirmados no se envían a otras personas.</span></p>
     </section>
 
     <section id="document-screen" aria-labelledby="document-screen-title" hidden>
@@ -1053,6 +1289,7 @@
     const year = document.getElementById('year');
     const periodScreen = document.getElementById('period-screen');
     const historyScreen = document.getElementById('history-screen');
+    const analysisScreen = document.getElementById('analysis-screen');
     const documentScreen = document.getElementById('document-screen');
     const topBack = document.getElementById('top-back');
     const openHistoryButton = document.getElementById('open-history');
@@ -1062,6 +1299,20 @@
     const historyError = document.getElementById('history-error');
     const historyList = document.getElementById('history-list');
     const historyEmpty = document.getElementById('history-empty');
+    const startAnalysisButton = document.getElementById('start-analysis');
+    const analysisPeriod = document.getElementById('analysis-period');
+    const analysisProgress = document.getElementById('analysis-progress');
+    const analysisProgressIcon = document.getElementById('analysis-progress-icon');
+    const analysisProgressTitle = document.getElementById('analysis-progress-title');
+    const analysisProgressMessage = document.getElementById('analysis-progress-message');
+    const analysisReferenceImage = document.getElementById('analysis-reference-image');
+    const analysisForm = document.getElementById('analysis-form');
+    const analysisDetectedCount = document.getElementById('analysis-detected-count');
+    const analysisFields = document.getElementById('analysis-fields');
+    const analysisError = document.getElementById('analysis-error');
+    const retryAnalysisButton = document.getElementById('retry-analysis');
+    const confirmAnalysisButton = document.getElementById('confirm-analysis');
+    const analysisConfirmed = document.getElementById('analysis-confirmed');
     const privacyConfirmation = document.getElementById('privacy-confirmation');
     const fileInput = document.getElementById('document-image');
     const selectImageButton = document.getElementById('select-image');
@@ -1098,20 +1349,86 @@
       /\bPOSICION\b/
     ];
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const TIMESHEET_VARIABLES = [
+      {
+        key: 'rotation',
+        label: 'Plus rotatividad',
+        patterns: [/PLUS\s+ROT[A-Z]*VIDAD/],
+        max: 31
+      },
+      {
+        key: 'meals',
+        label: 'Comidas Can Guasch',
+        patterns: [/COMIDAS?\s+CAN\s+GUA?SCH/],
+        max: 31
+      },
+      {
+        key: 'night',
+        label: 'Plus nocturno',
+        patterns: [/PLUS\s+NOCTUR[NM]/],
+        max: 200
+      },
+      {
+        key: 'shift',
+        label: 'Plus de turno',
+        patterns: [/PLUS\s+(?:DE\s+)?TU(?:R[NM]|M)O/],
+        max: 31
+      },
+      {
+        key: 'holiday',
+        label: 'Plus festivo',
+        patterns: [/PLUS(?:ES)?\s+FESTIVO/],
+        max: 200
+      },
+      {
+        key: 'unpaidNight',
+        label: 'NOPAGA PNocturn teórico',
+        patterns: [/NOPAGA.*NOCTUR[NM]/],
+        max: 24,
+        decimalHint: true
+      },
+      {
+        key: 'unpaidHoliday',
+        label: 'NOPAGA PFestivo teórico',
+        patterns: [/NOPAGA.*FESTIVO/],
+        max: 24,
+        decimalHint: true
+      },
+      {
+        key: 'shift12',
+        label: 'Plus de turno 12 horas',
+        patterns: [/PLUS\s+(?:DE\s+)?TU(?:R[NM]|M)O\s+12\s+HORAS/],
+        max: 31,
+        labelNumber: 12
+      },
+      {
+        key: 'holidayDiets',
+        label: 'Dietas festivos',
+        patterns: [/DIETAS?\s+FESTIVOS?/],
+        max: 31
+      },
+      {
+        key: 'vacation',
+        label: 'Pluses vacaciones',
+        patterns: [/PLUS(?:ES)?\s+VACACIONES?/],
+        max: 31
+      }
+    ];
+    const TIMESHEET_MATCH_ORDER = ['unpaidNight', 'unpaidHoliday', 'shift12', 'holidayDiets', 'vacation', 'rotation', 'meals', 'night', 'shift', 'holiday'];
     const documents = {
-      timesheet: { file: null, url: '', confirmed: false, saved: false, path: '' },
-      payroll: { file: null, url: '', confirmed: false, saved: false, path: '' }
+      timesheet: { file: null, blob: null, url: '', ocrText: '', confirmed: false, saved: false, path: '' },
+      payroll: { file: null, blob: null, url: '', ocrText: '', confirmed: false, saved: false, path: '' }
     };
     const documentCopy = {
       timesheet: {
         title: 'Registro de jornada',
-        step: 'PASO 2 DE 3',
+        step: 'DOCUMENTO 1 DE 2',
         icon: '🗓️',
         instruction: 'Recorta la zona «Resumen de variables del mes».'
       },
       payroll: {
         title: 'Nómina',
-        step: 'PASO 3 DE 3',
+        step: 'DOCUMENTO 2 DE 2',
         icon: '🧾',
         instruction: 'Usa la primera página y recorta el apartado «Devengos y deducciones».'
       }
@@ -1126,8 +1443,13 @@
     let storageLoadVersion = 0;
     let historyLoadVersion = 0;
     let historyEntries = [];
+    let analysisRunVersion = 0;
+    let analysisRunning = false;
+    let analysisInputs = new Map();
+    const confirmedTimesheetAnalyses = new Map();
     let privacyScanState = 'idle';
     let privacyScanVersion = 0;
+    let workingOcrText = '';
     let ocrWorkerPromise = null;
     let ocrQueue = Promise.resolve();
 
@@ -1150,6 +1472,11 @@
       return `${currentUserId}/${year.value}/${selectedMonth}`;
     }
 
+    function periodKey() {
+      const selectedMonth = String(Number(month.value) + 1).padStart(2, '0');
+      return `${year.value}-${selectedMonth}`;
+    }
+
     function storagePath(kind) {
       return `${periodFolder()}/${kind}`;
     }
@@ -1166,6 +1493,7 @@
       workingUrl = '';
       workingFile = null;
       workingSaved = false;
+      workingOcrText = '';
     }
 
     function clearAllDocuments() {
@@ -1173,7 +1501,9 @@
       Object.values(documents).forEach((document) => {
         if (document.url) URL.revokeObjectURL(document.url);
         document.file = null;
+        document.blob = null;
         document.url = '';
+        document.ocrText = '';
         document.confirmed = false;
         document.saved = false;
         document.path = '';
@@ -1232,7 +1562,9 @@
         }
 
         documents[kind].file = null;
+        documents[kind].blob = blob;
         documents[kind].url = URL.createObjectURL(blob);
+        documents[kind].ocrText = '';
         documents[kind].confirmed = true;
         documents[kind].saved = true;
         documents[kind].path = path;
@@ -1413,6 +1745,7 @@
         openPayroll.textContent = 'Cargando…';
         document.getElementById('document-count').textContent = 'Cargando historial…';
         document.getElementById('completion-panel').hidden = true;
+        startAnalysisButton.disabled = true;
         return;
       }
 
@@ -1443,7 +1776,13 @@
       const completed = Number(timesheetComplete) + Number(payrollComplete);
       document.getElementById('document-count').textContent = `${completed} de 2 guardados`;
       document.getElementById('completion-panel').hidden = completed !== 2;
-      if (completed !== 2) document.getElementById('final-status').hidden = true;
+      startAnalysisButton.disabled = completed !== 2;
+      startAnalysisButton.textContent = confirmedTimesheetAnalyses.has(periodKey())
+        ? `Revisar datos de ${label}`
+        : `Analizar ${label}`;
+      const readyStatus = document.getElementById('analysis-ready-status');
+      readyStatus.textContent = '✓ Datos de la jornada confirmados para esta prueba.';
+      readyStatus.hidden = completed !== 2 || !confirmedTimesheetAnalyses.has(periodKey());
     }
 
     function normalizeOcrText(text) {
@@ -1453,6 +1792,154 @@
         .toUpperCase()
         .replace(/\s+/g, ' ')
         .trim();
+    }
+
+    function normalizeOcrLine(text) {
+      return String(text || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[|\[\]{}‘’“”]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function matchTimesheetVariable(line) {
+      const normalized = normalizeOcrLine(line);
+      for (const key of TIMESHEET_MATCH_ORDER) {
+        const variable = TIMESHEET_VARIABLES.find((item) => item.key === key);
+        if (variable?.patterns.some((pattern) => pattern.test(normalized))) return variable;
+      }
+      return null;
+    }
+
+    function numericCandidates(text) {
+      const normalized = normalizeOcrLine(text);
+      const compact = normalized.replace(/\s+/g, '');
+      if (/\d/.test(compact) && /[A-Z]/.test(compact) && compact.length <= 7 && /^[A-Z0-9.,+-]+$/.test(compact)) {
+        const corrected = compact
+          .replace(/[OQD]/g, '0')
+          .replace(/[IL]/g, '1')
+          .replace(/Z/g, '2')
+          .replace(/A/g, '4')
+          .replace(/S/g, '5')
+          .replace(/G/g, '6')
+          .replace(/B/g, '8');
+        if (/^[-+]?\d+(?:[.,]\d+)?$/.test(corrected)) {
+          return [{ raw: corrected, correctedLetters: true }];
+        }
+      }
+
+      const direct = normalized.match(/[-+]?\d+(?:[.,]\d+)?/g) || [];
+      return direct.map((value) => ({ raw: value, correctedLetters: false }));
+    }
+
+    function normalizeDetectedQuantity(candidate, variable) {
+      if (!candidate) return null;
+      const hadSeparator = /[.,]/.test(candidate.raw);
+      const normalized = candidate.raw.replace(',', '.');
+      let quantity = Number(normalized);
+      if (!Number.isFinite(quantity) || quantity < 0) return null;
+
+      let inferredDecimal = false;
+      if (!hadSeparator && variable.decimalHint && quantity >= 10 && quantity <= 99 && quantity % 5 === 0) {
+        quantity /= 10;
+        inferredDecimal = true;
+      }
+
+      while (quantity > variable.max && !hadSeparator && quantity / 10 <= variable.max) {
+        quantity /= 10;
+        inferredDecimal = true;
+      }
+      while (quantity > variable.max && !hadSeparator && quantity / 100 <= variable.max) {
+        quantity /= 100;
+        inferredDecimal = true;
+      }
+      if (quantity > variable.max) return null;
+
+      const rounded = Math.round(quantity * 100) / 100;
+      return {
+        value: String(rounded).replace('.', ','),
+        quality: candidate.correctedLetters || inferredDecimal ? 1 : 2
+      };
+    }
+
+    function quantityFromConceptLine(line, variable) {
+      let candidates = numericCandidates(line);
+      if (variable.labelNumber !== undefined) {
+        if (candidates.length === 1 && Number(candidates[0].raw.replace(',', '.')) === variable.labelNumber) return null;
+        candidates = candidates.filter((candidate, index) =>
+          index === candidates.length - 1 || Number(candidate.raw.replace(',', '.')) !== variable.labelNumber
+        );
+      }
+      return normalizeDetectedQuantity(candidates.at(-1), variable);
+    }
+
+    function parseTimesheetText(text) {
+      const allLines = String(text || '')
+        .split(/\r?\n/)
+        .map(normalizeOcrLine)
+        .filter(Boolean);
+      const summaryIndex = allLines.findIndex((line) => /RESUMEN\s+DE\s+VARIABLES/.test(line));
+      const relevantLines = summaryIndex >= 0 ? allLines.slice(summaryIndex + 1) : allLines;
+      const balancesIndex = relevantLines.findIndex((line) => /^SALDOS?$/.test(line));
+      const lines = balancesIndex >= 0 ? relevantLines.slice(0, balancesIndex) : relevantLines;
+      const found = new Map();
+      const consumedQuantityLines = new Set();
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const variable = matchTimesheetVariable(lines[index]);
+        if (!variable || found.has(variable.key)) continue;
+
+        let quantity = quantityFromConceptLine(lines[index], variable);
+        if (!quantity) {
+          for (let distance = 1; distance <= 3 && index + distance < lines.length; distance += 1) {
+            const nextLine = lines[index + distance];
+            if (matchTimesheetVariable(nextLine)) break;
+            quantity = normalizeDetectedQuantity(numericCandidates(nextLine).at(-1), variable);
+            if (quantity) {
+              consumedQuantityLines.add(index + distance);
+              break;
+            }
+          }
+        }
+
+        if (!quantity && index > 0 && !consumedQuantityLines.has(index - 1) && !matchTimesheetVariable(lines[index - 1])) {
+          quantity = normalizeDetectedQuantity(numericCandidates(lines[index - 1]).at(-1), variable);
+          if (quantity) consumedQuantityLines.add(index - 1);
+        }
+
+        if (quantity) found.set(variable.key, quantity);
+      }
+      return found;
+    }
+
+    function extractTimesheetVariables(texts) {
+      const candidates = new Map();
+      (Array.isArray(texts) ? texts : [texts]).forEach((text) => {
+        parseTimesheetText(text).forEach((result, key) => {
+          if (!candidates.has(key)) candidates.set(key, []);
+          candidates.get(key).push(result);
+        });
+      });
+
+      const extracted = new Map();
+      TIMESHEET_VARIABLES.forEach((variable) => {
+        const values = candidates.get(variable.key) || [];
+        if (!values.length) return;
+        const grouped = new Map();
+        values.forEach((result) => {
+          const group = grouped.get(result.value) || { count: 0, quality: 0, result };
+          group.count += 1;
+          group.quality = Math.max(group.quality, result.quality);
+          grouped.set(result.value, group);
+        });
+        const best = [...grouped.values()].sort((a, b) =>
+          b.count - a.count || b.quality - a.quality
+        )[0];
+        extracted.set(variable.key, best.result);
+      });
+      return extracted;
     }
 
     function containsLikelyPersonalData(text) {
@@ -1517,11 +2004,14 @@
       return ocrWorkerPromise;
     }
 
-    function recognizeTextLocally(file) {
+    function recognizeTextLocally(file, pageSegMode = '3') {
       const job = ocrQueue
         .catch(() => undefined)
         .then(async () => {
           const worker = await getOcrWorker();
+          if (worker.setParameters) {
+            await worker.setParameters({ tessedit_pageseg_mode: String(pageSegMode) });
+          }
           const result = await worker.recognize(file);
           return result?.data?.text || '';
         });
@@ -1529,10 +2019,280 @@
       return job;
     }
 
+    function setAnalysisProgress(state, icon, title, message) {
+      analysisProgress.className = `analysis-progress ${state}`;
+      analysisProgressIcon.textContent = icon;
+      analysisProgressTitle.textContent = title;
+      analysisProgressMessage.textContent = message;
+    }
+
+    function loadImageForAnalysis(blob) {
+      return new Promise((resolve, reject) => {
+        const imageUrl = URL.createObjectURL(blob);
+        const image = new Image();
+        image.onload = () => resolve({ image, imageUrl });
+        image.onerror = () => {
+          URL.revokeObjectURL(imageUrl);
+          reject(new Error('Image unavailable'));
+        };
+        image.src = imageUrl;
+      });
+    }
+
+    function createAnalysisCanvas(image, region, targetWidth) {
+      const sourceWidth = Math.max(1, Math.round(image.naturalWidth * region.width));
+      const sourceHeight = Math.max(1, Math.round(image.naturalHeight * region.height));
+      const sourceLeft = Math.round(image.naturalWidth * region.left);
+      const sourceTop = Math.round(image.naturalHeight * region.top);
+      const scale = Math.min(targetWidth / sourceWidth, 2800 / sourceHeight);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+      canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) throw new Error('Canvas unavailable');
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+      context.drawImage(
+        image,
+        sourceLeft,
+        sourceTop,
+        sourceWidth,
+        sourceHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+      for (let index = 0; index < pixels.data.length; index += 4) {
+        const gray = Math.round(
+          pixels.data[index] * .299
+          + pixels.data[index + 1] * .587
+          + pixels.data[index + 2] * .114
+        );
+        const contrast = gray > 220
+          ? 255
+          : Math.max(0, Math.min(255, Math.round((gray - 128) * 1.45 + 128)));
+        pixels.data[index] = contrast;
+        pixels.data[index + 1] = contrast;
+        pixels.data[index + 2] = contrast;
+      }
+      context.putImageData(pixels, 0, 0);
+      return canvas;
+    }
+
+    async function createTimesheetOcrSources(blob) {
+      const { image, imageUrl } = await loadImageForAnalysis(blob);
+      try {
+        const sources = [createAnalysisCanvas(image, { left: 0, top: 0, width: 1, height: 1 }, 1600)];
+        const ratio = image.naturalHeight / Math.max(1, image.naturalWidth);
+        if (ratio >= .8) {
+          sources.push(createAnalysisCanvas(
+            image,
+            { left: 0, top: .5, width: .7, height: .48 },
+            1800
+          ));
+        }
+        return sources;
+      } finally {
+        URL.revokeObjectURL(imageUrl);
+      }
+    }
+
+    function renderTimesheetAnalysis(extracted, confirmed = false) {
+      analysisFields.textContent = '';
+      analysisInputs = new Map();
+      let detected = 0;
+
+      TIMESHEET_VARIABLES.forEach((variable) => {
+        const result = extracted?.get(variable.key);
+        const value = typeof result === 'string' ? result : (result?.value || '');
+        if (value !== '') detected += 1;
+
+        const field = document.createElement('div');
+        field.className = 'analysis-field';
+        const fieldTop = document.createElement('div');
+        fieldTop.className = 'analysis-field-top';
+        const label = document.createElement('label');
+        const inputId = `analysis-${variable.key}`;
+        label.setAttribute('for', inputId);
+        label.textContent = variable.label;
+        const status = document.createElement('span');
+        status.className = `analysis-field-status${value !== '' ? ' detected' : ''}`;
+        status.textContent = value !== '' ? (confirmed ? 'Confirmado' : 'Detectado') : 'Comprobar';
+        fieldTop.appendChild(label);
+        fieldTop.appendChild(status);
+
+        const input = document.createElement('input');
+        input.id = inputId;
+        input.type = 'text';
+        input.inputMode = 'decimal';
+        input.autocomplete = 'off';
+        input.placeholder = 'No aparece';
+        input.value = value;
+        input.addEventListener('input', () => {
+          status.className = `analysis-field-status${input.value.trim() ? ' detected' : ''}`;
+          status.textContent = input.value.trim() ? 'Revisado' : 'Comprobar';
+          analysisConfirmed.hidden = true;
+          confirmAnalysisButton.textContent = 'Confirmar datos';
+        });
+        analysisInputs.set(variable.key, input);
+
+        const hint = document.createElement('small');
+        hint.textContent = 'Cantidad indicada en el resumen mensual.';
+        field.appendChild(fieldTop);
+        field.appendChild(input);
+        field.appendChild(hint);
+        analysisFields.appendChild(field);
+      });
+
+      analysisDetectedCount.textContent = `${detected} de ${TIMESHEET_VARIABLES.length} conceptos ${confirmed ? 'confirmados' : 'detectados'}`;
+      analysisError.hidden = true;
+      analysisError.textContent = '';
+      analysisConfirmed.hidden = true;
+      confirmAnalysisButton.disabled = false;
+      confirmAnalysisButton.textContent = confirmed ? 'Datos confirmados ✓' : 'Confirmar datos';
+      analysisForm.hidden = false;
+    }
+
+    function showAnalysisScreen() {
+      periodScreen.hidden = true;
+      historyScreen.hidden = true;
+      documentScreen.hidden = true;
+      analysisScreen.hidden = false;
+      analysisPeriod.textContent = periodLabel();
+      analysisReferenceImage.src = documents.timesheet.url;
+      topBack.setAttribute('aria-label', 'Volver al periodo seleccionado');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.getElementById('analysis-screen-title').focus({ preventScroll: true });
+    }
+
+    async function startTimesheetAnalysis(force = false) {
+      if (analysisRunning || !documents.timesheet.confirmed) return;
+      showAnalysisScreen();
+      const savedAnalysis = confirmedTimesheetAnalyses.get(periodKey());
+      if (savedAnalysis && !force) {
+        renderTimesheetAnalysis(savedAnalysis, true);
+        setAnalysisProgress(
+          'ready',
+          '✓',
+          'Datos ya confirmados',
+          'Puedes volver a revisarlos y cambiar cualquier cantidad.'
+        );
+        return;
+      }
+
+      const requestVersion = ++analysisRunVersion;
+      analysisRunning = true;
+      analysisForm.hidden = true;
+      retryAnalysisButton.disabled = true;
+      confirmAnalysisButton.disabled = true;
+      setAnalysisProgress(
+        'checking',
+        '🔎',
+        'Leyendo el registro de jornada…',
+        'Buscamos el resumen mensual y ampliamos la tabla para reconocer mejor las cifras.'
+      );
+
+      try {
+        const source = documents.timesheet.blob || documents.timesheet.file;
+        if (!source) throw new Error('Timesheet unavailable');
+        const texts = [];
+        if (documents.timesheet.ocrText) texts.push(documents.timesheet.ocrText);
+        let ocrSources;
+        try {
+          ocrSources = await createTimesheetOcrSources(source);
+        } catch {
+          ocrSources = [source];
+        }
+        const sourcesToRead = texts.length && ocrSources.length > 1 ? ocrSources.slice(1) : ocrSources;
+        for (const ocrSource of sourcesToRead) {
+          texts.push(await recognizeTextLocally(ocrSource, '11'));
+        }
+        if (requestVersion !== analysisRunVersion) return;
+
+        const extracted = extractTimesheetVariables(texts);
+        renderTimesheetAnalysis(extracted);
+        if (extracted.size) {
+          setAnalysisProgress(
+            'ready',
+            '✓',
+            'Lectura terminada',
+            'Revisa todas las cantidades: una lectura automática puede confundir alguna cifra.'
+          );
+        } else {
+          setAnalysisProgress(
+            'warning',
+            '!',
+            'No hemos podido leer las cantidades',
+            'Puedes escribirlas manualmente mirando la imagen guardada.'
+          );
+        }
+      } catch {
+        if (requestVersion !== analysisRunVersion) return;
+        renderTimesheetAnalysis(new Map());
+        setAnalysisProgress(
+          'failed',
+          '!',
+          'Lectura incompleta',
+          'No bloqueamos la revisión: introduce manualmente las cantidades del resumen mensual.'
+        );
+      } finally {
+        if (requestVersion === analysisRunVersion) {
+          analysisRunning = false;
+          retryAnalysisButton.disabled = false;
+        }
+      }
+    }
+
+    function confirmTimesheetAnalysis() {
+      analysisError.hidden = true;
+      analysisError.textContent = '';
+      const confirmed = new Map();
+
+      for (const variable of TIMESHEET_VARIABLES) {
+        const input = analysisInputs.get(variable.key);
+        const raw = input?.value.trim() || '';
+        if (!raw) continue;
+        const normalized = raw.replace(/\s+/g, '').replace(',', '.');
+        const quantity = Number(normalized);
+        if (!Number.isFinite(quantity) || quantity < 0 || quantity > variable.max) {
+          analysisError.textContent = `Revisa la cantidad de «${variable.label}».`;
+          analysisError.hidden = false;
+          input?.focus();
+          return;
+        }
+        const rounded = Math.round(quantity * 100) / 100;
+        confirmed.set(variable.key, String(rounded).replace('.', ','));
+      }
+
+      if (!confirmed.size) {
+        analysisError.textContent = 'Introduce al menos una cantidad antes de confirmar.';
+        analysisError.hidden = false;
+        return;
+      }
+
+      confirmedTimesheetAnalyses.set(periodKey(), confirmed);
+      renderTimesheetAnalysis(confirmed, true);
+      analysisConfirmed.textContent = '✓ Datos de la jornada confirmados para esta prueba. El siguiente desarrollo leerá los conceptos de la nómina.';
+      analysisConfirmed.hidden = false;
+      confirmAnalysisButton.textContent = 'Datos confirmados ✓';
+      setAnalysisProgress(
+        'ready',
+        '✓',
+        'Datos confirmados',
+        'Las cantidades están preparadas para la futura comparación con la nómina.'
+      );
+      updatePeriodCards();
+      analysisConfirmed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     async function checkSelectedFilePrivacy(file, scanVersion) {
       try {
         const recognizedText = await recognizeTextLocally(file);
         if (scanVersion !== privacyScanVersion || workingFile !== file) return;
+        workingOcrText = recognizedText;
         const readableCharacters = normalizeOcrText(recognizedText).replace(/[^A-Z0-9]/g, '').length;
         setPrivacyScanState(
           readableCharacters < 8
@@ -1541,6 +2301,7 @@
         );
       } catch {
         if (scanVersion !== privacyScanVersion || workingFile !== file) return;
+        workingOcrText = '';
         if (ocrWorkerPromise) {
           ocrWorkerPromise.then((worker) => worker.terminate()).catch(() => undefined);
           ocrWorkerPromise = null;
@@ -1607,6 +2368,7 @@
       workingFile = documents[kind].file;
       workingUrl = documents[kind].url;
       workingSaved = documents[kind].saved;
+      workingOcrText = documents[kind].ocrText;
       resetDocumentScreen();
 
       if (workingSaved) {
@@ -1622,6 +2384,8 @@
       renderWorkingPreview();
 
       periodScreen.hidden = true;
+      historyScreen.hidden = true;
+      analysisScreen.hidden = true;
       documentScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver al resumen de documentos');
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -1641,6 +2405,7 @@
     async function showHistoryScreen() {
       periodScreen.hidden = true;
       documentScreen.hidden = true;
+      analysisScreen.hidden = true;
       historyScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver al periodo seleccionado');
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -1658,12 +2423,15 @@
 
     function showPeriodScreen() {
       historyLoadVersion += 1;
+      analysisRunVersion += 1;
+      analysisRunning = false;
       privacyScanVersion += 1;
       setPrivacyScanState('idle');
       revokeWorkingUrlIfTemporary();
       activeKind = '';
       documentScreen.hidden = true;
       historyScreen.hidden = true;
+      analysisScreen.hidden = true;
       periodScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver a la pantalla principal');
       updatePeriodCards();
@@ -1672,7 +2440,7 @@
     }
 
     async function handlePeriodChange() {
-      document.getElementById('final-status').hidden = true;
+      document.getElementById('analysis-ready-status').hidden = true;
       await loadStoredDocuments();
     }
 
@@ -1703,6 +2471,7 @@
       workingFile = file;
       workingUrl = URL.createObjectURL(file);
       workingSaved = false;
+      workingOcrText = '';
       const scanVersion = ++privacyScanVersion;
       setPrivacyScanState('checking');
       renderWorkingPreview();
@@ -1752,7 +2521,9 @@
       const document = documents[activeKind];
       if (document.url && document.url !== workingUrl) URL.revokeObjectURL(document.url);
       document.file = null;
+      document.blob = workingFile;
       document.url = workingUrl;
+      document.ocrText = workingOcrText;
       document.confirmed = true;
       document.saved = true;
       document.path = path;
@@ -1773,6 +2544,9 @@
 
     document.getElementById('open-timesheet').addEventListener('click', () => openDocument('timesheet'));
     document.getElementById('open-payroll').addEventListener('click', () => openDocument('payroll'));
+    startAnalysisButton.addEventListener('click', () => startTimesheetAnalysis());
+    retryAnalysisButton.addEventListener('click', () => startTimesheetAnalysis(true));
+    confirmAnalysisButton.addEventListener('click', confirmTimesheetAnalysis);
     openHistoryButton.addEventListener('click', showHistoryScreen);
     refreshHistoryButton.addEventListener('click', loadPrivateHistory);
     document.getElementById('history-empty-action').addEventListener('click', showPeriodScreen);
@@ -1784,6 +2558,11 @@
     year.addEventListener('change', handlePeriodChange);
 
     topBack.addEventListener('click', (event) => {
+      if (!analysisScreen.hidden) {
+        event.preventDefault();
+        showPeriodScreen();
+        return;
+      }
       if (!historyScreen.hidden) {
         event.preventDefault();
         showPeriodScreen();
@@ -1793,13 +2572,6 @@
       event.preventDefault();
       if (savingDocument) return;
       showPeriodScreen();
-    });
-
-    document.getElementById('finish').addEventListener('click', () => {
-      const finalStatus = document.getElementById('final-status');
-      finalStatus.textContent = `Preparación completada. Los documentos de ${periodLabel()} están guardados en tu historial privado.`;
-      finalStatus.hidden = false;
-      finalStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 
     window.addEventListener('beforeunload', () => {
