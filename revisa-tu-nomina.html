@@ -460,7 +460,7 @@
       <p id="status" class="status" role="status"></p>
     </section>
 
-    <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba las imágenes solo se muestran en tu dispositivo. No se envían ni se guardan.</span></p>
+    <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba las imágenes solo se muestran en tu dispositivo. Cuando activemos el análisis, se guardarán de forma privada en tu historial mensual para poder comparar meses anteriores.</span></p>
   </main>
 
   <script type="module">
@@ -581,7 +581,7 @@
 
     continueButton.addEventListener('click', () => {
       if (continueButton.disabled) return;
-      status.textContent = 'Primera pantalla completada. Las imágenes están preparadas en este dispositivo; el análisis se añadirá en la siguiente fase.';
+      status.textContent = 'Primera pantalla completada. En esta prueba no se han enviado las imágenes. El guardado privado por meses se activará junto con el análisis.';
       status.classList.add('show');
       status.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
