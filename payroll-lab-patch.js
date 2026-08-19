@@ -76,6 +76,10 @@
   }
 
   function updateSafeWording() {
+    document.querySelectorAll('input[id^="analysis-"]').forEach((input) => {
+      if (!input.value.trim()) input.placeholder = 'No leído automáticamente';
+    });
+
     document.querySelectorAll('input[id^="comparison-"]').forEach((input) => {
       if (!input.value.trim()) input.placeholder = 'No leído automáticamente';
     });
@@ -149,8 +153,8 @@
   }
 
   const observer = new MutationObserver(() => {
+    updateSafeWording();
     if (!document.getElementById('comparison-screen')?.hidden) {
-      updateSafeWording();
       setTimeout(improvePayrollReading, 250);
     }
   });
