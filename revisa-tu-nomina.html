@@ -363,6 +363,16 @@
       background: #dff3e7;
     }
 
+    .history-card.has-alert {
+      border-color: #eea9ae;
+      background: #fffafa;
+    }
+
+    .history-card.has-alert .history-period-status {
+      color: #8a1d24;
+      background: #ffe3e5;
+    }
+
     .history-document-chips {
       display: flex;
       flex-wrap: wrap;
@@ -382,6 +392,11 @@
     .history-document-chip.saved {
       color: #205b38;
       background: #e5f5eb;
+    }
+
+    .history-document-chip.alert {
+      color: #8a1d24;
+      background: #ffe3e5;
     }
 
     .history-open-label {
@@ -896,6 +911,176 @@
       line-height: 1.45;
     }
 
+    .watch-intro {
+      margin: 16px 0 12px;
+      padding: 14px;
+      border: 1px solid #efb0b5;
+      border-left: 5px solid var(--red);
+      border-radius: 14px;
+      background: #fff7f7;
+    }
+
+    .watch-intro strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #8a1d24;
+      font-size: 14px;
+    }
+
+    .watch-intro p {
+      margin: 0;
+      color: #6f3a3e;
+      font-size: 12px;
+      line-height: 1.48;
+    }
+
+    .comparison-fields {
+      display: grid;
+      gap: 11px;
+    }
+
+    .comparison-field {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fbfbfc;
+    }
+
+    .comparison-field.meals {
+      border: 2px solid #efb0b5;
+      background: #fffafa;
+    }
+
+    .comparison-field.ok {
+      border-color: #a8ddbf;
+      background: #f8fdf9;
+    }
+
+    .comparison-field.issue {
+      border-color: #ee9da3;
+      background: #fff4f5;
+    }
+
+    .comparison-field-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .comparison-field-top strong {
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .comparison-status {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: #6c5206;
+      background: #fff1bd;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+    }
+
+    .comparison-status.ok {
+      color: #17603d;
+      background: #dff3e7;
+    }
+
+    .comparison-status.issue {
+      color: #8a1d24;
+      background: #ffe0e2;
+    }
+
+    .comparison-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .comparison-value {
+      min-width: 0;
+    }
+
+    .comparison-value label,
+    .comparison-value small {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .comparison-fixed,
+    .comparison-value input {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 47px;
+      padding: 10px 12px;
+      border: 1px solid #cacace;
+      border-radius: 11px;
+      color: var(--ink);
+      background: white;
+      font-size: 17px;
+      font-weight: 850;
+    }
+
+    .comparison-value input:focus {
+      border-color: var(--red);
+      outline: 3px solid rgba(227, 6, 19, .12);
+    }
+
+    .comparison-difference {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      line-height: 1.42;
+    }
+
+    .comparison-field.ok .comparison-difference { color: #205b38; }
+    .comparison-field.issue .comparison-difference { color: #8a1d24; }
+
+    .comparison-result {
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid #a8ddbf;
+      border-radius: 16px;
+      color: #205b38;
+      background: #eef9f3;
+    }
+
+    .comparison-result.issue {
+      border-color: #ee9da3;
+      color: #8a1d24;
+      background: #fff0f1;
+    }
+
+    .comparison-result strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .comparison-result p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .comparison-result ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
     .schedule-panel {
       margin-top: 18px;
       padding: 15px;
@@ -1322,6 +1507,7 @@
       }
       .actions { grid-template-columns: 1fr; }
       .analysis-actions { grid-template-columns: 1fr; }
+      .comparison-values { grid-template-columns: 1fr; }
       .schedule-grid,
       .salary-results { grid-template-columns: 1fr; }
       .salary-difference { grid-column: auto; }
@@ -1520,8 +1706,8 @@
 
         <section id="completion-panel" class="completion-panel" hidden>
           <strong>✓ Los dos documentos están guardados</strong>
-          <p>Ya puedes comprobar los datos detectados en el registro de jornada.</p>
-          <button id="start-analysis" class="primary" type="button">Analizar periodo</button>
+          <p>Ya puedes cruzar las cantidades del registro con las descontadas o pagadas en la nómina.</p>
+          <button id="start-analysis" class="primary" type="button">Analizar y comparar</button>
           <p id="analysis-ready-status" class="final-status" role="status" hidden></p>
         </section>
 
@@ -1599,6 +1785,60 @@
       </section>
 
       <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba solo se muestran conceptos y cantidades. Los datos confirmados no se envían a otras personas.</span></p>
+    </section>
+
+    <section id="comparison-screen" aria-labelledby="comparison-screen-title" hidden>
+      <div class="document-screen-header">
+        <span class="step-label">PASO 3 DE 3</span>
+        <h1 id="comparison-screen-title" tabindex="-1">Control mensual de nómina</h1>
+        <p id="comparison-period" class="document-period"></p>
+      </div>
+
+      <section class="panel">
+        <div id="comparison-progress" class="analysis-progress checking" role="status" aria-live="polite">
+          <span id="comparison-progress-icon" class="analysis-progress-icon" aria-hidden="true">🔎</span>
+          <div>
+            <strong id="comparison-progress-title">Preparando la comparación…</strong>
+            <p id="comparison-progress-message">Leeremos las cantidades de la nómina para cruzarlas con el registro del mismo mes.</p>
+          </div>
+        </div>
+        <button id="replace-wrong-payroll" class="secondary analysis-replace" type="button" hidden>Sustituir por la nómina</button>
+
+        <details class="analysis-reference">
+          <summary>Ver la nómina guardada</summary>
+          <img id="comparison-reference-image" alt="Nómina usada para comparar las cantidades del mes">
+        </details>
+
+        <div id="comparison-form" class="analysis-form" hidden>
+          <div class="watch-intro">
+            <strong>🛡️ Control de comidas del mismo mes</strong>
+            <p>Las comidas de «Can Guasch» del registro y las descontadas en la nómina deberían coincidir. Si no coinciden, quedará anotado como desfase para revisarlo.</p>
+          </div>
+
+          <div class="analysis-form-heading">
+            <h2>Registro frente a nómina</h2>
+            <p>La cifra del registro ya está confirmada. Comprueba o corrige la cantidad leída de la nómina antes de guardar el informe mensual.</p>
+            <span id="comparison-detected-count" class="analysis-detected-count">0 cantidades leídas automáticamente</span>
+          </div>
+
+          <div id="comparison-fields" class="comparison-fields"></div>
+          <p id="comparison-error" class="error" role="alert" hidden></p>
+
+          <div id="comparison-result" class="comparison-result" role="status" hidden>
+            <strong id="comparison-result-title"></strong>
+            <p id="comparison-result-message"></p>
+            <ul id="comparison-result-list"></ul>
+          </div>
+
+          <div class="analysis-actions">
+            <button id="retry-payroll-analysis" class="secondary" type="button">Volver a leer nómina</button>
+            <button id="confirm-comparison" class="primary" type="button">Guardar revisión mensual</button>
+          </div>
+          <p id="comparison-saved" class="analysis-confirmed" role="status" hidden></p>
+        </div>
+      </section>
+
+      <p class="local-note"><span aria-hidden="true">🔒</span><span>El informe guarda únicamente el periodo, las cantidades y los desfases dentro del historial privado de la cuenta.</span></p>
     </section>
 
     <section id="document-screen" aria-labelledby="document-screen-title" hidden>
@@ -1704,6 +1944,7 @@
     const periodScreen = document.getElementById('period-screen');
     const historyScreen = document.getElementById('history-screen');
     const analysisScreen = document.getElementById('analysis-screen');
+    const comparisonScreen = document.getElementById('comparison-screen');
     const documentScreen = document.getElementById('document-screen');
     const topBack = document.getElementById('top-back');
     const openHistoryButton = document.getElementById('open-history');
@@ -1728,6 +1969,24 @@
     const retryAnalysisButton = document.getElementById('retry-analysis');
     const confirmAnalysisButton = document.getElementById('confirm-analysis');
     const analysisConfirmed = document.getElementById('analysis-confirmed');
+    const comparisonPeriod = document.getElementById('comparison-period');
+    const comparisonProgress = document.getElementById('comparison-progress');
+    const comparisonProgressIcon = document.getElementById('comparison-progress-icon');
+    const comparisonProgressTitle = document.getElementById('comparison-progress-title');
+    const comparisonProgressMessage = document.getElementById('comparison-progress-message');
+    const replaceWrongPayrollButton = document.getElementById('replace-wrong-payroll');
+    const comparisonReferenceImage = document.getElementById('comparison-reference-image');
+    const comparisonForm = document.getElementById('comparison-form');
+    const comparisonDetectedCount = document.getElementById('comparison-detected-count');
+    const comparisonFields = document.getElementById('comparison-fields');
+    const comparisonError = document.getElementById('comparison-error');
+    const comparisonResult = document.getElementById('comparison-result');
+    const comparisonResultTitle = document.getElementById('comparison-result-title');
+    const comparisonResultMessage = document.getElementById('comparison-result-message');
+    const comparisonResultList = document.getElementById('comparison-result-list');
+    const retryPayrollAnalysisButton = document.getElementById('retry-payroll-analysis');
+    const confirmComparisonButton = document.getElementById('confirm-comparison');
+    const comparisonSaved = document.getElementById('comparison-saved');
     const scheduleType = document.getElementById('schedule-type');
     const percentageField = document.getElementById('percentage-field');
     const workPercentage = document.getElementById('work-percentage');
@@ -1880,6 +2139,23 @@
       }
     ];
     const TIMESHEET_MATCH_ORDER = ['unpaidNight', 'unpaidHoliday', 'shift12', 'holidayDiets', 'vacation', 'rotation', 'meals', 'night', 'shift', 'holiday'];
+    const COMPARABLE_KEYS = ['meals', 'rotation', 'night', 'shift', 'holiday', 'shift12', 'holidayDiets', 'vacation'];
+    const PAYROLL_VARIABLES = TIMESHEET_VARIABLES
+      .filter((variable) => COMPARABLE_KEYS.includes(variable.key))
+      .map((variable) => ({
+        ...variable,
+        payrollPatterns: ({
+          meals: [/(?:PRF\s+)?COMIDAS?\s+(?:C\.?\s*)?GUASCH(?:\s+EX)?/],
+          rotation: [/PLUS\s+ROT[A-Z0-9]*VIDAD/, /P(?:L)?U[S5]\s*ROT[A-Z0-9]*V[A-Z0-9]*D[A-Z0-9]?D/],
+          night: [/PLUS\s+NOCTUR[NM]/, /P(?:L)?U[S5]\s*NOCT[A-Z0-9]{2,10}/],
+          shift: [/PLUS\s+(?:DE\s+)?TU(?:R[NM]|M)O/],
+          holiday: [/PLUS(?:ES)?\s+FESTIVO/, /P(?:L)?U[S5](?:E[S5])?\s*FEST[A-Z0-9]{2,8}/],
+          shift12: [/PLUS\s+(?:DE\s+)?TU(?:R[NM]|M)O\s+12\s+HORAS/],
+          holidayDiets: [/DIETAS?\s+FESTIVOS?/, /DIET[A-Z0-9]{1,5}\s*FEST[A-Z0-9]{2,8}/],
+          vacation: [/PLUS(?:ES)?\s+VACACIONES?/, /P(?:L)?U[S5](?:E[S5])?\s*VAC[A-Z0-9]{3,14}/]
+        })[variable.key]
+      }));
+    const PAYROLL_MATCH_ORDER = ['shift12', 'holidayDiets', 'vacation', 'rotation', 'meals', 'night', 'shift', 'holiday'];
     const documents = {
       timesheet: { file: null, blob: null, url: '', ocrText: '', confirmed: false, saved: false, path: '' },
       payroll: { file: null, blob: null, url: '', ocrText: '', confirmed: false, saved: false, path: '' }
@@ -1911,7 +2187,13 @@
     let analysisRunVersion = 0;
     let analysisRunning = false;
     let analysisInputs = new Map();
+    let comparisonRunVersion = 0;
+    let comparisonRunning = false;
+    let comparisonInputs = new Map();
+    let comparisonCards = new Map();
     const confirmedTimesheetAnalyses = new Map();
+    const confirmedPayrollAnalyses = new Map();
+    const monthlyReviews = new Map();
     const workSchedules = new Map();
     let privacyScanState = 'idle';
     let privacyScanVersion = 0;
@@ -2156,6 +2438,64 @@
       return `${periodFolder()}/${kind}`;
     }
 
+    function mapToPlainObject(values) {
+      return Object.fromEntries([...(values || new Map()).entries()]);
+    }
+
+    function plainObjectToMap(values) {
+      return new Map(Object.entries(values && typeof values === 'object' ? values : {}));
+    }
+
+    function hydrateMonthlyReview(review) {
+      if (!review || review.status !== 'complete' || review.period !== periodKey()) return false;
+      const timesheetValues = plainObjectToMap(review.timesheet);
+      const payrollValues = plainObjectToMap(review.payroll);
+      confirmedTimesheetAnalyses.set(periodKey(), timesheetValues);
+      confirmedPayrollAnalyses.set(periodKey(), payrollValues);
+      monthlyReviews.set(periodKey(), review);
+      if (review.schedule && typeof review.schedule === 'object') {
+        workSchedules.set(periodKey(), review.schedule);
+      }
+      return true;
+    }
+
+    async function downloadMonthlyReview(path = storagePath('review')) {
+      const { data: blob, error } = await supabase.storage.from(STORAGE_BUCKET).download(path);
+      if (error || !blob?.text) return null;
+      try {
+        return JSON.parse(await blob.text());
+      } catch {
+        return null;
+      }
+    }
+
+    async function uploadMonthlyReview(review) {
+      const payload = new Blob([JSON.stringify(review)], { type: 'application/json' });
+      const { error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(storagePath('review'), payload, {
+          cacheControl: '0',
+          contentType: 'application/json',
+          upsert: true
+        });
+      if (error) throw error;
+    }
+
+    async function invalidateStoredReviewIfNeeded() {
+      if (!monthlyReviews.has(periodKey())) return;
+      confirmedTimesheetAnalyses.delete(periodKey());
+      confirmedPayrollAnalyses.delete(periodKey());
+      monthlyReviews.delete(periodKey());
+      try {
+        await uploadMonthlyReview({
+          version: 1,
+          status: 'pending',
+          period: periodKey(),
+          updatedAt: new Date().toISOString()
+        });
+      } catch {}
+    }
+
     function showPeriodMessage(message = '', isError = false) {
       periodMessage.textContent = message;
       periodMessage.classList.toggle('error', isError);
@@ -2189,6 +2529,9 @@
     async function loadStoredDocuments() {
       const requestVersion = ++storageLoadVersion;
       clearAllDocuments();
+      confirmedTimesheetAnalyses.delete(periodKey());
+      confirmedPayrollAnalyses.delete(periodKey());
+      monthlyReviews.delete(periodKey());
       loadWorkSchedule();
 
       if (!currentUserId) {
@@ -2221,12 +2564,16 @@
       const storedKinds = ['timesheet', 'payroll'].filter((kind) =>
         storedFiles?.some((item) => item.id && item.name === kind)
       );
+      const hasStoredReview = storedFiles?.some((item) => item.id && item.name === 'review');
 
-      const downloads = await Promise.all(storedKinds.map(async (kind) => {
+      const [downloads, storedReview] = await Promise.all([
+        Promise.all(storedKinds.map(async (kind) => {
         const path = `${folder}/${kind}`;
         const { data: blob, error } = await supabase.storage.from(STORAGE_BUCKET).download(path);
         return { kind, path, blob, error };
-      }));
+        })),
+        hasStoredReview ? downloadMonthlyReview(`${folder}/review`) : Promise.resolve(null)
+      ]);
 
       if (requestVersion !== storageLoadVersion) return;
 
@@ -2245,6 +2592,8 @@
         documents[kind].saved = true;
         documents[kind].path = path;
       });
+
+      if (storedReview && hydrateMonthlyReview(storedReview)) loadWorkSchedule();
 
       loadingDocuments = false;
       showPeriodMessage(
@@ -2278,11 +2627,16 @@
       return items;
     }
 
-    function createHistoryChip(label, saved) {
+    function createHistoryChip(label, saved, alert = false) {
       const chip = document.createElement('span');
-      chip.className = `history-document-chip${saved ? ' saved' : ''}`;
-      chip.textContent = `${saved ? '✓' : '–'} ${label}`;
+      chip.className = `history-document-chip${saved ? ' saved' : ''}${alert ? ' alert' : ''}`;
+      chip.textContent = `${alert ? '⚠' : (saved ? '✓' : '–')} ${label}`;
       return chip;
+    }
+
+    function monthlyIncidentCount(review) {
+      if (!review || review.status !== 'complete') return 0;
+      return Object.values(review.comparisons || {}).filter((item) => item?.status === 'mismatch').length;
     }
 
     function renderPrivateHistory() {
@@ -2297,9 +2651,12 @@
 
       historyEntries.forEach((entry) => {
         const complete = entry.timesheet && entry.payroll;
+        const reviewed = entry.review?.status === 'complete';
+        const incidents = monthlyIncidentCount(entry.review);
+        const mealMismatch = entry.review?.comparisons?.meals?.status === 'mismatch';
         const card = document.createElement('button');
         card.type = 'button';
-        card.className = `history-card${complete ? ' complete' : ''}`;
+        card.className = `history-card${complete ? ' complete' : ''}${incidents ? ' has-alert' : ''}`;
         card.setAttribute('aria-label', `Abrir ${monthNames[entry.month - 1]} de ${entry.year}`);
 
         const top = document.createElement('span');
@@ -2311,7 +2668,11 @@
 
         const status = document.createElement('span');
         status.className = 'history-period-status';
-        status.textContent = complete ? 'Completo' : '1 de 2';
+        status.textContent = !complete
+          ? '1 de 2'
+          : (!reviewed
+            ? 'Pendiente revisar'
+            : (incidents ? `${incidents} incidencia${incidents === 1 ? '' : 's'}` : 'Revisión OK'));
 
         top.appendChild(title);
         top.appendChild(status);
@@ -2320,6 +2681,13 @@
         chips.className = 'history-document-chips';
         chips.appendChild(createHistoryChip('Registro de jornada', entry.timesheet));
         chips.appendChild(createHistoryChip('Nómina', entry.payroll));
+        if (complete) {
+          chips.appendChild(createHistoryChip(
+            mealMismatch ? 'Comidas con desfase' : (reviewed ? 'Comidas coinciden' : 'Comidas sin revisar'),
+            reviewed && !mealMismatch,
+            mealMismatch
+          ));
+        }
 
         const openLabel = document.createElement('span');
         openLabel.className = 'history-open-label';
@@ -2371,11 +2739,14 @@
         const entries = await Promise.all(months.map(async ({ year: savedYear, month: savedMonth }) => {
           const folder = `${currentUserId}/${savedYear}/${String(savedMonth).padStart(2, '0')}`;
           const files = await listAllStorageItems(folder);
+          const hasReview = files.some((item) => Boolean(item.id) && item.name === 'review');
+          const review = hasReview ? await downloadMonthlyReview(`${folder}/review`) : null;
           return {
             year: savedYear,
             month: savedMonth,
             timesheet: files.some((item) => Boolean(item.id) && item.name === 'timesheet'),
-            payroll: files.some((item) => Boolean(item.id) && item.name === 'payroll')
+            payroll: files.some((item) => Boolean(item.id) && item.name === 'payroll'),
+            review
           };
         }));
 
@@ -2450,15 +2821,23 @@
       }
 
       const completed = Number(timesheetComplete) + Number(payrollComplete);
+      const savedReview = monthlyReviews.get(periodKey());
+      const incidents = monthlyIncidentCount(savedReview);
       document.getElementById('document-count').textContent = `${completed} de 2 guardados`;
       document.getElementById('completion-panel').hidden = completed !== 2;
       startAnalysisButton.disabled = completed !== 2;
-      startAnalysisButton.textContent = confirmedTimesheetAnalyses.has(periodKey())
-        ? `Revisar datos de ${label}`
-        : `Analizar ${label}`;
+      startAnalysisButton.textContent = savedReview?.status === 'complete'
+        ? `Ver revisión de ${label}`
+        : (confirmedTimesheetAnalyses.has(periodKey())
+          ? `Continuar revisión de ${label}`
+          : `Analizar y comparar ${label}`);
       const readyStatus = document.getElementById('analysis-ready-status');
-      readyStatus.textContent = '✓ Datos de la jornada confirmados para esta prueba.';
-      readyStatus.hidden = completed !== 2 || !confirmedTimesheetAnalyses.has(periodKey());
+      readyStatus.textContent = savedReview?.status === 'complete'
+        ? (incidents
+          ? `⚠ Revisión guardada con ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'}.`
+          : '✓ Revisión mensual guardada: las cantidades coinciden.')
+        : '✓ Datos de la jornada confirmados; falta cruzarlos con la nómina.';
+      readyStatus.hidden = completed !== 2 || (!savedReview && !confirmedTimesheetAnalyses.has(periodKey()));
     }
 
     function normalizeOcrText(text) {
@@ -2618,6 +2997,85 @@
 
       const extracted = new Map();
       TIMESHEET_VARIABLES.forEach((variable) => {
+        const values = candidates.get(variable.key) || [];
+        if (!values.length) return;
+        const grouped = new Map();
+        values.forEach((result) => {
+          const group = grouped.get(result.value) || { count: 0, quality: 0, result };
+          group.count += 1;
+          group.quality = Math.max(group.quality, result.quality);
+          grouped.set(result.value, group);
+        });
+        const best = [...grouped.values()].sort((a, b) =>
+          b.count - a.count || b.quality - a.quality
+        )[0];
+        extracted.set(variable.key, best.result);
+      });
+      return extracted;
+    }
+
+    function matchPayrollVariable(line) {
+      const normalized = normalizeOcrLine(line);
+      for (const key of PAYROLL_MATCH_ORDER) {
+        const variable = PAYROLL_VARIABLES.find((item) => item.key === key);
+        for (const pattern of variable?.payrollPatterns || []) {
+          const match = pattern.exec(normalized);
+          if (match) return { variable, match, normalized };
+        }
+      }
+      return null;
+    }
+
+    function quantityFromPayrollLine(line, matchResult) {
+      const suffix = matchResult.normalized.slice(matchResult.match.index + matchResult.match[0].length);
+      const candidate = numericCandidates(suffix)[0];
+      return normalizeDetectedQuantity(candidate, matchResult.variable);
+    }
+
+    function parsePayrollText(text) {
+      const allLines = String(text || '')
+        .split(/\r?\n/)
+        .map(normalizeOcrLine)
+        .filter(Boolean);
+      if (detectDocumentKind(text) === 'timesheet' && !allLines.some((line) => /DEVENGOS?\s+Y\s+DEDUCCIONES?/.test(line))) {
+        return new Map();
+      }
+
+      const devengosIndex = allLines.findIndex((line) => /DEVENGOS?\s+Y\s+DEDUCCIONES?/.test(line));
+      const relevantLines = devengosIndex >= 0 ? allLines.slice(devengosIndex + 1) : allLines;
+      const totalIndex = relevantLines.findIndex((line) => /^TOTAL\s*:?/.test(line) || /TOTAL\s+COTIZ/.test(line));
+      const lines = totalIndex >= 0 ? relevantLines.slice(0, totalIndex) : relevantLines;
+      const found = new Map();
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const matchResult = matchPayrollVariable(lines[index]);
+        if (!matchResult || found.has(matchResult.variable.key)) continue;
+
+        let quantity = quantityFromPayrollLine(lines[index], matchResult);
+        if (!quantity) {
+          for (let distance = 1; distance <= 2 && index + distance < lines.length; distance += 1) {
+            const nextLine = lines[index + distance];
+            if (matchPayrollVariable(nextLine)) break;
+            quantity = normalizeDetectedQuantity(numericCandidates(nextLine)[0], matchResult.variable);
+            if (quantity) break;
+          }
+        }
+        if (quantity) found.set(matchResult.variable.key, quantity);
+      }
+      return found;
+    }
+
+    function extractPayrollVariables(texts) {
+      const candidates = new Map();
+      (Array.isArray(texts) ? texts : [texts]).forEach((text) => {
+        parsePayrollText(text).forEach((result, key) => {
+          if (!candidates.has(key)) candidates.set(key, []);
+          candidates.get(key).push(result);
+        });
+      });
+
+      const extracted = new Map();
+      PAYROLL_VARIABLES.forEach((variable) => {
         const values = candidates.get(variable.key) || [];
         if (!values.length) return;
         const grouped = new Map();
@@ -2873,6 +3331,29 @@
       }
     }
 
+    async function createPayrollOcrSources(blob) {
+      const { image, imageUrl } = await loadImageForAnalysis(blob);
+      try {
+        return [
+          {
+            source: createAnalysisCanvas(image, { left: 0, top: 0, width: 1, height: 1 }, 2100),
+            pageSegMode: '11'
+          },
+          {
+            source: createAnalysisCanvas(
+              image,
+              { left: 0, top: 0, width: 1, height: 1 },
+              2500,
+              { removeGridLines: true }
+            ),
+            pageSegMode: '6'
+          }
+        ];
+      } finally {
+        URL.revokeObjectURL(imageUrl);
+      }
+    }
+
     function renderTimesheetAnalysis(extracted, confirmed = false) {
       analysisFields.textContent = '';
       analysisInputs = new Map();
@@ -2928,8 +3409,8 @@
       analysisError.textContent = '';
       analysisConfirmed.hidden = true;
       confirmAnalysisButton.disabled = false;
-      confirmAnalysisButton.dataset.action = confirmed ? 'back' : 'confirm';
-      confirmAnalysisButton.textContent = confirmed ? 'Volver al resumen' : 'Confirmar datos';
+      confirmAnalysisButton.dataset.action = confirmed ? 'comparison' : 'confirm';
+      confirmAnalysisButton.textContent = confirmed ? 'Continuar: comprobar nómina' : 'Confirmar datos';
       analysisForm.hidden = false;
     }
 
@@ -2937,6 +3418,7 @@
       periodScreen.hidden = true;
       historyScreen.hidden = true;
       documentScreen.hidden = true;
+      comparisonScreen.hidden = true;
       analysisScreen.hidden = false;
       analysisPeriod.textContent = periodLabel();
       analysisReferenceImage.src = documents.timesheet.url;
@@ -3094,15 +3576,15 @@
       confirmedTimesheetAnalyses.set(periodKey(), confirmed);
       saveWorkSchedule(scheduleSettings);
       renderTimesheetAnalysis(confirmed, true);
-      analysisConfirmed.textContent = '✓ Datos de la jornada confirmados. Pulsa «Volver al resumen» para regresar al periodo.';
+      analysisConfirmed.textContent = '✓ Datos de la jornada confirmados. Continúa para cruzarlos con la nómina del mismo mes.';
       analysisConfirmed.hidden = false;
-      confirmAnalysisButton.dataset.action = 'back';
-      confirmAnalysisButton.textContent = 'Volver al resumen';
+      confirmAnalysisButton.dataset.action = 'comparison';
+      confirmAnalysisButton.textContent = 'Continuar: comprobar nómina';
       setAnalysisProgress(
         'ready',
         '✓',
         'Datos confirmados',
-        'Las cantidades están preparadas para la futura comparación con la nómina.'
+        'Ahora comprobaremos las cantidades descontadas o pagadas en la nómina.'
       );
       updatePeriodCards();
       analysisConfirmed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -3117,7 +3599,383 @@
         showPeriodScreen();
         return;
       }
+      if (confirmAnalysisButton.dataset.action === 'comparison') {
+        startPayrollComparison();
+        return;
+      }
       confirmTimesheetAnalysis();
+    }
+
+    function setComparisonProgress(state, icon, title, message) {
+      comparisonProgress.className = `analysis-progress ${state}`;
+      comparisonProgressIcon.textContent = icon;
+      comparisonProgressTitle.textContent = title;
+      comparisonProgressMessage.textContent = message;
+    }
+
+    function parseQuantityValue(raw) {
+      const normalized = String(raw ?? '').trim().replace(/\s+/g, '').replace(',', '.');
+      if (!normalized) return null;
+      const value = Number(normalized);
+      return Number.isFinite(value) ? Math.round(value * 100) / 100 : Number.NaN;
+    }
+
+    function formatQuantity(value) {
+      return String(Math.round(Number(value || 0) * 100) / 100).replace('.', ',');
+    }
+
+    function comparisonMessage(variable, registerValue, payrollValue, difference) {
+      if (difference === 0) return `Coinciden: ${formatQuantity(registerValue)} en ambos documentos.`;
+      const absolute = formatQuantity(Math.abs(difference));
+      if (variable.key === 'meals') {
+        return difference > 0
+          ? `La nómina descuenta ${absolute} comida${Math.abs(difference) === 1 ? '' : 's'} más que el registro.`
+          : `La nómina descuenta ${absolute} comida${Math.abs(difference) === 1 ? '' : 's'} menos que el registro.`;
+      }
+      return difference > 0
+        ? `La nómina incluye ${absolute} más que el registro.`
+        : `La nómina incluye ${absolute} menos que el registro.`;
+    }
+
+    function buildMonthlyComparisons(timesheetValues, payrollValues) {
+      const comparisons = {};
+      COMPARABLE_KEYS.forEach((key) => {
+        const registerRaw = timesheetValues.get(key);
+        const payrollRaw = payrollValues.get(key);
+        if (key !== 'meals' && registerRaw === undefined && payrollRaw === undefined) return;
+        const registerValue = parseQuantityValue(registerRaw) || 0;
+        const payrollValue = parseQuantityValue(payrollRaw) || 0;
+        const difference = Math.round((payrollValue - registerValue) * 100) / 100;
+        comparisons[key] = {
+          register: registerValue,
+          payroll: payrollValue,
+          difference,
+          status: difference === 0 ? 'match' : 'mismatch'
+        };
+      });
+      return comparisons;
+    }
+
+    function applyComparisonCardResult(key, result) {
+      const cardParts = comparisonCards.get(key);
+      if (!cardParts || !result) return;
+      const variable = PAYROLL_VARIABLES.find((item) => item.key === key);
+      const issue = result.status === 'mismatch';
+      cardParts.card.classList.toggle('ok', !issue);
+      cardParts.card.classList.toggle('issue', issue);
+      cardParts.status.className = `comparison-status ${issue ? 'issue' : 'ok'}`;
+      cardParts.status.textContent = issue ? 'Desfase' : 'Coincide';
+      cardParts.difference.textContent = comparisonMessage(
+        variable,
+        result.register,
+        result.payroll,
+        result.difference
+      );
+    }
+
+    function renderComparisonResult(review) {
+      const incidents = Object.entries(review?.comparisons || {})
+        .filter(([, item]) => item?.status === 'mismatch');
+      const meal = review?.comparisons?.meals;
+      comparisonResult.className = `comparison-result${incidents.length ? ' issue' : ''}`;
+      comparisonResultTitle.textContent = incidents.length
+        ? `⚠ ${incidents.length} posible${incidents.length === 1 ? '' : 's'} incidencia${incidents.length === 1 ? '' : 's'}`
+        : '✓ Registro y nómina coinciden';
+      comparisonResultMessage.textContent = meal?.status === 'mismatch'
+        ? `Control de comidas: el registro indica ${formatQuantity(meal.register)} y la nómina descuenta ${formatQuantity(meal.payroll)}. Diferencia: ${formatQuantity(Math.abs(meal.difference))}.`
+        : `Control de comidas superado: ${formatQuantity(meal?.register || 0)} en el registro y ${formatQuantity(meal?.payroll || 0)} en la nómina.`;
+      comparisonResultList.textContent = '';
+      incidents.forEach(([key, result]) => {
+        const variable = PAYROLL_VARIABLES.find((item) => item.key === key);
+        const item = document.createElement('li');
+        item.textContent = `${variable?.label || key}: registro ${formatQuantity(result.register)} · nómina ${formatQuantity(result.payroll)}.`;
+        comparisonResultList.appendChild(item);
+      });
+      comparisonResultList.hidden = incidents.length === 0;
+      comparisonResult.hidden = false;
+    }
+
+    function renderPayrollComparison(extracted, confirmed = false, review = null) {
+      comparisonFields.textContent = '';
+      comparisonInputs = new Map();
+      comparisonCards = new Map();
+      const timesheetValues = confirmedTimesheetAnalyses.get(periodKey()) || new Map();
+      let detected = 0;
+
+      COMPARABLE_KEYS.forEach((key) => {
+        const variable = PAYROLL_VARIABLES.find((item) => item.key === key);
+        const result = extracted?.get(key);
+        const payrollValue = typeof result === 'string' ? result : (result?.value || '');
+        const registerValue = timesheetValues.get(key);
+        if (key !== 'meals' && registerValue === undefined && payrollValue === '') return;
+        if (payrollValue !== '') detected += 1;
+
+        const card = document.createElement('div');
+        card.className = `comparison-field${key === 'meals' ? ' meals' : ''}`;
+        const top = document.createElement('div');
+        top.className = 'comparison-field-top';
+        const title = document.createElement('strong');
+        title.textContent = variable.label;
+        const status = document.createElement('span');
+        status.className = 'comparison-status';
+        status.textContent = confirmed ? 'Comprobado' : 'Por comparar';
+        top.appendChild(title);
+        top.appendChild(status);
+
+        const values = document.createElement('div');
+        values.className = 'comparison-values';
+        const registerColumn = document.createElement('div');
+        registerColumn.className = 'comparison-value';
+        const registerLabel = document.createElement('small');
+        registerLabel.textContent = 'Registro de jornada';
+        const registerFixed = document.createElement('span');
+        registerFixed.className = 'comparison-fixed';
+        registerFixed.textContent = formatQuantity(parseQuantityValue(registerValue) || 0);
+        registerColumn.appendChild(registerLabel);
+        registerColumn.appendChild(registerFixed);
+
+        const payrollColumn = document.createElement('div');
+        payrollColumn.className = 'comparison-value';
+        const inputId = `comparison-${key}`;
+        const payrollLabel = document.createElement('label');
+        payrollLabel.setAttribute('for', inputId);
+        payrollLabel.textContent = 'Cantidad en nómina';
+        const input = document.createElement('input');
+        input.id = inputId;
+        input.type = 'text';
+        input.inputMode = 'decimal';
+        input.autocomplete = 'off';
+        input.placeholder = 'No aparece';
+        input.value = payrollValue;
+        input.addEventListener('input', () => {
+          card.classList.remove('ok', 'issue');
+          status.className = 'comparison-status';
+          status.textContent = input.value.trim() ? 'Revisado' : 'Por comparar';
+          difference.textContent = 'Confirma la cifra para calcular el desfase.';
+          comparisonResult.hidden = true;
+          comparisonSaved.hidden = true;
+          confirmComparisonButton.dataset.action = 'save';
+          confirmComparisonButton.textContent = 'Guardar revisión mensual';
+        });
+        payrollColumn.appendChild(payrollLabel);
+        payrollColumn.appendChild(input);
+        values.appendChild(registerColumn);
+        values.appendChild(payrollColumn);
+
+        const difference = document.createElement('p');
+        difference.className = 'comparison-difference';
+        difference.textContent = 'Confirma la cifra para calcular el desfase.';
+        card.appendChild(top);
+        card.appendChild(values);
+        card.appendChild(difference);
+        comparisonFields.appendChild(card);
+        comparisonInputs.set(key, input);
+        comparisonCards.set(key, { card, status, difference });
+      });
+
+      comparisonDetectedCount.textContent = confirmed
+        ? `${detected} cantidades confirmadas en nómina`
+        : `${detected} cantidades leídas automáticamente de la nómina`;
+      comparisonError.hidden = true;
+      comparisonError.textContent = '';
+      comparisonSaved.hidden = true;
+      confirmComparisonButton.disabled = false;
+      confirmComparisonButton.dataset.action = confirmed ? 'back' : 'save';
+      confirmComparisonButton.textContent = confirmed ? 'Volver al resumen' : 'Guardar revisión mensual';
+      comparisonForm.hidden = false;
+      comparisonResult.hidden = true;
+
+      if (confirmed && review) {
+        Object.entries(review.comparisons || {}).forEach(([key, result]) => applyComparisonCardResult(key, result));
+        renderComparisonResult(review);
+        comparisonSaved.textContent = '✓ Revisión mensual guardada en tu historial privado.';
+        comparisonSaved.hidden = false;
+      }
+    }
+
+    function showComparisonScreen() {
+      periodScreen.hidden = true;
+      historyScreen.hidden = true;
+      analysisScreen.hidden = true;
+      documentScreen.hidden = true;
+      comparisonScreen.hidden = false;
+      comparisonPeriod.textContent = periodLabel();
+      comparisonReferenceImage.src = documents.payroll.url;
+      topBack.setAttribute('aria-label', 'Volver al periodo seleccionado');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.getElementById('comparison-screen-title').focus({ preventScroll: true });
+    }
+
+    function showWrongPayrollMessage() {
+      renderPayrollComparison(new Map());
+      replaceWrongPayrollButton.hidden = false;
+      confirmComparisonButton.dataset.action = 'replace-payroll';
+      confirmComparisonButton.textContent = 'Sustituir nómina';
+      setComparisonProgress(
+        'failed',
+        '!',
+        'La imagen guardada es un registro de jornada',
+        'Sustitúyela por la primera página de la nómina, donde aparece «Devengos y deducciones».'
+      );
+    }
+
+    async function startPayrollComparison(force = false) {
+      if (comparisonRunning || !documents.payroll.confirmed) return;
+      showComparisonScreen();
+      const savedReview = monthlyReviews.get(periodKey());
+      if (savedReview?.status === 'complete' && !force) {
+        const savedPayroll = plainObjectToMap(savedReview.payroll);
+        renderPayrollComparison(savedPayroll, true, savedReview);
+        setComparisonProgress('ready', '✓', 'Revisión mensual guardada', 'Puedes consultar el resultado o volver a leer la nómina.');
+        return;
+      }
+
+      const requestVersion = ++comparisonRunVersion;
+      comparisonRunning = true;
+      comparisonForm.hidden = true;
+      replaceWrongPayrollButton.hidden = true;
+      retryPayrollAnalysisButton.disabled = true;
+      confirmComparisonButton.disabled = true;
+      setComparisonProgress(
+        'checking',
+        '🔎',
+        'Leyendo las cantidades de la nómina…',
+        'Buscamos la columna «Cantidad» para compararla con el registro del mismo mes.'
+      );
+
+      try {
+        const source = documents.payroll.blob || documents.payroll.file;
+        if (!source) throw new Error('Payroll unavailable');
+        if (detectDocumentKind(documents.payroll.ocrText) === 'timesheet') {
+          showWrongPayrollMessage();
+          return;
+        }
+        const texts = [];
+        if (documents.payroll.ocrText) texts.push(documents.payroll.ocrText);
+        let ocrSources;
+        try {
+          ocrSources = await createPayrollOcrSources(source);
+        } catch {
+          ocrSources = [source];
+        }
+        const sourcesToRead = texts.length && ocrSources.length > 1 ? ocrSources.slice(1) : ocrSources;
+        for (const ocrSource of sourcesToRead) {
+          const sourcePart = ocrSource?.source || ocrSource;
+          const pageSegMode = ocrSource?.pageSegMode || '11';
+          texts.push(await recognizeTextLocally(sourcePart, pageSegMode));
+        }
+        if (requestVersion !== comparisonRunVersion) return;
+
+        const detectedKinds = texts.map(detectDocumentKind).filter(Boolean);
+        if (detectedKinds.includes('timesheet') && !detectedKinds.includes('payroll')) {
+          showWrongPayrollMessage();
+          return;
+        }
+
+        const extracted = extractPayrollVariables(texts);
+        renderPayrollComparison(extracted);
+        setComparisonProgress(
+          extracted.size ? 'ready' : 'warning',
+          extracted.size ? '✓' : '!',
+          extracted.size ? 'Nómina leída' : 'No hemos podido leer las cantidades',
+          extracted.size
+            ? 'Comprueba especialmente las comidas antes de guardar el control mensual.'
+            : 'Introduce manualmente las cantidades mirando la nómina guardada.'
+        );
+      } catch {
+        if (requestVersion !== comparisonRunVersion) return;
+        renderPayrollComparison(new Map());
+        setComparisonProgress('failed', '!', 'Lectura incompleta', 'Introduce manualmente las cantidades de la nómina para completar el control.');
+      } finally {
+        if (requestVersion === comparisonRunVersion) {
+          comparisonRunning = false;
+          retryPayrollAnalysisButton.disabled = false;
+        }
+      }
+    }
+
+    async function confirmMonthlyComparison() {
+      if (confirmComparisonButton.dataset.action === 'back') {
+        showPeriodScreen();
+        return;
+      }
+      if (confirmComparisonButton.dataset.action === 'replace-payroll') {
+        openDocument('payroll');
+        return;
+      }
+
+      comparisonError.hidden = true;
+      comparisonError.textContent = '';
+      const payrollValues = new Map();
+      for (const [key, input] of comparisonInputs.entries()) {
+        const raw = input.value.trim();
+        if (!raw) continue;
+        const variable = PAYROLL_VARIABLES.find((item) => item.key === key);
+        const quantity = parseQuantityValue(raw);
+        if (!Number.isFinite(quantity) || quantity < 0 || quantity > variable.max) {
+          comparisonError.textContent = `Revisa la cantidad de «${variable.label}» en la nómina.`;
+          comparisonError.hidden = false;
+          input.focus();
+          return;
+        }
+        if (variable.wholeNumber && !Number.isInteger(quantity)) {
+          comparisonError.textContent = `«${variable.label}» debe ser una cantidad entera, no un importe en euros.`;
+          comparisonError.hidden = false;
+          input.focus();
+          return;
+        }
+        payrollValues.set(key, formatQuantity(quantity));
+      }
+
+      const timesheetValues = confirmedTimesheetAnalyses.get(periodKey()) || new Map();
+      const comparisons = buildMonthlyComparisons(timesheetValues, payrollValues);
+      const incidents = Object.values(comparisons).filter((item) => item.status === 'mismatch').length;
+      const review = {
+        version: 1,
+        status: 'complete',
+        period: periodKey(),
+        year: Number(year.value),
+        month: Number(month.value) + 1,
+        schedule: currentScheduleSettings(),
+        timesheet: mapToPlainObject(timesheetValues),
+        payroll: mapToPlainObject(payrollValues),
+        comparisons,
+        incidentCount: incidents,
+        updatedAt: new Date().toISOString()
+      };
+
+      confirmComparisonButton.disabled = true;
+      confirmComparisonButton.textContent = 'Guardando revisión…';
+      try {
+        await uploadMonthlyReview(review);
+      } catch {
+        comparisonError.textContent = 'No se ha podido guardar la revisión privada. Comprueba la conexión e inténtalo de nuevo.';
+        comparisonError.hidden = false;
+        confirmComparisonButton.disabled = false;
+        confirmComparisonButton.textContent = 'Guardar revisión mensual';
+        return;
+      }
+
+      confirmedPayrollAnalyses.set(periodKey(), payrollValues);
+      monthlyReviews.set(periodKey(), review);
+      renderPayrollComparison(payrollValues, true, review);
+      setComparisonProgress(
+        incidents ? 'warning' : 'ready',
+        incidents ? '!' : '✓',
+        incidents ? 'Revisión guardada con posibles incidencias' : 'Revisión mensual completada',
+        incidents ? 'Los desfases quedan registrados para poder revisarlos o reclamarlos.' : 'Las cantidades comparadas coinciden.'
+      );
+      updatePeriodCards();
+      comparisonResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function startMonthlyReview() {
+      const savedReview = monthlyReviews.get(periodKey());
+      if (savedReview?.status === 'complete') {
+        startPayrollComparison();
+        return;
+      }
+      startTimesheetAnalysis();
     }
 
     async function checkSelectedFilePrivacy(file, scanVersion) {
@@ -3221,6 +4079,7 @@
       periodScreen.hidden = true;
       historyScreen.hidden = true;
       analysisScreen.hidden = true;
+      comparisonScreen.hidden = true;
       documentScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver al resumen de documentos');
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -3241,6 +4100,7 @@
       periodScreen.hidden = true;
       documentScreen.hidden = true;
       analysisScreen.hidden = true;
+      comparisonScreen.hidden = true;
       historyScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver al periodo seleccionado');
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -3260,6 +4120,8 @@
       historyLoadVersion += 1;
       analysisRunVersion += 1;
       analysisRunning = false;
+      comparisonRunVersion += 1;
+      comparisonRunning = false;
       privacyScanVersion += 1;
       setPrivacyScanState('idle');
       revokeWorkingUrlIfTemporary();
@@ -3267,6 +4129,7 @@
       documentScreen.hidden = true;
       historyScreen.hidden = true;
       analysisScreen.hidden = true;
+      comparisonScreen.hidden = true;
       periodScreen.hidden = false;
       topBack.setAttribute('aria-label', 'Volver a la pantalla principal');
       updateScheduleUI();
@@ -3354,6 +4217,8 @@
         return;
       }
 
+      await invalidateStoredReviewIfNeeded();
+
       const document = documents[activeKind];
       if (document.url && document.url !== workingUrl) URL.revokeObjectURL(document.url);
       document.file = null;
@@ -3382,10 +4247,13 @@
     document.getElementById('open-payroll').addEventListener('click', () => openDocument('payroll'));
     workModeFull.addEventListener('click', () => selectWorkMode('full'));
     workModeReduced.addEventListener('click', () => selectWorkMode('reduced'));
-    startAnalysisButton.addEventListener('click', () => startTimesheetAnalysis());
+    startAnalysisButton.addEventListener('click', startMonthlyReview);
     retryAnalysisButton.addEventListener('click', () => startTimesheetAnalysis(true));
     confirmAnalysisButton.addEventListener('click', handleAnalysisPrimaryAction);
     replaceWrongTimesheetButton.addEventListener('click', () => openDocument('timesheet'));
+    retryPayrollAnalysisButton.addEventListener('click', () => startPayrollComparison(true));
+    confirmComparisonButton.addEventListener('click', confirmMonthlyComparison);
+    replaceWrongPayrollButton.addEventListener('click', () => openDocument('payroll'));
     scheduleType.addEventListener('change', markScheduleDirty);
     workPercentage.addEventListener('input', markScheduleDirty);
     reductionDuration.addEventListener('change', markScheduleDirty);
@@ -3404,6 +4272,11 @@
     year.addEventListener('change', handlePeriodChange);
 
     topBack.addEventListener('click', (event) => {
+      if (!comparisonScreen.hidden) {
+        event.preventDefault();
+        showPeriodScreen();
+        return;
+      }
       if (!analysisScreen.hidden) {
         event.preventDefault();
         showPeriodScreen();
