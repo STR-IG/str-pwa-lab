@@ -70,9 +70,10 @@
         linear-gradient(90deg,rgba(112,0,9,.92) 0%,rgba(172,0,14,.76) 43%,rgba(105,0,8,.08) 72%),
         url("revisa-tu-nomina-bg.webp") center / cover no-repeat;
       box-shadow:none;
-      cursor:default;
+      text-decoration:none;
+      cursor:pointer;
     }
-    .payroll-card:hover { transform:none; box-shadow:none; }
+    .payroll-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.11); }
     .payroll-copy {
       position:relative;
       z-index:2;
@@ -238,13 +239,12 @@
         <img src="calcula-tu-v.png" alt="Calcula tu V" style="width:100%; height:100%; object-fit:cover; display:block;">
       </a>
 
-      <article class="quick-card payroll-card" aria-label="Revisa tu nómina, próximamente">
+      <a href="revisa-tu-nomina.html" class="quick-card payroll-card" aria-label="Revisa tu nómina, acceso para afiliados">
         <div class="payroll-copy">
           <h3>Revisa tu nómina</h3>
-          <span class="coming-soon">Próximamente</span>
         </div>
         <span class="card-lock" aria-hidden="true"></span>
-      </article>
+      </a>
 
       <article class="quick-card">
         <div class="icon">📅</div>

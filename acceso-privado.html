@@ -50,6 +50,22 @@
     const REQUEST=URL+'/functions/v1/lab-request-custom-otp';
     const VERIFY=URL+'/functions/v1/lab-verify-custom-otp';
     const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    const ALLOWED_DESTINATIONS=new Set(['area-privada.html','revisa-tu-nomina.html']);
+    const requestedDestination=new URLSearchParams(window.location.search).get('next');
+    if(ALLOWED_DESTINATIONS.has(requestedDestination)){
+      sessionStorage.setItem('strLabNext',requestedDestination);
+    }
+
+    function privateDestination(){
+      const saved=sessionStorage.getItem('strLabNext');
+      return ALLOWED_DESTINATIONS.has(saved) ? saved : 'area-privada.html';
+    }
+
+    function enterPrivateArea(){
+      const destination=privateDestination();
+      sessionStorage.removeItem('strLabNext');
+      window.location.replace(destination);
+    }
 
     const emailForm=document.getElementById('email-form');
     const codeForm=document.getElementById('code-form');
@@ -152,7 +168,7 @@
 
         sessionStorage.removeItem('strLabPendingEmail');
         showStatus(verifyStatus,'Acceso correcto. Entrando en el área privada…','ok');
-        window.location.replace('area-privada.html');
+        enterPrivateArea();
       }catch(_){
         showStatus(verifyStatus,'No se ha podido completar la verificación. Comprueba tu conexión.','bad');
       }finally{
@@ -165,7 +181,7 @@
 
     const {data:{session}}=await supabase.auth.getSession();
     if(session && await authorized()){
-      window.location.replace('area-privada.html');
+      enterPrivateArea();
     }else if(session){
       await supabase.auth.signOut();
       showEmailStep();

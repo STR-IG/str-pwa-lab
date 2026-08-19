@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Revisa tu nómina · STR-IG LAB</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --red: #e30613;
+      --red-dark: #b9000b;
+      --green: #0f766e;
+      --ink: #18181b;
+      --muted: #6e6e73;
+      --line: #e3e3e7;
+      --surface: #ffffff;
+      --background: #f5f5f7;
+      --warning: #fff8df;
+      --warning-ink: #684900;
+    }
+
+    html, body { width: 100%; overflow-x: hidden; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button, select, input { font: inherit; }
+
+    [hidden] { display: none !important; }
+
+    .labbar {
+      padding: 10px 16px;
+      background: var(--green);
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .5px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 68px;
+      padding: 12px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .back {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--ink);
+      background: #f0f0f2;
+      text-decoration: none;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .topbar strong { font-size: 18px; }
+
+    .auth-check {
+      width: min(100% - 28px, 480px);
+      margin: 48px auto;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    main {
+      width: min(100% - 28px, 520px);
+      margin: 0 auto;
+      padding: 28px 0 calc(48px + env(safe-area-inset-bottom));
+    }
+
+    .tool-icon {
+      display: grid;
+      place-items: center;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 17px;
+      border-radius: 22px;
+      color: white;
+      background: linear-gradient(145deg, var(--red), var(--red-dark));
+      box-shadow: 0 12px 28px rgba(227, 6, 19, .22);
+      font-size: 31px;
+    }
+
+    h1 {
+      margin: 0 0 9px;
+      text-align: center;
+      font-size: 29px;
+      letter-spacing: -.5px;
+    }
+
+    .intro {
+      max-width: 430px;
+      margin: 0 auto 22px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      padding: 21px 18px;
+      border: 1px solid rgba(0, 0, 0, .04);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .07);
+    }
+
+    .section-title {
+      margin: 0 0 13px;
+      font-size: 16px;
+    }
+
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1.35fr .85fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    label.field-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    select {
+      width: 100%;
+      min-height: 50px;
+      padding: 11px 13px;
+      border: 1px solid #cfcfd3;
+      border-radius: 13px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font-size: 16px;
+    }
+
+    select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(227, 6, 19, .12);
+    }
+
+    .upload-card {
+      margin-top: 13px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .upload-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      margin-bottom: 7px;
+    }
+
+    .upload-number {
+      display: grid;
+      flex: 0 0 34px;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: white;
+      background: var(--red);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .upload-heading strong {
+      display: block;
+      margin-top: 1px;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .upload-heading span:not(.upload-number) {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .choose-file {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 50px;
+      margin-top: 12px;
+      border: 2px dashed #d2a7aa;
+      border-radius: 14px;
+      color: var(--red-dark);
+      background: #fff6f7;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .file-input:focus + .choose-file {
+      outline: 3px solid rgba(227, 6, 19, .16);
+      outline-offset: 2px;
+    }
+
+    .preview {
+      position: relative;
+      margin-top: 12px;
+      padding: 9px;
+      border: 1px solid #b9dfc9;
+      border-radius: 14px;
+      background: #f0faf4;
+    }
+
+    .preview img {
+      display: block;
+      width: 100%;
+      max-height: 260px;
+      border-radius: 9px;
+      object-fit: contain;
+      background: white;
+    }
+
+    .preview-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .file-name {
+      min-width: 0;
+      overflow: hidden;
+      color: #28613f;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .remove-file {
+      flex: 0 0 auto;
+      padding: 6px 8px;
+      border: 0;
+      color: var(--red-dark);
+      background: transparent;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .privacy-warning {
+      margin-top: 16px;
+      padding: 14px;
+      border-left: 4px solid #e0a000;
+      border-radius: 12px;
+      color: var(--warning-ink);
+      background: var(--warning);
+      font-size: 13px;
+      line-height: 1.48;
+    }
+
+    .privacy-warning strong { display: block; margin-bottom: 4px; }
+
+    .confirmation {
+      display: grid;
+      grid-template-columns: 23px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      margin-top: 15px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.42;
+      cursor: pointer;
+    }
+
+    .confirmation input {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      accent-color: var(--red);
+    }
+
+    .primary {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 17px;
+      border: 0;
+      border-radius: 999px;
+      color: white;
+      background: var(--red);
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .primary:disabled {
+      cursor: not-allowed;
+      opacity: .42;
+    }
+
+    .status {
+      display: none;
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 13px;
+      color: #205b35;
+      background: #eef7f1;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .status.show { display: block; }
+
+    .error {
+      display: none;
+      margin-top: 9px;
+      color: #8a1d24;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .error.show { display: block; }
+
+    .local-note {
+      display: flex;
+      gap: 9px;
+      margin: 17px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="labbar">🧪 STR-IG LABORATORIO · NO ES PRODUCCIÓN</div>
+  <header class="topbar">
+    <a class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a>
+    <strong>Revisa tu nómina</strong>
+  </header>
+
+  <p id="auth-check" class="auth-check">Comprobando el acceso privado…</p>
+
+  <main id="content" hidden>
+    <div class="tool-icon" aria-hidden="true">🔎</div>
+    <h1>Revisa tu nómina</h1>
+    <p class="intro">Prepara una imagen recortada de tu nómina y otra del resumen de tu hoja de trabajo.</p>
+
+    <section class="panel">
+      <h2 class="section-title">Mes que quieres revisar</h2>
+      <div class="date-grid">
+        <div>
+          <label class="field-label" for="month">Mes</label>
+          <select id="month" name="month">
+            <option value="0">Enero</option>
+            <option value="1">Febrero</option>
+            <option value="2">Marzo</option>
+            <option value="3">Abril</option>
+            <option value="4">Mayo</option>
+            <option value="5">Junio</option>
+            <option value="6">Julio</option>
+            <option value="7">Agosto</option>
+            <option value="8">Septiembre</option>
+            <option value="9">Octubre</option>
+            <option value="10">Noviembre</option>
+            <option value="11">Diciembre</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="year">Año</label>
+          <select id="year" name="year"></select>
+        </div>
+      </div>
+
+      <article class="upload-card">
+        <div class="upload-heading">
+          <span class="upload-number">1</span>
+          <div>
+            <strong id="payroll-title">Nómina del mes</strong>
+            <span>Primera página: recorta el apartado «Devengos y deducciones».</span>
+          </div>
+        </div>
+        <input id="payroll-image" class="file-input" type="file" accept="image/*">
+        <label class="choose-file" for="payroll-image"><span aria-hidden="true">▣</span> Insertar imagen de la nómina</label>
+        <p id="payroll-error" class="error"></p>
+        <div id="payroll-preview" class="preview" hidden>
+          <img id="payroll-preview-image" alt="Vista previa de la nómina recortada">
+          <div class="preview-footer">
+            <span id="payroll-file-name" class="file-name"></span>
+            <button class="remove-file" type="button" data-remove="payroll">Eliminar</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="upload-card">
+        <div class="upload-heading">
+          <span class="upload-number">2</span>
+          <div>
+            <strong id="timesheet-title">Hoja de trabajo del mes</strong>
+            <span>Recorta el apartado «Resumen de variables del mes».</span>
+          </div>
+        </div>
+        <input id="timesheet-image" class="file-input" type="file" accept="image/*">
+        <label class="choose-file" for="timesheet-image"><span aria-hidden="true">▣</span> Insertar imagen de la hoja de trabajo</label>
+        <p id="timesheet-error" class="error"></p>
+        <div id="timesheet-preview" class="preview" hidden>
+          <img id="timesheet-preview-image" alt="Vista previa del resumen de la hoja de trabajo">
+          <div class="preview-footer">
+            <span id="timesheet-file-name" class="file-name"></span>
+            <button class="remove-file" type="button" data-remove="timesheet">Eliminar</button>
+          </div>
+        </div>
+      </article>
+
+      <div class="privacy-warning">
+        <strong>🔒 Protege tus datos personales</strong>
+        Antes de continuar, recorta las imágenes para que no aparezcan tu nombre y apellidos, DNI/NIE, número de empleado, número de la Seguridad Social, domicilio, cuenta bancaria, códigos QR o de barras ni ningún otro dato identificativo. Solo deben verse los conceptos y los datos numéricos necesarios.
+      </div>
+
+      <label class="confirmation" for="privacy-confirmation">
+        <input id="privacy-confirmation" type="checkbox">
+        <span>He comprobado que las imágenes no contienen datos personales.</span>
+      </label>
+
+      <button id="continue" class="primary" type="button" disabled>Continuar</button>
+      <p id="status" class="status" role="status"></p>
+    </section>
+
+    <p class="local-note"><span aria-hidden="true">🛡️</span><span>En esta primera prueba las imágenes solo se muestran en tu dispositivo. No se envían ni se guardan.</span></p>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://icneigdnuntzugisexaz.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { detectSessionInUrl: false, persistSession: true, autoRefreshToken: true }
+    });
+
+    const authCheck = document.getElementById('auth-check');
+    const content = document.getElementById('content');
+
+    async function hasPrivateAccess(session) {
+      if (!session) return false;
+      const { data, error } = await supabase.rpc('is_current_user_private_access_allowed');
+      return !error && data === true;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!(await hasPrivateAccess(session))) {
+      if (session) await supabase.auth.signOut();
+      sessionStorage.setItem('strLabNext', 'revisa-tu-nomina.html');
+      window.location.replace('acceso-privado.html?next=revisa-tu-nomina.html');
+    } else {
+      authCheck.hidden = true;
+      content.hidden = false;
+    }
+
+    const month = document.getElementById('month');
+    const year = document.getElementById('year');
+    const privacyConfirmation = document.getElementById('privacy-confirmation');
+    const continueButton = document.getElementById('continue');
+    const status = document.getElementById('status');
+    const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+    const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const files = { payroll: null, timesheet: null };
+    const objectUrls = { payroll: '', timesheet: '' };
+
+    const now = new Date();
+    for (let value = now.getFullYear() + 1; value >= now.getFullYear() - 3; value -= 1) {
+      const option = document.createElement('option');
+      option.value = String(value);
+      option.textContent = String(value);
+      year.appendChild(option);
+    }
+    month.value = String(now.getMonth());
+    year.value = String(now.getFullYear());
+
+    function updateTitles() {
+      const selectedMonth = monthNames[Number(month.value)];
+      document.getElementById('payroll-title').textContent = `Nómina de ${selectedMonth} de ${year.value}`;
+      document.getElementById('timesheet-title').textContent = `Hoja de trabajo de ${selectedMonth} de ${year.value}`;
+      status.classList.remove('show');
+    }
+
+    function updateButton() {
+      continueButton.disabled = !(files.payroll && files.timesheet && privacyConfirmation.checked);
+      if (continueButton.disabled) status.classList.remove('show');
+    }
+
+    function clearFile(kind) {
+      if (objectUrls[kind]) URL.revokeObjectURL(objectUrls[kind]);
+      objectUrls[kind] = '';
+      files[kind] = null;
+      document.getElementById(`${kind}-image`).value = '';
+      document.getElementById(`${kind}-preview`).hidden = true;
+      document.getElementById(`${kind}-preview-image`).removeAttribute('src');
+      document.getElementById(`${kind}-file-name`).textContent = '';
+      document.getElementById(`${kind}-error`).classList.remove('show');
+      updateButton();
+    }
+
+    function showFile(kind, file) {
+      const error = document.getElementById(`${kind}-error`);
+      error.classList.remove('show');
+      error.textContent = '';
+
+      if (!file || !file.type.startsWith('image/')) {
+        clearFile(kind);
+        error.textContent = 'Selecciona una imagen válida.';
+        error.classList.add('show');
+        return;
+      }
+
+      if (file.size > MAX_IMAGE_BYTES) {
+        clearFile(kind);
+        error.textContent = 'La imagen es demasiado grande. Elige una de menos de 15 MB.';
+        error.classList.add('show');
+        return;
+      }
+
+      if (objectUrls[kind]) URL.revokeObjectURL(objectUrls[kind]);
+      files[kind] = file;
+      objectUrls[kind] = URL.createObjectURL(file);
+      document.getElementById(`${kind}-preview-image`).src = objectUrls[kind];
+      document.getElementById(`${kind}-file-name`).textContent = file.name || 'Imagen seleccionada';
+      document.getElementById(`${kind}-preview`).hidden = false;
+      updateButton();
+    }
+
+    document.getElementById('payroll-image').addEventListener('change', (event) => {
+      showFile('payroll', event.target.files[0]);
+    });
+
+    document.getElementById('timesheet-image').addEventListener('change', (event) => {
+      showFile('timesheet', event.target.files[0]);
+    });
+
+    document.querySelectorAll('[data-remove]').forEach((button) => {
+      button.addEventListener('click', () => clearFile(button.dataset.remove));
+    });
+
+    month.addEventListener('change', updateTitles);
+    year.addEventListener('change', updateTitles);
+    privacyConfirmation.addEventListener('change', updateButton);
+
+    continueButton.addEventListener('click', () => {
+      if (continueButton.disabled) return;
+      status.textContent = 'Primera pantalla completada. Las imágenes están preparadas en este dispositivo; el análisis se añadirá en la siguiente fase.';
+      status.classList.add('show');
+      status.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    window.addEventListener('beforeunload', () => {
+      Object.values(objectUrls).forEach((url) => { if (url) URL.revokeObjectURL(url); });
+    });
+
+    updateTitles();
+    updateButton();
+  </script>
+</body>
+</html>
