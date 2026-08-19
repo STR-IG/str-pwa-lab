@@ -543,6 +543,62 @@
       line-height: 1.4;
     }
 
+    .privacy-scan {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      margin-top: 15px;
+      padding: 13px;
+      border: 1px solid #d8d8dc;
+      border-radius: 14px;
+      color: #45454a;
+      background: #f5f5f7;
+    }
+
+    .privacy-scan[hidden] { display: none; }
+
+    .privacy-scan-icon {
+      flex: 0 0 auto;
+      width: 24px;
+      text-align: center;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .privacy-scan.checking .privacy-scan-icon {
+      animation: privacy-pulse 1.15s ease-in-out infinite;
+    }
+
+    .privacy-scan.passed {
+      border-color: #a8ddbf;
+      color: #205b38;
+      background: #eef9f3;
+    }
+
+    .privacy-scan.blocked,
+    .privacy-scan.failed {
+      border-color: #efb0b5;
+      color: #841d25;
+      background: #fff1f2;
+    }
+
+    .privacy-scan strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .privacy-scan p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.42;
+    }
+
+    @keyframes privacy-pulse {
+      0%, 100% { opacity: .45; transform: scale(.94); }
+      50% { opacity: 1; transform: scale(1.06); }
+    }
+
     .preview {
       margin-top: 17px;
       padding: 10px;
@@ -550,6 +606,13 @@
       border-radius: 16px;
       background: #f0faf4;
     }
+
+    .preview.scan-blocked {
+      border-color: #efb0b5;
+      background: #fff5f6;
+    }
+
+    .preview.scan-blocked .preview-label { color: #841d25; }
 
     .preview img {
       display: block;
@@ -704,13 +767,21 @@
 
         <label class="confirmation" for="privacy-confirmation">
           <input id="privacy-confirmation" type="checkbox">
-          <span>Acepto y confirmo que la imagen no contiene datos personales.</span>
+          <span>He recortado la imagen y confirmo que no contiene datos personales.</span>
         </label>
 
         <input id="document-image" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
         <button id="select-image" class="secondary select-image" type="button" disabled><span aria-hidden="true">▣</span> Seleccionar imagen</button>
         <p id="select-hint" class="select-hint">Marca primero la casilla de aceptación.</p>
         <p id="file-error" class="error" role="alert" hidden></p>
+
+        <div id="privacy-scan" class="privacy-scan" role="status" aria-live="polite" hidden>
+          <span id="privacy-scan-icon" class="privacy-scan-icon" aria-hidden="true">🔎</span>
+          <div>
+            <strong id="privacy-scan-title">Comprobando privacidad…</strong>
+            <p id="privacy-scan-message">La imagen se analiza en este dispositivo antes de guardarse.</p>
+          </div>
+        </div>
 
         <div id="image-preview" class="preview" hidden>
           <img id="preview-image" alt="Vista previa de la imagen seleccionada">
@@ -727,6 +798,7 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" integrity="sha384-2BQ3U3OdKOb0Uczxqr41I9UvZkzr4V9Hv8uSzMMZAlmhsFClvdZX5wi5fDCzG+tM" crossorigin="anonymous"></script>
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -767,6 +839,10 @@
     const fileInput = document.getElementById('document-image');
     const selectImageButton = document.getElementById('select-image');
     const selectHint = document.getElementById('select-hint');
+    const privacyScan = document.getElementById('privacy-scan');
+    const privacyScanIcon = document.getElementById('privacy-scan-icon');
+    const privacyScanTitle = document.getElementById('privacy-scan-title');
+    const privacyScanMessage = document.getElementById('privacy-scan-message');
     const preview = document.getElementById('image-preview');
     const previewImage = document.getElementById('preview-image');
     const fileError = document.getElementById('file-error');
@@ -777,6 +853,23 @@
     const periodMessage = document.getElementById('period-reset-note');
     const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
     const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
+    const PERSONAL_DATA_LABELS = [
+      /\bTRABAJADOR(?:A)?\b/,
+      /\bNOMBRE(?:\s+Y\s+APELLIDOS)?\b/,
+      /\bAPELLIDOS?\b/,
+      /\b(?:DNI|NIE|NIF)\b/,
+      /\bNUMERO\s+(?:DE\s+)?(?:ID|EMPLEADO|PERSONAL)\b/,
+      /\b(?:NSS|NAF)\b/,
+      /\bSEGURIDAD\s+SOCIAL\b/,
+      /\bIBAN\b/,
+      /\bCUENTA\s+BANCARIA\b/,
+      /\b(?:DOMICILIO|DIRECCION)\b/,
+      /\bCORREO\s+ELECTRONICO\b/,
+      /\bTELEFONO\b/,
+      /\bRESPONSABLE\b/,
+      /\bCENTRO\s+DE\s+TRABAJO\b/,
+      /\bPOSICION\b/
+    ];
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     const documents = {
       timesheet: { file: null, url: '', confirmed: false, saved: false, path: '' },
@@ -804,6 +897,10 @@
     let loadingDocuments = false;
     let savingDocument = false;
     let storageLoadVersion = 0;
+    let privacyScanState = 'idle';
+    let privacyScanVersion = 0;
+    let ocrWorkerPromise = null;
+    let ocrQueue = Promise.resolve();
 
     const now = new Date();
     for (let value = now.getFullYear() + 1; value >= now.getFullYear() - 4; value -= 1) {
@@ -979,8 +1076,114 @@
       if (completed !== 2) document.getElementById('final-status').hidden = true;
     }
 
+    function normalizeOcrText(text) {
+      return String(text || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function containsLikelyPersonalData(text) {
+      const normalized = normalizeOcrText(text);
+      if (!normalized) return false;
+
+      if (PERSONAL_DATA_LABELS.some((pattern) => pattern.test(normalized))) return true;
+
+      const tokens = normalized.match(/[A-Z0-9@._+-]{5,}/g) || [];
+      const hasSpanishIdentityNumber = tokens.some((token) => {
+        const compact = token.replace(/[-.]/g, '');
+        return /^(?:[XYZ]\d{7}[A-Z]|\d{8}[A-Z])$/.test(compact);
+      });
+      const hasEmail = tokens.some((token) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/.test(token));
+      const hasIban = /\bES\d{22}\b/.test(normalized.replace(/\s+/g, ''));
+
+      return hasSpanishIdentityNumber || hasEmail || hasIban;
+    }
+
+    function setPrivacyScanState(state) {
+      privacyScanState = state;
+      privacyScan.hidden = state === 'idle';
+      privacyScan.className = `privacy-scan ${state}`;
+
+      const copy = {
+        checking: {
+          icon: '🔎',
+          title: 'Comprobando privacidad…',
+          message: 'La imagen se analiza en este dispositivo antes de guardarse. La primera comprobación puede tardar unos segundos.'
+        },
+        passed: {
+          icon: '✓',
+          title: 'Comprobación superada',
+          message: 'No se han detectado indicios evidentes. Revísala también visualmente: el control automático no es infalible.'
+        },
+        blocked: {
+          icon: '!',
+          title: 'Posibles datos personales detectados',
+          message: 'Recorta la imagen dejando únicamente los conceptos y cantidades. Esta imagen no se guardará.'
+        },
+        failed: {
+          icon: '!',
+          title: 'No hemos podido comprobar la imagen',
+          message: 'Prueba con una imagen JPG o PNG, o recórtala y vuelve a seleccionarla. Esta imagen no se guardará.'
+        }
+      }[state];
+
+      if (!copy) return;
+      privacyScanIcon.textContent = copy.icon;
+      privacyScanTitle.textContent = copy.title;
+      privacyScanMessage.textContent = copy.message;
+    }
+
+    async function getOcrWorker() {
+      if (!window.Tesseract?.createWorker) throw new Error('OCR unavailable');
+      if (!ocrWorkerPromise) {
+        ocrWorkerPromise = window.Tesseract.createWorker('spa').catch((error) => {
+          ocrWorkerPromise = null;
+          throw error;
+        });
+      }
+      return ocrWorkerPromise;
+    }
+
+    function recognizeTextLocally(file) {
+      const job = ocrQueue
+        .catch(() => undefined)
+        .then(async () => {
+          const worker = await getOcrWorker();
+          const result = await worker.recognize(file);
+          return result?.data?.text || '';
+        });
+      ocrQueue = job.then(() => undefined, () => undefined);
+      return job;
+    }
+
+    async function checkSelectedFilePrivacy(file, scanVersion) {
+      try {
+        const recognizedText = await recognizeTextLocally(file);
+        if (scanVersion !== privacyScanVersion || workingFile !== file) return;
+        const readableCharacters = normalizeOcrText(recognizedText).replace(/[^A-Z0-9]/g, '').length;
+        setPrivacyScanState(
+          readableCharacters < 8
+            ? 'failed'
+            : (containsLikelyPersonalData(recognizedText) ? 'blocked' : 'passed')
+        );
+      } catch {
+        if (scanVersion !== privacyScanVersion || workingFile !== file) return;
+        if (ocrWorkerPromise) {
+          ocrWorkerPromise.then((worker) => worker.terminate()).catch(() => undefined);
+          ocrWorkerPromise = null;
+        }
+        setPrivacyScanState('failed');
+      }
+      renderWorkingPreview();
+    }
+
     function resetDocumentScreen() {
+      privacyScanVersion += 1;
       savingDocument = false;
+      setPrivacyScanState('idle');
       privacyConfirmation.checked = false;
       fileInput.value = '';
       selectImageButton.disabled = true;
@@ -994,19 +1197,35 @@
     function renderWorkingPreview() {
       const hasImage = Boolean(workingUrl && (workingFile || workingSaved));
       const needsUpload = Boolean(workingFile && !workingSaved);
+      const checkingPrivacy = needsUpload && privacyScanState === 'checking';
+      const privacyBlocked = needsUpload && ['blocked', 'failed'].includes(privacyScanState);
+      const readyToUpload = needsUpload && privacyConfirmation.checked && privacyScanState === 'passed';
       preview.hidden = !hasImage;
+      preview.classList.toggle('scan-blocked', privacyBlocked);
       documentActions.hidden = !hasImage;
-      changeImageButton.disabled = savingDocument || !privacyConfirmation.checked;
-      confirmImageButton.disabled = savingDocument || !hasImage || (needsUpload && !privacyConfirmation.checked);
+      selectImageButton.disabled = savingDocument || checkingPrivacy || !privacyConfirmation.checked;
+      changeImageButton.disabled = savingDocument || checkingPrivacy || !privacyConfirmation.checked;
+      changeImageButton.textContent = privacyBlocked ? 'Recortar o cambiar imagen' : 'Cambiar imagen';
+      confirmImageButton.disabled = savingDocument || !hasImage || (needsUpload && !readyToUpload);
       confirmImageButton.textContent = savingDocument
         ? 'Guardando…'
-        : (needsUpload ? 'Guardar imagen' : 'Volver al resumen');
+        : (checkingPrivacy
+          ? 'Comprobando…'
+          : (privacyBlocked
+            ? 'Imagen no aceptada'
+            : (needsUpload ? 'Guardar imagen' : 'Volver al resumen')));
 
       if (hasImage) {
         previewImage.src = workingUrl;
         previewStatusText.textContent = workingSaved
           ? 'Imagen guardada en tu historial privado'
-          : 'Imagen lista para guardar de forma privada';
+          : (checkingPrivacy
+            ? 'Comprobando la imagen antes de guardarla'
+            : (privacyBlocked
+              ? 'Imagen no aceptada: recórtala o cámbiala'
+              : (privacyScanState === 'passed'
+                ? 'Control superado: imagen lista para guardar'
+                : 'Imagen pendiente de comprobación')));
       } else {
         previewImage.removeAttribute('src');
       }
@@ -1040,6 +1259,8 @@
     }
 
     function showPeriodScreen() {
+      privacyScanVersion += 1;
+      setPrivacyScanState('idle');
       revokeWorkingUrlIfTemporary();
       activeKind = '';
       documentScreen.hidden = true;
@@ -1061,7 +1282,7 @@
       fileInput.click();
     }
 
-    function showSelectedFile(file) {
+    async function showSelectedFile(file) {
       fileError.hidden = true;
       fileError.textContent = '';
 
@@ -1082,8 +1303,11 @@
       workingFile = file;
       workingUrl = URL.createObjectURL(file);
       workingSaved = false;
+      const scanVersion = ++privacyScanVersion;
+      setPrivacyScanState('checking');
       renderWorkingPreview();
       preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      await checkSelectedFilePrivacy(file, scanVersion);
     }
 
     async function confirmImage() {
@@ -1095,6 +1319,13 @@
       }
 
       if (!currentUserId || !workingFile || !workingUrl || !privacyConfirmation.checked) return;
+
+      if (privacyScanState !== 'passed') {
+        fileError.textContent = 'La imagen debe superar la comprobación de privacidad antes de guardarse.';
+        fileError.hidden = false;
+        renderWorkingPreview();
+        return;
+      }
 
       savingDocument = true;
       fileError.hidden = true;
@@ -1114,7 +1345,6 @@
         savingDocument = false;
         fileError.textContent = 'No se ha podido guardar la imagen. Comprueba la conexión e inténtalo de nuevo.';
         fileError.hidden = false;
-        selectImageButton.disabled = !privacyConfirmation.checked;
         renderWorkingPreview();
         return;
       }
@@ -1133,9 +1363,8 @@
     }
 
     privacyConfirmation.addEventListener('change', () => {
-      selectImageButton.disabled = savingDocument || !privacyConfirmation.checked;
       selectHint.textContent = privacyConfirmation.checked
-        ? 'Puedes seleccionar una imagen JPG, PNG, WEBP o HEIC de hasta 15 MB.'
+        ? 'Selecciona una imagen recortada. Se comprobará en este dispositivo antes de guardarse.'
         : (workingSaved
           ? 'La imagen ya está guardada. Marca la casilla solo si quieres sustituirla.'
           : 'Marca primero la casilla de aceptación.');
@@ -1170,6 +1399,9 @@
       Object.values(documents).forEach((document) => {
         if (document.url) URL.revokeObjectURL(document.url);
       });
+      if (ocrWorkerPromise) {
+        ocrWorkerPromise.then((worker) => worker.terminate()).catch(() => undefined);
+      }
     });
 
     if (currentUserId) {
