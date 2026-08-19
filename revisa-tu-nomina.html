@@ -606,6 +606,12 @@
       line-height: 1.45;
     }
 
+    .analysis-replace {
+      margin-top: 12px;
+      border-color: #e8aeb2;
+      color: var(--red-dark);
+    }
+
     .analysis-form {
       margin-top: 17px;
     }
@@ -1298,6 +1304,7 @@
             <p id="analysis-progress-message">La imagen se analizará en este dispositivo.</p>
           </div>
         </div>
+        <button id="replace-wrong-timesheet" class="secondary analysis-replace" type="button" hidden>Sustituir por el registro de jornada</button>
 
         <details class="analysis-reference">
           <summary>Ver el registro de jornada guardado</summary>
@@ -1511,6 +1518,7 @@
     const analysisProgressIcon = document.getElementById('analysis-progress-icon');
     const analysisProgressTitle = document.getElementById('analysis-progress-title');
     const analysisProgressMessage = document.getElementById('analysis-progress-message');
+    const replaceWrongTimesheetButton = document.getElementById('replace-wrong-timesheet');
     const analysisReferenceImage = document.getElementById('analysis-reference-image');
     const analysisForm = document.getElementById('analysis-form');
     const analysisDetectedCount = document.getElementById('analysis-detected-count');
@@ -2455,6 +2463,19 @@
       analysisProgressMessage.textContent = message;
     }
 
+    function showWrongTimesheetMessage() {
+      renderTimesheetAnalysis(new Map());
+      replaceWrongTimesheetButton.hidden = false;
+      confirmAnalysisButton.dataset.action = 'replace-timesheet';
+      confirmAnalysisButton.textContent = 'Sustituir registro';
+      setAnalysisProgress(
+        'failed',
+        '!',
+        'La imagen guardada es una nómina',
+        'Está colocada en el apartado «Registro de jornada». Sustitúyela por la hoja que contiene «Resumen de variables del mes».'
+      );
+    }
+
     function loadImageForAnalysis(blob) {
       return new Promise((resolve, reject) => {
         const imageUrl = URL.createObjectURL(blob);
@@ -2623,6 +2644,7 @@
       const requestVersion = ++analysisRunVersion;
       analysisRunning = true;
       analysisForm.hidden = true;
+      replaceWrongTimesheetButton.hidden = true;
       retryAnalysisButton.disabled = true;
       confirmAnalysisButton.disabled = true;
       setAnalysisProgress(
@@ -2636,15 +2658,7 @@
         const source = documents.timesheet.blob || documents.timesheet.file;
         if (!source) throw new Error('Timesheet unavailable');
         if (detectDocumentKind(documents.timesheet.ocrText) === 'payroll') {
-          renderTimesheetAnalysis(new Map());
-          confirmAnalysisButton.dataset.action = 'back';
-          confirmAnalysisButton.textContent = 'Volver al resumen';
-          setAnalysisProgress(
-            'failed',
-            '!',
-            'El documento guardado parece una nómina',
-            'Vuelve al resumen y sustituye el registro de jornada por la imagen correcta.'
-          );
+          showWrongTimesheetMessage();
           return;
         }
         const texts = [];
@@ -2660,6 +2674,12 @@
           texts.push(await recognizeTextLocally(ocrSource, '11'));
         }
         if (requestVersion !== analysisRunVersion) return;
+
+        const detectedKinds = texts.map(detectDocumentKind).filter(Boolean);
+        if (detectedKinds.includes('payroll') && !detectedKinds.includes('timesheet')) {
+          showWrongTimesheetMessage();
+          return;
+        }
 
         const extracted = extractTimesheetVariables(texts);
         renderTimesheetAnalysis(extracted);
@@ -2763,6 +2783,10 @@
     }
 
     function handleAnalysisPrimaryAction() {
+      if (confirmAnalysisButton.dataset.action === 'replace-timesheet') {
+        openDocument('timesheet');
+        return;
+      }
       if (confirmAnalysisButton.dataset.action === 'back') {
         showPeriodScreen();
         return;
@@ -3032,6 +3056,7 @@
     startAnalysisButton.addEventListener('click', () => startTimesheetAnalysis());
     retryAnalysisButton.addEventListener('click', () => startTimesheetAnalysis(true));
     confirmAnalysisButton.addEventListener('click', handleAnalysisPrimaryAction);
+    replaceWrongTimesheetButton.addEventListener('click', () => openDocument('timesheet'));
     scheduleType.addEventListener('change', markScheduleDirty);
     workPercentage.addEventListener('input', markScheduleDirty);
     reductionDuration.addEventListener('change', markScheduleDirty);
