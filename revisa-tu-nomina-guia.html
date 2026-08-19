@@ -4,51 +4,131 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0f766e">
-  <title>Revisa tu nómina · guía LAB</title>
+  <title>Revisa tu nómina · STR-IG LAB</title>
   <link rel="icon" type="image/png" href="icono-str-ig.png">
   <style>
-    *{box-sizing:border-box}body{margin:0;background:#f5f5f7;color:#18181b;font-family:Arial,Helvetica,sans-serif}.lab{padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:#0f766e;color:#fff;text-align:center;font-size:12px;font-weight:900}.top{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-bottom:1px solid #e5e5e7}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#f0f0f2;color:#18181b;text-decoration:none;font-size:26px}.top strong{font-size:18px}main{width:min(100% - 28px,520px);margin:auto;padding:26px 0 50px}.title{text-align:center}.title .icon{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 15px;border-radius:20px;background:#e30613;color:#fff;font-size:28px}.title h1{margin:0 0 8px;font-size:28px}.title p{margin:0 auto 22px;max-width:430px;color:#6e6e73;font-size:14px;line-height:1.45}.card{margin-top:14px;padding:18px;border:1px solid #e3e3e7;border-radius:22px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,.06)}.step{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:8px;border-radius:50%;background:#e30613;color:#fff;font-weight:900}.card h2{display:inline;margin:0;font-size:18px}.help{margin:9px 0 14px;color:#6e6e73;font-size:13px;line-height:1.45}.drop{position:relative;overflow:hidden;min-height:360px;border:2px dashed #9eabb8;border-radius:18px;background:#fbfcfd;cursor:pointer}.sheet{position:absolute;inset:18px;opacity:.18;filter:grayscale(1);pointer-events:none;font-size:9px;color:#111}.sheet .home{margin-bottom:12px;font-weight:700}.sheet table{width:100%;border-collapse:collapse;margin-bottom:14px}.sheet th,.sheet td{border:1px solid #111;padding:4px 5px}.sheet th{text-align:center}.sheet td:last-child{text-align:center;width:30%}.sheet .bar{margin:8px 0 7px;border-top:2px solid #111;text-align:center;font-weight:800;padding-top:4px}.upload-copy{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:25px;text-align:center}.camera{font-size:40px}.upload-copy strong{margin-top:8px;color:#e30613;font-size:19px}.upload-copy span{margin-top:6px;max-width:260px;color:#414146;font-size:13px;line-height:1.4}.file{position:absolute;width:1px;height:1px;clip:rect(0,0,0,0)}.privacy{display:flex;gap:8px;margin:12px 2px 0;color:#6e6e73;font-size:12px;line-height:1.4}.selected{margin-top:12px;padding:12px;border-radius:13px;background:#edf8f3;color:#17603d;font-size:13px;font-weight:800}.payroll{display:flex;align-items:center;justify-content:center;min-height:105px;margin-top:14px;border:2px dashed #c8c8ce;border-radius:16px;color:#777;background:#f7f7f8;text-align:center}.payroll strong{display:block;margin-bottom:4px;color:#444}.notice{margin-top:16px;padding:13px;border-radius:13px;background:#fff8df;color:#684900;font-size:12px;line-height:1.45}.auth{margin:40px auto;color:#6e6e73;text-align:center;font-size:13px}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f5f5f7;font-family:Arial,Helvetica,sans-serif}.lab-auth{display:grid;place-items:center;width:100%;height:100%;padding:24px;color:#6e6e73;text-align:center;font-size:14px}.frame{display:block;width:100%;height:100%;border:0;background:#f5f5f7}
   </style>
 </head>
 <body>
-  <div class="lab">🧪 STR-IG LABORATORIO · PRUEBA DE DISEÑO</div>
-  <header class="top"><a class="back" href="index.html" aria-label="Volver">‹</a><strong>Revisa tu nómina</strong></header>
-  <p id="auth" class="auth">Comprobando acceso privado…</p>
-  <main id="content" hidden>
-    <div class="title"><div class="icon">🔎</div><h1>Revisa tu nómina</h1><p>Primero necesitamos una captura concreta de tu registro de jornada. Te mostramos exactamente qué parte debes subir.</p></div>
-    <section class="card">
-      <div><span class="step">1</span><h2>Sube el resumen mensual</h2></div>
-      <p class="help">Haz una captura donde se vea el apartado <strong>«Resumen de variables del mes»</strong>.</p>
-      <label class="drop" for="timesheet-image">
-        <div class="sheet" aria-hidden="true">
-          <div class="home">(H) = HOME</div>
-          <table><tr><th>TOTAL HORAS PERIODO</th><th>TEÓRICAS</th><th>AUSENCIAS</th></tr><tr><td></td><td>139,6</td><td>90,93</td></tr></table>
-          <div class="bar">RESUMEN DE VARIABLES DEL MES</div>
-          <table><tr><th>CONCEPTO</th><th>CANTIDAD</th></tr><tr><td>Comidas Can Guasch</td><td>4</td></tr><tr><td>Plus rotatividad</td><td>30</td></tr><tr><td>Plus de turno</td><td>15</td></tr><tr><td>Pluses Vacaciones</td><td>2</td></tr><tr><td>Plus Nocturno</td><td>37</td></tr><tr><td>Plus Festivo</td><td>42,98</td></tr><tr><td>Plus de turno 12 horas</td><td>2</td></tr><tr><td>Dietas Festivos</td><td>2</td></tr></table>
-          <div class="bar">SALDOS</div>
-          <table><tr><th>CONCEPTO</th><th>CANTIDAD</th></tr><tr><td>Saldo consolidado inicio de mes</td><td>0</td></tr><tr><td>Saldo mensual</td><td>0</td></tr><tr><td>Saldo aprobado manager</td><td>0</td></tr><tr><td>Saldo consolidado final de mes</td><td>0</td></tr></table>
-        </div>
-        <div class="upload-copy"><div class="camera">📷</div><strong>Añadir captura</strong><span>Debe verse el «Resumen de variables del mes» como en la imagen de ejemplo.</span></div>
-      </label>
-      <input id="timesheet-image" class="file" type="file" accept="image/*">
-      <div id="selected" class="selected" hidden></div>
-      <p class="privacy"><span>🔒</span><span>Recorta la captura para que no aparezcan nombre, número de empleado ni otros datos personales.</span></p>
-    </section>
-    <section class="card">
-      <div><span class="step">2</span><h2>Después, tu nómina</h2></div>
-      <p class="help">Cuando tengamos el registro del mes, pediremos la nómina del mismo periodo para comparar las cantidades.</p>
-      <div class="payroll"><div><strong>🧾 Añadir nómina</strong>Segundo documento · se desbloqueará después</div></div>
-    </section>
-    <div class="notice"><strong>Esta pantalla es una prueba de laboratorio.</strong> No sustituye todavía el flujo actual de «Revisa tu nómina».</div>
-  </main>
+  <div id="auth" class="lab-auth">Comprobando acceso privado…</div>
+  <iframe id="app-frame" class="frame" title="Revisa tu nómina laboratorio" hidden></iframe>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-    const supabase=createClient('https://icneigdnuntzugisexaz.supabase.co','sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m',{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
-    const auth=document.getElementById('auth');const content=document.getElementById('content');
+
+    const SUPABASE_URL='https://icneigdnuntzugisexaz.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    const auth=document.getElementById('auth');
+    const frame=document.getElementById('app-frame');
+
     const {data:{session}}=await supabase.auth.getSession();
-    let allowed=false;if(session){const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');allowed=!error&&data===true;}
-    if(!allowed){sessionStorage.setItem('strLabNext','revisa-tu-nomina-guia.html');window.location.replace('acceso-privado.html?next=revisa-tu-nomina-guia.html');}else{auth.hidden=true;content.hidden=false;}
-    const input=document.getElementById('timesheet-image');const selected=document.getElementById('selected');input.addEventListener('change',()=>{const f=input.files?.[0];if(!f)return;selected.textContent=`✓ Captura seleccionada: ${f.name}`;selected.hidden=false;});
+    let allowed=false;
+    if(session){
+      const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
+      allowed=!error&&data===true;
+    }
+
+    if(!allowed){
+      sessionStorage.setItem('strLabNext','revisa-tu-nomina-guia.html');
+      window.location.replace('acceso-privado.html?next=revisa-tu-nomina-guia.html');
+    }else{
+      auth.hidden=true;
+      frame.hidden=false;
+      frame.src='revisa-tu-nomina.html?labGuide=1';
+    }
+
+    function buildGuide(doc){
+      if(doc.getElementById('str-timesheet-capture-guide')) return;
+      const instruction=doc.querySelector('#document-screen .instruction');
+      if(!instruction) return;
+
+      const style=doc.createElement('style');
+      style.id='str-guide-style';
+      style.textContent=`
+        .str-capture-guide{position:relative;overflow:hidden;min-height:355px;margin:0 0 16px;border:2px dashed #9eabb8;border-radius:18px;background:#fbfcfd}
+        .str-example-sheet{position:absolute;inset:16px;opacity:.18;filter:grayscale(1);pointer-events:none;color:#111;font-size:9px}
+        .str-example-sheet .home{margin-bottom:11px;font-weight:700}
+        .str-example-sheet table{width:100%;border-collapse:collapse;margin-bottom:13px}
+        .str-example-sheet th,.str-example-sheet td{border:1px solid #111;padding:4px 5px}
+        .str-example-sheet th{text-align:center}.str-example-sheet td:last-child{text-align:center;width:30%}
+        .str-example-sheet .bar{margin:8px 0 7px;border-top:2px solid #111;padding-top:4px;text-align:center;font-weight:900}
+        .str-guide-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:rgba(255,255,255,.26)}
+        .str-guide-camera{font-size:40px;line-height:1}
+        .str-guide-overlay strong{margin-top:9px;color:#b9000b;font-size:18px;line-height:1.25}
+        .str-guide-overlay span{max-width:285px;margin-top:7px;color:#343439;font-size:13px;line-height:1.42}
+        .str-guide-label{display:block;margin:0 0 8px;color:#18181b;font-size:13px;font-weight:900}
+      `;
+      doc.head.appendChild(style);
+
+      const guide=doc.createElement('div');
+      guide.id='str-timesheet-capture-guide';
+      guide.innerHTML=`
+        <span class="str-guide-label">Ejemplo de la captura que necesitamos</span>
+        <div class="str-capture-guide">
+          <div class="str-example-sheet" aria-hidden="true">
+            <div class="home">(H) = HOME</div>
+            <table><tr><th>TOTAL HORAS PERIODO</th><th>TEÓRICAS</th><th>AUSENCIAS</th></tr><tr><td></td><td>139,6</td><td>90,93</td></tr></table>
+            <div class="bar">RESUMEN DE VARIABLES DEL MES</div>
+            <table>
+              <tr><th>CONCEPTO</th><th>CANTIDAD</th></tr>
+              <tr><td>Comidas Can Guasch</td><td>4</td></tr>
+              <tr><td>Plus rotatividad</td><td>30</td></tr>
+              <tr><td>Plus de turno</td><td>15</td></tr>
+              <tr><td>Pluses Vacaciones</td><td>2</td></tr>
+              <tr><td>Plus Nocturno</td><td>37</td></tr>
+              <tr><td>Plus Festivo</td><td>42,98</td></tr>
+              <tr><td>Plus de turno 12 horas</td><td>2</td></tr>
+              <tr><td>Dietas Festivos</td><td>2</td></tr>
+            </table>
+            <div class="bar">SALDOS</div>
+            <table>
+              <tr><th>CONCEPTO</th><th>CANTIDAD</th></tr>
+              <tr><td>Saldo consolidado inicio de mes</td><td>0</td></tr>
+              <tr><td>Saldo mensual</td><td>0</td></tr>
+              <tr><td>Saldo aprobado manager</td><td>0</td></tr>
+              <tr><td>Saldo consolidado final de mes</td><td>0</td></tr>
+            </table>
+          </div>
+          <div class="str-guide-overlay">
+            <div class="str-guide-camera">📷</div>
+            <strong>Sube esta zona del registro</strong>
+            <span>Debe verse claramente «Resumen de variables del mes». No hace falta subir toda la hoja de jornada.</span>
+          </div>
+        </div>`;
+      instruction.insertAdjacentElement('afterend',guide);
+
+      const instructionText=doc.getElementById('instruction-text');
+      if(instructionText && doc.getElementById('document-screen-title')?.textContent.trim()==='Registro de jornada'){
+        instructionText.textContent='Haz una captura de la zona «Resumen de variables del mes», como en el ejemplo de abajo.';
+      }
+
+      const sync=()=>{
+        const title=doc.getElementById('document-screen-title')?.textContent.trim()||'';
+        const isTimesheet=title==='Registro de jornada';
+        guide.hidden=!isTimesheet;
+        if(isTimesheet && instructionText){
+          instructionText.textContent='Haz una captura de la zona «Resumen de variables del mes», como en el ejemplo de abajo.';
+        }
+      };
+      sync();
+
+      const screen=doc.getElementById('document-screen');
+      const title=doc.getElementById('document-screen-title');
+      if(screen) new MutationObserver(sync).observe(screen,{attributes:true,attributeFilter:['hidden']});
+      if(title) new MutationObserver(sync).observe(title,{childList:true,subtree:true,characterData:true});
+    }
+
+    frame.addEventListener('load',()=>{
+      try{
+        const doc=frame.contentDocument;
+        if(!doc) return;
+        buildGuide(doc);
+        const observer=new MutationObserver(()=>buildGuide(doc));
+        observer.observe(doc.documentElement,{childList:true,subtree:true});
+      }catch(_error){}
+    });
   </script>
 </body>
 </html>
