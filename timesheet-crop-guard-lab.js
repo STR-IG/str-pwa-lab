@@ -1,129 +1,119 @@
+// STR-IG LAB · lectura guiada del registro de jornada
+// Objetivo: leer SOLO la zona útil «Resumen de variables del mes» y evitar
+// que columnas irrelevantes (p. ej. horas teóricas) contaminen la extracción.
+
 (() => {
   'use strict';
 
-  const fileInput = document.getElementById('document-image');
-  const confirmButton = document.getElementById('confirm-image');
-  const privacyScan = document.getElementById('privacy-scan');
-  const privacyIcon = document.getElementById('privacy-scan-icon');
-  const privacyTitle = document.getElementById('privacy-scan-title');
-  const privacyMessage = document.getElementById('privacy-scan-message');
-  const preview = document.getElementById('image-preview');
-  const previewStatus = document.getElementById('preview-status-text');
-  const changeButton = document.getElementById('change-image');
-  const screenTitle = document.getElementById('document-screen-title');
-  if (!fileInput || !confirmButton) return;
+  const TARGET_TITLE = 'resumen de variables del mes';
+  const ALLOWED_VARIABLES = [
+    { key: 'comidas_can_guasch', labels: ['comidas can guasch', 'comida can guasch', 'can guasch'] },
+    { key: 'plus_turno', labels: ['plus de turno', 'plus turno'] },
+    { key: 'plus_nocturno', labels: ['plus nocturno', 'nocturno', 'nocturnidad'] },
+    { key: 'plus_festivo', labels: ['plus festivo', 'festivo'] },
+    { key: 'turno_12h', labels: ['turno de 12 horas', 'turno 12 horas', '12 horas', '12h'] },
+    { key: 'sabado_domingo', labels: ['sábado/domingo', 'sabado/domingo', 'sábado domingo', 'sabado domingo'] },
+    { key: 'flexibilizacion', labels: ['flexibilización', 'flexibilizacion'] },
+    { key: 'diferencia_grupo_superior', labels: ['diferencia grupo superior', 'grupo superior'] },
+    { key: 'festivo_local', labels: ['festivo local'] }
+  ];
 
-  let state = 'idle'; // idle | checking | valid | invalid
-  let version = 0;
+  const normalize = value => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 
-  function isTimesheetScreen() {
-    return (screenTitle?.textContent || '').trim().toLowerCase().includes('registro de jornada');
-  }
+  const numberFromText = value => {
+    const text = String(value || '')
+      .replace(/\s/g, '')
+      .replace(/\.(?=\d{3}(?:\D|$))/g, '')
+      .replace(',', '.');
+    const match = text.match(/-?\d+(?:\.\d+)?/);
+    return match ? Number(match[0]) : null;
+  };
 
-  function normalize(text) {
-    return String(text || '')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toUpperCase().replace(/\s+/g, ' ').trim();
-  }
+  function findTargetBlock(lines) {
+    const normalized = lines.map(normalize);
+    const start = normalized.findIndex(line => line.includes(TARGET_TITLE));
+    if (start < 0) return null;
 
-  function classify(text) {
-    const t = normalize(text);
-    const summaryMarkers = [
-      /RESUMEN\s+DE\s+VARIABLES(?:\s+DEL\s+MES)?/,
-      /PLUS\s+ROT[A-Z]*VIDAD/,
-      /COMIDAS?\s+CAN\s+GUA?SCH/,
-      /PLUS\s+NOCTURN/,
-      /PLUS\s+(?:DE\s+)?TURNO/,
-      /PLUS(?:ES)?\s+FESTIVO/,
-      /DIETAS?\s+FESTIVOS?/,
-      /PLUS(?:ES)?\s+VACACIONES?/
-    ];
-    const knownVariables = summaryMarkers.slice(1).filter(re => re.test(t)).length;
-    const hasSummaryHeading = summaryMarkers[0].test(t);
-    const hasSupportBlock = /TOTAL\s+HORAS\s+PERIODO/.test(t) || /\bSALDOS?\b/.test(t);
-
-    const dailyMarkers = [
-      /\bFECHA\b/, /\bDIA\b/, /\bHORARIO\b/, /HORA\s+INICIO/, /HORA\s+FIN/, /HORAS?\s+TEOR/, /\bDIAS\b/
-    ].filter(re => re.test(t)).length;
-    const dateRows = (t.match(/\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/g) || []).length;
-
-    const looksLikeSummary = hasSummaryHeading || (knownVariables >= 3 && hasSupportBlock);
-    const includesDailyRegister = dailyMarkers >= 3 || dateRows >= 3;
-    return { looksLikeSummary, includesDailyRegister, knownVariables, dailyMarkers, dateRows };
-  }
-
-  function showInvalid(reason) {
-    state = 'invalid';
-    if (privacyScan) {
-      privacyScan.hidden = false;
-      privacyScan.className = 'privacy-scan blocked';
+    // El resumen normalmente ocupa pocas líneas. Cortamos antes de entrar en
+    // otra sección para no mezclar fichajes, horas teóricas u otros totales.
+    const block = [];
+    for (let i = start; i < Math.min(lines.length, start + 45); i += 1) {
+      const n = normalized[i];
+      if (i > start && /^(detalle|fichajes|marcajes|saldo|resumen diario|horas teoricas|horas teóricas)/.test(n)) break;
+      block.push(lines[i]);
     }
-    if (privacyIcon) privacyIcon.textContent = '!';
-    if (privacyTitle) privacyTitle.textContent = 'Recorte del registro no válido';
-    if (privacyMessage) privacyMessage.textContent = reason || 'Recorta la hoja dejando «Total horas periodo», «Resumen de variables del mes» y «Saldos». No debe aparecer la tabla diaria con fechas y horarios.';
-    if (preview) preview.classList.add('scan-blocked');
-    if (previewStatus) previewStatus.textContent = 'Imagen no aceptada: recorta el resumen mensual';
-    confirmButton.disabled = true;
-    confirmButton.textContent = 'Imagen no aceptada';
-    if (changeButton) changeButton.textContent = 'Recortar o cambiar imagen';
+    return block;
   }
 
-  function showChecking() {
-    state = 'checking';
-    if (privacyScan) {
-      privacyScan.hidden = false;
-      privacyScan.className = 'privacy-scan checking';
-    }
-    if (privacyIcon) privacyIcon.textContent = '🔎';
-    if (privacyTitle) privacyTitle.textContent = 'Comprobando el recorte…';
-    if (privacyMessage) privacyMessage.textContent = 'Verificamos que sea el resumen mensual y que no incluya la tabla diaria de fechas y horarios.';
-    confirmButton.disabled = true;
-  }
+  function parseVariables(block) {
+    const result = {};
+    const warnings = [];
 
-  async function validateFile(file, myVersion) {
-    if (!isTimesheetScreen() || !file) {
-      state = 'idle';
-      return;
-    }
-    showChecking();
-    try {
-      if (!window.Tesseract?.recognize) throw new Error('OCR unavailable');
-      const result = await window.Tesseract.recognize(file, 'spa', { logger: () => undefined });
-      if (myVersion !== version) return;
-      const c = classify(result?.data?.text || '');
-      if (c.includesDailyRegister) {
-        showInvalid('Has incluido la tabla diaria del registro de jornada (fechas, horarios o fichajes). Recorta la imagen dejando únicamente «Total horas periodo», «Resumen de variables del mes» y «Saldos».');
-        return;
+    for (let i = 0; i < block.length; i += 1) {
+      const line = String(block[i] || '');
+      const n = normalize(line);
+
+      for (const variable of ALLOWED_VARIABLES) {
+        if (result[variable.key] != null) continue;
+        if (!variable.labels.some(label => n.includes(normalize(label)))) continue;
+
+        let value = numberFromText(line.replace(/^[^:\t-]*[:\t-]?/, ''));
+
+        // Si la etiqueta y el valor han quedado partidos por la extracción del PDF,
+        // probamos la línea siguiente, pero nunca más allá de una línea.
+        if (value == null && i + 1 < block.length) {
+          value = numberFromText(block[i + 1]);
+        }
+
+        if (value != null) result[variable.key] = value;
       }
-      if (!c.looksLikeSummary) {
-        showInvalid('No podemos confirmar que esta sea la captura correcta. Deben verse «Resumen de variables del mes» y sus conceptos/cantidades; también pueden verse «Total horas periodo» y «Saldos».');
-        return;
-      }
-      state = 'valid';
-      // No forzamos el botón: la comprobación original de privacidad debe superarse también.
-    } catch (_) {
-      if (myVersion !== version) return;
-      showInvalid('No hemos podido comprobar el recorte. Prueba con una captura JPG o PNG donde se vea claramente el resumen mensual.');
     }
+
+    if (Object.keys(result).length === 0) {
+      warnings.push('Se encontró «Resumen de variables del mes», pero no se pudieron leer sus conceptos.');
+    }
+
+    return { values: result, warnings };
   }
 
-  fileInput.addEventListener('change', (event) => {
-    if (!isTimesheetScreen()) { state = 'idle'; return; }
-    const file = event.target.files?.[0];
-    const myVersion = ++version;
-    setTimeout(() => validateFile(file, myVersion), 40);
-  }, true);
+  function extractFromText(rawText) {
+    const lines = String(rawText || '')
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
 
-  confirmButton.addEventListener('click', (event) => {
-    if (!isTimesheetScreen()) return;
-    if (state === 'valid') return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (state === 'checking') {
-      if (privacyTitle) privacyTitle.textContent = 'Comprobando el recorte…';
-      if (privacyMessage) privacyMessage.textContent = 'Espera unos segundos a que termine la comprobación.';
-      return;
+    const block = findTargetBlock(lines);
+    if (!block) {
+      return {
+        ok: false,
+        code: 'SUMMARY_NOT_FOUND',
+        message: 'No encuentro la tabla «Resumen de variables del mes». Usa un PDF donde esa tabla sea visible.',
+        values: {},
+        sourceBlock: []
+      };
     }
-    showInvalid();
-  }, true);
+
+    const parsed = parseVariables(block);
+    return {
+      ok: Object.keys(parsed.values).length > 0,
+      code: Object.keys(parsed.values).length > 0 ? 'OK' : 'NO_VARIABLES_READ',
+      message: Object.keys(parsed.values).length > 0
+        ? 'Resumen de variables leído.'
+        : parsed.warnings[0],
+      values: parsed.values,
+      sourceBlock: block,
+      warnings: parsed.warnings
+    };
+  }
+
+  // API estable para el resto del laboratorio.
+  window.STRIG_TIMESHEET_READER = {
+    extractFromText,
+    allowedVariables: ALLOWED_VARIABLES.map(v => v.key)
+  };
 })();
