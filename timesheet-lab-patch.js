@@ -70,8 +70,6 @@
       if (target.key === 'shift' && /TURNO\s*12|12\s*HORAS?/.test(line)) continue;
       const match = pattern.exec(line);
       const tail = match ? line.slice(match.index + match[0].length) : line;
-      // Para Plus de turno solo aceptamos una cifra en la misma línea. Así evitamos
-      // coger el 48,5 de Plus Festivo de la fila siguiente.
       const candidates = target.key === 'shift'
         ? numericCandidates(tail)
         : [...numericCandidates(tail), ...numericCandidates(lines[i + 1] || '')];
@@ -123,9 +121,6 @@
     return '';
   }
 
-  // Refuerzo exclusivo para «Plus de turno».
-  // El orden real del resumen es: ... Plus Nocturno -> Plus de turno -> Plus Festivo.
-  // Por tanto buscamos únicamente la franja vertical comprendida entre Nocturno y Festivo.
   function findShiftValueByNeighbourRows(result) {
     const words = Array.isArray(result?.data?.words) ? result.data.words : [];
     if (!words.length) return '';
@@ -150,8 +145,6 @@
     const rowText = rowWords.map((w) => w.n).join(' ');
     if (!/TURNO/.test(rowText) || /TURNO\s*12|12\s*HORAS?/.test(rowText)) return '';
 
-    // La cantidad está en la columna derecha: preferimos el número más a la derecha
-    // de la propia fila, y nunca aceptamos el 12 de la etiqueta «12 horas».
     const numericWords = rowWords
       .filter((w) => /\d/.test(w.n))
       .sort((a, b) => b.cx - a.cx);
@@ -165,6 +158,77 @@
       }
     }
     return '';
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = src;
+    });
+  }
+
+  function makeShiftCellCanvas(image, result, extraPad = 0) {
+    const words = Array.isArray(result?.data?.words) ? result.data.words : [];
+    const usable = words
+      .filter((word) => normalize(word.text))
+      .map((word) => ({ ...word, n: normalize(word.text), cy: centerY(word) }));
+    const night = usable.filter((w) => /NOCTURNO/.test(w.n)).sort((a, b) => a.cy - b.cy)[0];
+    const holiday = usable.filter((w) => /FESTIVO/.test(w.n) && !/DIETA/.test(w.n) && (!night || w.cy > night.cy)).sort((a, b) => a.cy - b.cy)[0];
+    if (!night || !holiday || holiday.cy <= night.cy) return null;
+
+    const rowY = (night.cy + holiday.cy) / 2;
+    const gap = holiday.cy - night.cy;
+    const y0 = Math.max(0, Math.round(rowY - gap * (0.34 + extraPad)));
+    const y1 = Math.min(image.naturalHeight, Math.round(rowY + gap * (0.34 + extraPad)));
+    const x0 = Math.round(image.naturalWidth * 0.60);
+    const x1 = Math.round(image.naturalWidth * 0.92);
+    const sw = Math.max(1, x1 - x0);
+    const sh = Math.max(1, y1 - y0);
+    const scale = Math.max(5, Math.min(10, 1200 / sw));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(sw * scale);
+    canvas.height = Math.round(sh * scale);
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(image, x0, y0, sw, sh, 0, 0, canvas.width, canvas.height);
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    for (let p = 0; p < data.data.length; p += 4) {
+      const g = .299 * data.data[p] + .587 * data.data[p + 1] + .114 * data.data[p + 2];
+      const v = g > 180 ? 255 : 0;
+      data.data[p] = data.data[p + 1] = data.data[p + 2] = v;
+    }
+    ctx.putImageData(data, 0, 0);
+    return canvas;
+  }
+
+  async function readShiftFromOwnCell(src, result) {
+    const image = await loadImage(src);
+    const target = TARGETS.find((t) => t.key === 'shift');
+    const votes = [];
+    for (const pad of [0, 0.08, 0.16]) {
+      const canvas = makeShiftCellCanvas(image, result, pad);
+      if (!canvas) continue;
+      for (const psm of ['7', '10']) {
+        try {
+          const ocr = await window.Tesseract.recognize(canvas, 'eng', {
+            logger: () => undefined,
+            tessedit_pageseg_mode: psm,
+            tessedit_char_whitelist: '0123456789'
+          });
+          const candidates = numericCandidates(ocr?.data?.text || '');
+          for (const raw of candidates) {
+            const value = parseNumber(raw, target);
+            if (value !== '' && value !== '12') votes.push(value);
+          }
+        } catch (_) {}
+      }
+    }
+    if (!votes.length) return '';
+    const counts = new Map();
+    votes.forEach((v) => counts.set(v, (counts.get(v) || 0) + 1));
+    const best = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    return best && best[1] >= 2 ? best[0] : '';
   }
 
   function applyResults(results) {
@@ -205,6 +269,12 @@
       if (target.key === 'shift' && value === '') value = findShiftValueByNeighbourRows(result);
       if (value !== '') values.set(target.key, value);
     });
+
+    // Si «Plus de turno» sigue vacío, hacemos OCR exclusivamente sobre su celda CANTIDAD.
+    if (!values.has('shift')) {
+      const shiftValue = await readShiftFromOwnCell(src, result);
+      if (shiftValue !== '') values.set('shift', shiftValue);
+    }
     return values;
   }
 
@@ -220,7 +290,7 @@
     const title = document.getElementById('analysis-progress-title');
     const message = document.getElementById('analysis-progress-message');
     if (title) title.textContent = 'Leyendo «Resumen de variables del mes»…';
-    if (message) message.textContent = 'Buscamos los 8 conceptos habituales y reforzamos especialmente la lectura de «Plus de turno».';
+    if (message) message.textContent = 'Buscamos los 8 conceptos habituales y leemos «Plus de turno» directamente desde su propia celda.';
 
     try {
       const results = await readSummaryByConcept(src);
