@@ -54,6 +54,21 @@
     if (message) message.textContent = messageText;
   }
 
+  function markAsRead(input) {
+    if (!input?.value?.trim()) return;
+    let node = input.parentElement;
+    for (let depth = 0; node && depth < 6; depth += 1, node = node.parentElement) {
+      const badge = [...node.querySelectorAll('span, div')].find((el) => {
+        const text = el.textContent.trim().toUpperCase();
+        return text === 'REVISADO' || text === 'DETECTADO';
+      });
+      if (badge) {
+        badge.textContent = 'LEÍDO';
+        return;
+      }
+    }
+  }
+
   async function imageToJpegDataUrl(img) {
     if (!img?.naturalWidth || !img?.naturalHeight) {
       await new Promise((resolve, reject) => {
@@ -95,6 +110,9 @@
       input.value = value;
       input.dataset.labAutoRead = 'vision';
       input.dispatchEvent(new Event('input', { bubbles: true }));
+      markAsRead(input);
+      setTimeout(() => markAsRead(input), 0);
+      setTimeout(() => markAsRead(input), 150);
       seen.add(key);
       count += 1;
     }
