@@ -7,7 +7,7 @@
     { key: 'rotation', id: 'analysis-rotation', max: 31, integer: true, labels: [/PLUS\s+ROTATIVIDAD/, /ROTATIVIDAD/] },
     { key: 'meals', id: 'analysis-meals', max: 31, integer: true, labels: [/COMIDAS?\s+CAN\s+GUASCH/, /COMIDAS?.*GUASCH/, /CAN\s+GUASCH/] },
     { key: 'night', id: 'analysis-night', max: 200, labels: [/PLUS\s+NOCTURNO/, /NOCTURNO/] },
-    { key: 'shift', id: 'analysis-shift', max: 31, integer: true, labels: [/PLUS\s+DE\s+TURNO(?!\s*12)/, /PLUS\s+TURNO(?!\s*12)/] },
+    { key: 'shift', id: 'analysis-shift', max: 31, integer: true, labels: [/PLUS\s+DE\s+TURNO(?!\s*12)/, /PLUS\s+TURNO(?!\s*12)/, /\bTURNO\b(?!\s*12)/] },
     { key: 'holiday', id: 'analysis-holiday', max: 200, labels: [/PLUS\s+FESTIVO/, /FESTIVO/] },
     { key: 'shift12', id: 'analysis-shift12', max: 31, integer: true, labels: [/PLUS\s+(?:DE\s+)?TURNO\s*12\s*(?:H|HORAS?)/, /TURNO\s*12\s*(?:H|HORAS?)/] },
     { key: 'holidayDiets', id: 'analysis-holidayDiets', max: 31, integer: true, labels: [/DIETAS?\s+FESTIVOS?/, /DIETA.*FESTIVO/] },
@@ -70,7 +70,11 @@
       if (target.key === 'shift' && /TURNO\s*12|12\s*HORAS?/.test(line)) continue;
       const match = pattern.exec(line);
       const tail = match ? line.slice(match.index + match[0].length) : line;
-      const candidates = [...numericCandidates(tail), ...numericCandidates(lines[i + 1] || '')];
+      // Para Plus de turno solo aceptamos una cifra en la misma línea. Así evitamos
+      // coger el 48,5 de Plus Festivo de la fila siguiente.
+      const candidates = target.key === 'shift'
+        ? numericCandidates(tail)
+        : [...numericCandidates(tail), ...numericCandidates(lines[i + 1] || '')];
       for (const raw of candidates) {
         if (target.key === 'shift' && Number(String(raw).replace(',', '.')) === 12) continue;
         const value = parseNumber(raw, target);
@@ -119,10 +123,9 @@
     return '';
   }
 
-  // Tercer intento exclusivo para «Plus de turno».
-  // En el registro de junio el OCR reconoce la etiqueta pero puede perder el 15.
-  // Buscamos la fila exacta entre «Plus rotatividad» y «Plus Nocturno» y leemos
-  // únicamente un entero distinto de 12 situado en esa franja.
+  // Refuerzo exclusivo para «Plus de turno».
+  // El orden real del resumen es: ... Plus Nocturno -> Plus de turno -> Plus Festivo.
+  // Por tanto buscamos únicamente la franja vertical comprendida entre Nocturno y Festivo.
   function findShiftValueByNeighbourRows(result) {
     const words = Array.isArray(result?.data?.words) ? result.data.words : [];
     if (!words.length) return '';
@@ -130,16 +133,25 @@
       .filter((word) => normalize(word.text))
       .map((word) => ({ ...word, n: normalize(word.text), cy: centerY(word), cx: centerX(word) }));
 
-    const rotationY = usable.find((w) => /ROTATIVIDAD/.test(w.n))?.cy;
-    const nightY = usable.find((w) => /NOCTURNO/.test(w.n))?.cy;
-    if (!Number.isFinite(rotationY) || !Number.isFinite(nightY)) return '';
+    const nightWords = usable.filter((w) => /NOCTURNO/.test(w.n));
+    const holidayWords = usable.filter((w) => /FESTIVO/.test(w.n) && !/DIETA/.test(w.n));
+    if (!nightWords.length || !holidayWords.length) return '';
 
-    const minY = Math.min(rotationY, nightY);
-    const maxY = Math.max(rotationY, nightY);
-    const rowWords = usable.filter((w) => w.cy > minY && w.cy < maxY);
-    const labelPresent = rowWords.some((w) => /TURNO/.test(w.n));
-    if (!labelPresent) return '';
+    const nightY = nightWords.sort((a, b) => a.cy - b.cy)[0].cy;
+    const holidayY = holidayWords.filter((w) => w.cy > nightY).sort((a, b) => a.cy - b.cy)[0]?.cy;
+    if (!Number.isFinite(nightY) || !Number.isFinite(holidayY) || holidayY <= nightY) return '';
 
+    const midpoint = (nightY + holidayY) / 2;
+    const tolerance = Math.max(8, (holidayY - nightY) * 0.38);
+    const rowWords = usable
+      .filter((w) => Math.abs(w.cy - midpoint) <= tolerance)
+      .sort((a, b) => a.cx - b.cx);
+
+    const rowText = rowWords.map((w) => w.n).join(' ');
+    if (!/TURNO/.test(rowText) || /TURNO\s*12|12\s*HORAS?/.test(rowText)) return '';
+
+    // La cantidad está en la columna derecha: preferimos el número más a la derecha
+    // de la propia fila, y nunca aceptamos el 12 de la etiqueta «12 horas».
     const numericWords = rowWords
       .filter((w) => /\d/.test(w.n))
       .sort((a, b) => b.cx - a.cx);
