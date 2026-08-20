@@ -62,7 +62,7 @@
     }
 
     summary.classList.add('issue');
-    summary.textContent = `⚠ ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'} detectada${incidents === 1 ? '' : 's'}.`;
+    summary.textContent = `⚠ ${incidents} incidencia${incidents === 1 ? '' : 's'} detectada${incidents === 1 ? '' : 's'}.`;
 
     mismatches.slice(0, 3).forEach(([key, result]) => {
       const detail = document.createElement('span');
@@ -140,4 +140,14 @@
       historyList.appendChild(card);
     });
   };
+
+  function removePossibleFromIncidentWording() {
+    document.querySelectorAll('#comparison-result-title').forEach((node) => {
+      node.textContent = node.textContent.replace(/posibles?\s+/i, '');
+    });
+  }
+
+  const wordingObserver = new MutationObserver(removePossibleFromIncidentWording);
+  wordingObserver.observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+  removePossibleFromIncidentWording();
 })();
