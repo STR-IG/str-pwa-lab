@@ -89,15 +89,6 @@
   }
 
   function clearAndApply(concepts) {
-    Object.values(FIELD_MAP).forEach((id) => {
-      const input = document.getElementById(id);
-      if (!input) return;
-      input.value = '';
-      input.placeholder = 'No leído automáticamente';
-      delete input.dataset.labAutoRead;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-
     let count = 0;
     const seen = new Set();
     for (const item of concepts || []) {
@@ -106,7 +97,7 @@
       const id = FIELD_MAP[key];
       const input = document.getElementById(id);
       const value = String(item?.value || '').trim();
-      if (!input || !value) continue;
+      if (!input || !value || input.value.trim()) continue;
       input.value = value;
       input.dataset.labAutoRead = 'vision';
       input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -185,9 +176,6 @@
     }
   }
 
-  const observer = new MutationObserver(() => {
-    const screen = document.getElementById('analysis-screen');
-    if (screen && !screen.hidden) setTimeout(runVisionRead, 2200);
-  });
-  observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'src'] });
+  // La visión secundaria queda disponible, pero no se lanza automáticamente.
+  // El lector principal de revisa-tu-nomina.html es el único flujo automático.
 })();
