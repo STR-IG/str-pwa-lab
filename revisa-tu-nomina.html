@@ -2855,15 +2855,15 @@
       document.getElementById('completion-panel').hidden = completed !== 2;
       startAnalysisButton.disabled = completed !== 2;
       startAnalysisButton.textContent = savedReview?.status === 'complete'
-        ? `Ver revisión de ${label}`
+        ? `Ver comparación de ${label}`
         : (confirmedTimesheetAnalyses.has(periodKey())
           ? `Continuar revisión de ${label}`
           : `Analizar y comparar ${label}`);
       const readyStatus = document.getElementById('analysis-ready-status');
       readyStatus.textContent = savedReview?.status === 'complete'
         ? (incidents
-          ? `⚠ Revisión guardada con ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'}.`
-          : '✓ Revisión mensual guardada: las cantidades coinciden.')
+          ? `⚠ ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'} detectada${incidents === 1 ? '' : 's'}.`
+          : '✓ No se detectaron diferencias en la última comparación.')
         : '✓ Datos de la jornada confirmados; falta cruzarlos con la nómina.';
       readyStatus.hidden = completed !== 2 || (!savedReview && !confirmedTimesheetAnalyses.has(periodKey()));
     }
@@ -3853,8 +3853,8 @@
       const savedReview = monthlyReviews.get(periodKey());
       if (savedReview?.status === 'complete' && !force) {
         const savedPayroll = plainObjectToMap(savedReview.payroll);
-        renderPayrollComparison(savedPayroll, true, savedReview);
-        setComparisonProgress('ready', '✓', 'Revisión mensual guardada', 'Puedes consultar el resultado o volver a leer la nómina.');
+        renderPayrollComparison(savedPayroll);
+        setComparisonProgress('ready', '✓', 'Comparación preparada', 'Revisa en rojo cualquier posible incidencia detectada.');
         return;
       }
 
