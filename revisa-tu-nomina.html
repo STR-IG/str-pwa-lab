@@ -3956,7 +3956,16 @@
 
       confirmedPayrollAnalyses.set(periodKey(), payrollValues);
       monthlyReviews.set(periodKey(), review);
-      renderPayrollComparison(payrollValues, true, review);
+      Object.entries(review.comparisons || {}).forEach(([key, result]) => {
+        applyComparisonCardResult(key, result);
+      });
+      renderComparisonResult(review);
+      comparisonDetectedCount.textContent = `${payrollValues.size} cantidades confirmadas en nómina`;
+      comparisonSaved.textContent = '✓ Revisión mensual guardada en tu historial privado.';
+      comparisonSaved.hidden = false;
+      confirmComparisonButton.disabled = false;
+      confirmComparisonButton.dataset.action = 'back';
+      confirmComparisonButton.textContent = 'Volver al resumen';
       setComparisonProgress(
         incidents ? 'warning' : 'ready',
         incidents ? '!' : '✓',
