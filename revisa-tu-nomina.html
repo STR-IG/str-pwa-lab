@@ -1832,7 +1832,7 @@
 
           <div class="analysis-actions">
             <button id="retry-payroll-analysis" class="secondary" type="button">Volver a leer nómina</button>
-            <button id="confirm-comparison" class="primary" type="button">Guardar revisión mensual</button>
+            <button id="confirm-comparison" class="primary" type="button">Comprobar cantidades</button>
           </div>
           <p id="comparison-saved" class="analysis-confirmed" role="status" hidden></p>
         </div>
@@ -3694,9 +3694,9 @@
       comparisonResultTitle.textContent = incidents.length
         ? `⚠ ${incidents.length} posible${incidents.length === 1 ? '' : 's'} incidencia${incidents.length === 1 ? '' : 's'}`
         : '✓ Registro y nómina coinciden';
-      comparisonResultMessage.textContent = meal?.status === 'mismatch'
-        ? `Control de comidas: el registro indica ${formatQuantity(meal.register)} y la nómina descuenta ${formatQuantity(meal.payroll)}. Diferencia: ${formatQuantity(Math.abs(meal.difference))}.`
-        : `Control de comidas superado: ${formatQuantity(meal?.register || 0)} en el registro y ${formatQuantity(meal?.payroll || 0)} en la nómina.`;
+      comparisonResultMessage.textContent = incidents.length
+        ? 'Contacta con tus delegados sindicales para resolver la incidencia.'
+        : 'No se han encontrado diferencias en las cantidades comparadas.';
       comparisonResultList.textContent = '';
       incidents.forEach(([key, result]) => {
         const variable = PAYROLL_VARIABLES.find((item) => item.key === key);
@@ -3767,8 +3767,8 @@
           difference.textContent = 'Confirma la cifra para calcular el desfase.';
           comparisonResult.hidden = true;
           comparisonSaved.hidden = true;
-          confirmComparisonButton.dataset.action = 'save';
-          confirmComparisonButton.textContent = 'Guardar revisión mensual';
+          confirmComparisonButton.dataset.action = 'check';
+          confirmComparisonButton.textContent = 'Comprobar cantidades';
         });
         payrollColumn.appendChild(payrollLabel);
         payrollColumn.appendChild(input);
@@ -3793,8 +3793,8 @@
       comparisonError.textContent = '';
       comparisonSaved.hidden = true;
       confirmComparisonButton.disabled = false;
-      confirmComparisonButton.dataset.action = confirmed ? 'back' : 'save';
-      confirmComparisonButton.textContent = confirmed ? 'Volver al resumen' : 'Guardar revisión mensual';
+      confirmComparisonButton.dataset.action = confirmed ? 'back' : 'check';
+      confirmComparisonButton.textContent = confirmed ? 'Volver al resumen' : 'Comprobar cantidades';
       comparisonForm.hidden = false;
       comparisonResult.hidden = true;
 
@@ -3928,51 +3928,22 @@
       const timesheetValues = confirmedTimesheetAnalyses.get(periodKey()) || new Map();
       const comparisons = buildMonthlyComparisons(timesheetValues, payrollValues);
       const incidents = Object.values(comparisons).filter((item) => item.status === 'mismatch').length;
-      const review = {
-        version: 1,
-        status: 'complete',
-        period: periodKey(),
-        year: Number(year.value),
-        month: Number(month.value) + 1,
-        schedule: currentScheduleSettings(),
-        timesheet: mapToPlainObject(timesheetValues),
-        payroll: mapToPlainObject(payrollValues),
-        comparisons,
-        incidentCount: incidents,
-        updatedAt: new Date().toISOString()
-      };
-
-      confirmComparisonButton.disabled = true;
-      confirmComparisonButton.textContent = 'Guardando revisión…';
-      try {
-        await uploadMonthlyReview(review);
-      } catch {
-        comparisonError.textContent = 'No se ha podido guardar la revisión privada. Comprueba la conexión e inténtalo de nuevo.';
-        comparisonError.hidden = false;
-        confirmComparisonButton.disabled = false;
-        confirmComparisonButton.textContent = 'Guardar revisión mensual';
-        return;
-      }
-
       confirmedPayrollAnalyses.set(periodKey(), payrollValues);
-      monthlyReviews.set(periodKey(), review);
-      Object.entries(review.comparisons || {}).forEach(([key, result]) => {
+      Object.entries(comparisons).forEach(([key, result]) => {
         applyComparisonCardResult(key, result);
       });
-      renderComparisonResult(review);
-      comparisonDetectedCount.textContent = `${payrollValues.size} cantidades confirmadas en nómina`;
-      comparisonSaved.textContent = '✓ Revisión mensual guardada en tu historial privado.';
-      comparisonSaved.hidden = false;
+      renderComparisonResult({ comparisons });
+      comparisonDetectedCount.textContent = `${payrollValues.size} cantidades comprobadas en nómina`;
+      comparisonSaved.hidden = true;
       confirmComparisonButton.disabled = false;
       confirmComparisonButton.dataset.action = 'back';
       confirmComparisonButton.textContent = 'Volver al resumen';
       setComparisonProgress(
         incidents ? 'warning' : 'ready',
         incidents ? '!' : '✓',
-        incidents ? 'Revisión guardada con posibles incidencias' : 'Revisión mensual completada',
-        incidents ? 'Los desfases quedan registrados para poder revisarlos o reclamarlos.' : 'Las cantidades comparadas coinciden.'
+        incidents ? 'Posible incidencia detectada' : 'Comprobación completada',
+        incidents ? 'Contacta con tus delegados sindicales para resolver la incidencia.' : 'Las cantidades comparadas coinciden.'
       );
-      updatePeriodCards();
       comparisonResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
