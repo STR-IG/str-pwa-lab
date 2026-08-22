@@ -2438,23 +2438,6 @@
       return `${periodFolder()}/${kind}`;
     }
 
-    function reviewFileName(review) {
-      const timestamp = Date.parse(review?.updatedAt || '');
-      return `review-${Number.isFinite(timestamp) ? timestamp : Date.now()}.json`;
-    }
-
-    function reviewFileTimestamp(name = '') {
-      const match = /^review-(\d+)\.json$/.exec(name);
-      return match ? Number(match[1]) : 0;
-    }
-
-    function latestReviewPath(folder, files = []) {
-      const latest = files
-        .filter((item) => item?.id && (item.name === 'review' || reviewFileTimestamp(item.name)))
-        .sort((left, right) => reviewFileTimestamp(right.name) - reviewFileTimestamp(left.name))[0];
-      return latest ? `${folder}/${latest.name}` : '';
-    }
-
     function mapToPlainObject(values) {
       return Object.fromEntries([...(values || new Map()).entries()]);
     }
@@ -2486,45 +2469,43 @@
       }
     }
 
-    function waitForMilliseconds(milliseconds) {
-      return new Promise((resolve) => setTimeout(resolve, milliseconds));
-    }
-
-    function withRequestTimeout(promise, milliseconds) {
-      return Promise.race([
-        promise,
-        new Promise((_, reject) => setTimeout(
-          () => reject(new Error('REQUEST_TIMEOUT')),
-          milliseconds
-        ))
-      ]);
-    }
-
     async function uploadMonthlyReview(review) {
-      const payload = new Blob([JSON.stringify(review)], { type: 'application/json' });
-      const path = storagePath(reviewFileName(review));
-      const uploadRequest = supabase.storage
-        .from(STORAGE_BUCKET)
-        .upload(path, payload, {
-          cacheControl: '0',
-          contentType: 'application/json',
-          upsert: false
-        });
+      const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !activeSession?.access_token) throw new Error('NO_SESSION');
+
+      const path = storagePath('review')
+        .split('/')
+        .map((part) => encodeURIComponent(part))
+        .join('/');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
       try {
-        const { error } = await withRequestTimeout(uploadRequest, 25000);
-        if (error) throw error;
+        const response = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(STORAGE_BUCKET)}/${path}`,
+          {
+            method: 'POST',
+            headers: {
+              'apikey': SUPABASE_PUBLISHABLE_KEY,
+              'Authorization': `Bearer ${activeSession.access_token}`,
+              'Content-Type': 'application/json',
+              'cache-control': 'max-age=0',
+              'x-upsert': 'true'
+            },
+            body: JSON.stringify(review),
+            cache: 'no-store',
+            signal: controller.signal
+          }
+        );
+        if (!response.ok) {
+          const details = await response.json().catch(() => ({}));
+          throw new Error(details?.message || details?.error || `HTTP_${response.status}`);
+        }
       } catch (error) {
-        if (error?.message !== 'REQUEST_TIMEOUT') throw error;
-
-        await waitForMilliseconds(1500);
-        const storedReview = await withRequestTimeout(
-          downloadMonthlyReview(path),
-          8000
-        ).catch(() => null);
-        const confirmed = storedReview?.updatedAt === review.updatedAt
-          && storedReview?.status === review.status;
-        if (!confirmed) throw error;
+        if (error?.name === 'AbortError') throw new Error('REQUEST_TIMEOUT');
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
 
@@ -2591,13 +2572,13 @@
       updatePeriodCards();
 
       const folder = periodFolder();
-      let storedFiles;
-      let listError = null;
-      try {
-        storedFiles = await listAllStorageItems(folder);
-      } catch (error) {
-        listError = error;
-      }
+      const { data: storedFiles, error: listError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .list(folder, {
+          limit: 10,
+          offset: 0,
+          sortBy: { column: 'name', order: 'asc' }
+        });
 
       if (requestVersion !== storageLoadVersion) return;
 
@@ -2611,7 +2592,7 @@
       const storedKinds = ['timesheet', 'payroll'].filter((kind) =>
         storedFiles?.some((item) => item.id && item.name === kind)
       );
-      const storedReviewPath = latestReviewPath(folder, storedFiles);
+      const hasStoredReview = storedFiles?.some((item) => item.id && item.name === 'review');
 
       const [downloads, storedReview] = await Promise.all([
         Promise.all(storedKinds.map(async (kind) => {
@@ -2619,7 +2600,7 @@
         const { data: blob, error } = await supabase.storage.from(STORAGE_BUCKET).download(path);
         return { kind, path, blob, error };
         })),
-        storedReviewPath ? downloadMonthlyReview(storedReviewPath) : Promise.resolve(null)
+        hasStoredReview ? downloadMonthlyReview(`${folder}/review`) : Promise.resolve(null)
       ]);
 
       if (requestVersion !== storageLoadVersion) return;
@@ -2786,8 +2767,8 @@
         const entries = await Promise.all(months.map(async ({ year: savedYear, month: savedMonth }) => {
           const folder = `${currentUserId}/${savedYear}/${String(savedMonth).padStart(2, '0')}`;
           const files = await listAllStorageItems(folder);
-          const storedReviewPath = latestReviewPath(folder, files);
-          const review = storedReviewPath ? await downloadMonthlyReview(storedReviewPath) : null;
+          const hasReview = files.some((item) => Boolean(item.id) && item.name === 'review');
+          const review = hasReview ? await downloadMonthlyReview(`${folder}/review`) : null;
           return {
             year: savedYear,
             month: savedMonth,
