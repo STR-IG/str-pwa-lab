@@ -2438,6 +2438,23 @@
       return `${periodFolder()}/${kind}`;
     }
 
+    function reviewFileName(review) {
+      const timestamp = Date.parse(review?.updatedAt || '');
+      return `review-${Number.isFinite(timestamp) ? timestamp : Date.now()}.json`;
+    }
+
+    function reviewFileTimestamp(name = '') {
+      const match = /^review-(\d+)\.json$/.exec(name);
+      return match ? Number(match[1]) : 0;
+    }
+
+    function latestReviewPath(folder, files = []) {
+      const latest = files
+        .filter((item) => item?.id && (item.name === 'review' || reviewFileTimestamp(item.name)))
+        .sort((left, right) => reviewFileTimestamp(right.name) - reviewFileTimestamp(left.name))[0];
+      return latest ? `${folder}/${latest.name}` : '';
+    }
+
     function mapToPlainObject(values) {
       return Object.fromEntries([...(values || new Map()).entries()]);
     }
@@ -2485,12 +2502,13 @@
 
     async function uploadMonthlyReview(review) {
       const payload = new Blob([JSON.stringify(review)], { type: 'application/json' });
+      const path = storagePath(reviewFileName(review));
       const uploadRequest = supabase.storage
         .from(STORAGE_BUCKET)
-        .upload(storagePath('review'), payload, {
+        .upload(path, payload, {
           cacheControl: '0',
           contentType: 'application/json',
-          upsert: true
+          upsert: false
         });
 
       try {
@@ -2501,7 +2519,7 @@
 
         await waitForMilliseconds(1500);
         const storedReview = await withRequestTimeout(
-          downloadMonthlyReview(),
+          downloadMonthlyReview(path),
           8000
         ).catch(() => null);
         const confirmed = storedReview?.updatedAt === review.updatedAt
@@ -2573,13 +2591,13 @@
       updatePeriodCards();
 
       const folder = periodFolder();
-      const { data: storedFiles, error: listError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .list(folder, {
-          limit: 10,
-          offset: 0,
-          sortBy: { column: 'name', order: 'asc' }
-        });
+      let storedFiles;
+      let listError = null;
+      try {
+        storedFiles = await listAllStorageItems(folder);
+      } catch (error) {
+        listError = error;
+      }
 
       if (requestVersion !== storageLoadVersion) return;
 
@@ -2593,7 +2611,7 @@
       const storedKinds = ['timesheet', 'payroll'].filter((kind) =>
         storedFiles?.some((item) => item.id && item.name === kind)
       );
-      const hasStoredReview = storedFiles?.some((item) => item.id && item.name === 'review');
+      const storedReviewPath = latestReviewPath(folder, storedFiles);
 
       const [downloads, storedReview] = await Promise.all([
         Promise.all(storedKinds.map(async (kind) => {
@@ -2601,7 +2619,7 @@
         const { data: blob, error } = await supabase.storage.from(STORAGE_BUCKET).download(path);
         return { kind, path, blob, error };
         })),
-        hasStoredReview ? downloadMonthlyReview(`${folder}/review`) : Promise.resolve(null)
+        storedReviewPath ? downloadMonthlyReview(storedReviewPath) : Promise.resolve(null)
       ]);
 
       if (requestVersion !== storageLoadVersion) return;
@@ -2768,8 +2786,8 @@
         const entries = await Promise.all(months.map(async ({ year: savedYear, month: savedMonth }) => {
           const folder = `${currentUserId}/${savedYear}/${String(savedMonth).padStart(2, '0')}`;
           const files = await listAllStorageItems(folder);
-          const hasReview = files.some((item) => Boolean(item.id) && item.name === 'review');
-          const review = hasReview ? await downloadMonthlyReview(`${folder}/review`) : null;
+          const storedReviewPath = latestReviewPath(folder, files);
+          const review = storedReviewPath ? await downloadMonthlyReview(storedReviewPath) : null;
           return {
             year: savedYear,
             month: savedMonth,
