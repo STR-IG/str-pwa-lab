@@ -1,4 +1,4 @@
-const CACHE_NAME = 'str-ig-cache-v53';
+const CACHE_NAME = 'str-ig-cache-v54';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -30,7 +30,7 @@ async function withLabPatches(response, request) {
     '<script src="timesheet-crop-guard-lab.js?v=45"></script>',
     '<script src="timesheet-vision-lab.js?v=45"></script>',
     '<script src="payroll-vision-lab.js?v=45"></script>',
-    '<script src="history-lab-patch.js?v=45"></script>'
+    '<script src="history-lab-patch.js?v=54"></script>'
   ].join('');
   const patched = html.includes('history-lab-patch.js')
     ? html

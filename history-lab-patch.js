@@ -143,7 +143,9 @@
 
   function removePossibleFromIncidentWording() {
     document.querySelectorAll('#comparison-result-title').forEach((node) => {
-      node.textContent = node.textContent.replace(/posibles?\s+/i, '');
+      const current = node.textContent;
+      const updated = current.replace(/posibles?\s+/i, '');
+      if (updated !== current) node.textContent = updated;
     });
   }
 
