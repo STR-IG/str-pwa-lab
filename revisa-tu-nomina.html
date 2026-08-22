@@ -3451,8 +3451,8 @@
       setAnalysisProgress(
         'checking',
         '🔎',
-        'Leyendo el registro de jornada…',
-        'Buscamos el resumen mensual y ampliamos la tabla para reconocer mejor las cifras.'
+        'Leyendo el registro de jornada con IA…',
+        'La IA identifica cada concepto y la cantidad de su misma fila.'
       );
 
       try {
@@ -3462,43 +3462,28 @@
           showWrongTimesheetMessage();
           return;
         }
-        const texts = [];
-        if (documents.timesheet.ocrText) texts.push(documents.timesheet.ocrText);
-        let ocrSources;
-        try {
-          ocrSources = await createTimesheetOcrSources(source);
-        } catch {
-          ocrSources = [source];
-        }
-        const sourcesToRead = texts.length && ocrSources.length > 1 ? ocrSources.slice(1) : ocrSources;
-        for (const ocrSource of sourcesToRead) {
-          const source = ocrSource?.source || ocrSource;
-          const pageSegMode = ocrSource?.pageSegMode || '11';
-          texts.push(await recognizeTextLocally(source, pageSegMode));
-        }
+        const visionReader = window.STRIG_READ_TIMESHEET_WITH_VISION;
+        if (typeof visionReader !== 'function') throw new Error('Timesheet vision unavailable');
+        const visionResult = await visionReader(analysisReferenceImage);
         if (requestVersion !== analysisRunVersion) return;
 
-        const detectedKinds = texts.map(detectDocumentKind).filter(Boolean);
-        if (detectedKinds.includes('payroll') && !detectedKinds.includes('timesheet')) {
-          showWrongTimesheetMessage();
-          return;
-        }
-
-        const extracted = extractTimesheetVariables(texts);
+        const extracted = visionResult?.isMonthlySummary
+          ? visionResult.extracted
+          : new Map();
         renderTimesheetAnalysis(extracted);
         if (extracted.size) {
           setAnalysisProgress(
             'ready',
             '✓',
-            'Lectura terminada',
-            'Revisa todas las cantidades: una lectura automática puede confundir alguna cifra.'
+            'Lectura con IA terminada',
+            'Revisa todas las cantidades antes de confirmar los datos.'
           );
         } else {
           setAnalysisProgress(
             'warning',
             '!',
-            'No hemos podido leer las cantidades',
-            'Puedes escribirlas manualmente mirando la imagen guardada.'
+            'La IA no ha podido leer las cantidades',
+            'Puedes escribirlas manualmente mirando la imagen guardada o volver a intentarlo.'
           );
         }
       } catch {
