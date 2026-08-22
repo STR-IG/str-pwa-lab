@@ -121,6 +121,38 @@
     return session;
   }
 
+  async function readPayrollWithVision(img) {
+    const [session, imageDataUrl] = await Promise.all([getSession(), imageToJpegDataUrl(img)]);
+    if (!session?.access_token) throw new Error('NO_SESSION');
+
+    const response = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ imageDataUrl })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data?.error || `HTTP_${response.status}`);
+
+    const extracted = new Map();
+    const seen = new Set();
+    for (const item of data?.concepts || []) {
+      const key = conceptKey(item?.name);
+      const value = String(item?.value || '').trim();
+      if (!key || !value || seen.has(key)) continue;
+      extracted.set(key, { value, quality: 2 });
+      seen.add(key);
+    }
+
+    return {
+      isPayroll: data?.isPayroll === true,
+      extracted
+    };
+  }
+
   async function runPayrollVisionRead() {
     const screen = document.getElementById('comparison-screen');
     const img = document.getElementById('comparison-reference-image');
@@ -169,6 +201,8 @@
     }
   }
 
-  // La visión secundaria queda disponible, pero no se lanza automáticamente.
-  // El lector principal de revisa-tu-nomina.html es el único flujo automático.
+  window.STRIG_READ_PAYROLL_WITH_VISION = readPayrollWithVision;
+
+  // La lectura visual se invoca de forma explícita desde revisa-tu-nomina.html.
+  // No hay observadores ni lanzamientos automáticos paralelos.
 })();

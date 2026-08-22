@@ -217,9 +217,6 @@
 
   const observer = new MutationObserver(() => {
     updateSafeWording();
-    if (!document.getElementById('comparison-screen')?.hidden) {
-      setTimeout(improvePayrollReading, 250);
-    }
   });
 
   observer.observe(document.documentElement, {

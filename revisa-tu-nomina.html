@@ -3824,8 +3824,8 @@
       setComparisonProgress(
         'checking',
         '🔎',
-        'Leyendo las cantidades de la nómina…',
-        'Buscamos la columna «Cantidad» para compararla con el registro del mismo mes.'
+        'Leyendo las cantidades de la nómina con IA…',
+        'La IA identifica cada concepto y su cantidad para compararla con el registro.'
       );
 
       try {
@@ -3835,34 +3835,19 @@
           showWrongPayrollMessage();
           return;
         }
-        const texts = [];
-        if (documents.payroll.ocrText) texts.push(documents.payroll.ocrText);
-        let ocrSources;
-        try {
-          ocrSources = await createPayrollOcrSources(source);
-        } catch {
-          ocrSources = [source];
-        }
-        const sourcesToRead = texts.length && ocrSources.length > 1 ? ocrSources.slice(1) : ocrSources;
-        for (const ocrSource of sourcesToRead) {
-          const sourcePart = ocrSource?.source || ocrSource;
-          const pageSegMode = ocrSource?.pageSegMode || '11';
-          texts.push(await recognizeTextLocally(sourcePart, pageSegMode));
-        }
+        const visionReader = window.STRIG_READ_PAYROLL_WITH_VISION;
+        if (typeof visionReader !== 'function') throw new Error('Payroll vision unavailable');
+        const visionResult = await visionReader(comparisonReferenceImage);
         if (requestVersion !== comparisonRunVersion) return;
 
-        const detectedKinds = texts.map(detectDocumentKind).filter(Boolean);
-        if (detectedKinds.includes('timesheet') && !detectedKinds.includes('payroll')) {
-          showWrongPayrollMessage();
-          return;
-        }
-
-        const extracted = extractPayrollVariables(texts);
+        const extracted = visionResult?.isPayroll
+          ? visionResult.extracted
+          : new Map();
         renderPayrollComparison(extracted);
         setComparisonProgress(
           extracted.size ? 'ready' : 'warning',
           extracted.size ? '✓' : '!',
-          extracted.size ? 'Nómina leída' : 'No hemos podido leer las cantidades',
+          extracted.size ? 'Nómina leída con IA' : 'La IA no ha podido leer las cantidades',
           extracted.size
             ? 'Comprueba especialmente las comidas antes de guardar el control mensual.'
             : 'Introduce manualmente las cantidades mirando la nómina guardada.'
