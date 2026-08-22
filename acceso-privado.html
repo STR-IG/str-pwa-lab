@@ -43,13 +43,16 @@
   </main>
 
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
     const URL='https://icneigdnuntzugisexaz.supabase.co';
     const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
     const REQUEST=URL+'/functions/v1/lab-request-custom-otp';
     const VERIFY=URL+'/functions/v1/lab-verify-custom-otp';
-    const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    let supabase=null;
+    const supabaseReady=import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+      .then(({createClient})=>{
+        supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+        return supabase;
+      });
     const ALLOWED_DESTINATIONS=new Set(['area-privada.html','revisa-tu-nomina.html']);
     const requestedDestination=new URLSearchParams(window.location.search).get('next');
     if(ALLOWED_DESTINATIONS.has(requestedDestination)){
@@ -103,6 +106,7 @@
       codeInput.focus();
     }
     async function authorized(){
+      await supabaseReady;
       const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
       return !error && data===true;
     }
@@ -116,13 +120,17 @@
       sendButton.disabled=true;
       sendButton.textContent='Enviando…';
       clearStatus(sendStatus);
+      const controller=new AbortController();
+      const timeoutId=setTimeout(()=>controller.abort(),15000);
       try{
-        await fetch(REQUEST,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email})});
+        const response=await fetch(REQUEST,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email}),cache:'no-store',signal:controller.signal});
+        if(!response.ok) throw new Error(`HTTP_${response.status}`);
         showStatus(sendStatus,'Si el correo está autorizado, recibirás un código de acceso.','ok');
         setTimeout(()=>showCodeStep(email),350);
       }catch(_){
         showStatus(sendStatus,'No se ha podido completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.','bad');
       }finally{
+        clearTimeout(timeoutId);
         sendButton.disabled=false;
         sendButton.textContent='Recibir código de acceso';
       }
@@ -137,6 +145,7 @@
       clearStatus(verifyStatus);
 
       try{
+        await supabaseReady;
         const response=await fetch(VERIFY,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email:pendingEmail,code})});
         const result=await response.json().catch(()=>({}));
 
@@ -179,6 +188,7 @@
 
     document.getElementById('change-email').addEventListener('click',showEmailStep);
 
+    await supabaseReady;
     const {data:{session}}=await supabase.auth.getSession();
     if(session && await authorized()){
       enterPrivateArea();
