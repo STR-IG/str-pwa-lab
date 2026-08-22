@@ -3946,7 +3946,8 @@
       confirmComparisonButton.textContent = 'Guardando revisión…';
       try {
         await uploadMonthlyReview(review);
-      } catch {
+      } catch (error) {
+        console.error('Error al guardar la revisión mensual:', error);
         comparisonError.textContent = 'No se ha podido guardar la revisión privada. Comprueba la conexión e inténtalo de nuevo.';
         comparisonError.hidden = false;
         confirmComparisonButton.disabled = false;
@@ -4315,6 +4316,24 @@
     } else {
       loadWorkSchedule();
       updatePeriodCards();
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' });
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+          });
+          await registration.update();
+        } catch (error) {
+          console.error('Error al actualizar el Service Worker:', error);
+        }
+      });
     }
   </script>
 </body>
