@@ -3852,20 +3852,6 @@
       );
     }
 
-    async function waitForPayrollVision(readerPromise) {
-      let timeoutId;
-      try {
-        return await Promise.race([
-          readerPromise,
-          new Promise((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('PAYROLL_VISION_TIMEOUT')), 35000);
-          })
-        ]);
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    }
-
     async function startPayrollComparison(force = false) {
       if (comparisonRunning || !documents.payroll.confirmed) return;
       showComparisonScreen();
@@ -3901,7 +3887,7 @@
         }
         const visionReader = window.STRIG_READ_PAYROLL_WITH_VISION;
         if (typeof visionReader !== 'function') throw new Error('Payroll vision unavailable');
-        const visionResult = await waitForPayrollVision(visionReader(comparisonReferenceImage));
+        const visionResult = await visionReader(comparisonReferenceImage);
         if (requestVersion !== comparisonRunVersion) return;
 
         const extracted = visionResult?.isPayroll
