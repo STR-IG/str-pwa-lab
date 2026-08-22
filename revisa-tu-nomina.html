@@ -3928,7 +3928,21 @@
       const timesheetValues = confirmedTimesheetAnalyses.get(periodKey()) || new Map();
       const comparisons = buildMonthlyComparisons(timesheetValues, payrollValues);
       const incidents = Object.values(comparisons).filter((item) => item.status === 'mismatch').length;
+      const review = {
+        version: 1,
+        status: 'complete',
+        period: periodKey(),
+        year: Number(year.value),
+        month: Number(month.value) + 1,
+        schedule: currentScheduleSettings(),
+        timesheet: mapToPlainObject(timesheetValues),
+        payroll: mapToPlainObject(payrollValues),
+        comparisons,
+        incidentCount: incidents,
+        updatedAt: new Date().toISOString()
+      };
       confirmedPayrollAnalyses.set(periodKey(), payrollValues);
+      monthlyReviews.set(periodKey(), review);
       Object.entries(comparisons).forEach(([key, result]) => {
         applyComparisonCardResult(key, result);
       });
@@ -3944,6 +3958,12 @@
         incidents ? 'Posible incidencia detectada' : 'Comprobación completada',
         incidents ? 'Contacta con tus delegados sindicales para resolver la incidencia.' : 'Las cantidades comparadas coinciden.'
       );
+      updatePeriodCards();
+      void uploadMonthlyReview(review).catch((error) => {
+        console.error('No se ha podido añadir la comprobación al historial:', error);
+        comparisonError.textContent = 'La comprobación está terminada, pero no se ha podido añadir al historial.';
+        comparisonError.hidden = false;
+      });
       comparisonResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
