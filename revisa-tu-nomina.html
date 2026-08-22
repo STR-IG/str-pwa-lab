@@ -3708,6 +3708,26 @@
       comparisonResult.hidden = false;
     }
 
+    function renderLiveComparison() {
+      const timesheetValues = confirmedTimesheetAnalyses.get(periodKey()) || new Map();
+      const payrollValues = new Map();
+      comparisonInputs.forEach((input, key) => {
+        const quantity = parseQuantityValue(input.value);
+        if (Number.isFinite(quantity)) payrollValues.set(key, formatQuantity(quantity));
+      });
+
+      const comparisons = buildMonthlyComparisons(timesheetValues, payrollValues);
+      Object.entries(comparisons).forEach(([key, result]) => applyComparisonCardResult(key, result));
+      renderComparisonResult({ comparisons });
+      const incidents = Object.values(comparisons).filter((item) => item.status === 'mismatch').length;
+      comparisonSaved.textContent = incidents
+        ? `⚠ ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'} detectada${incidents === 1 ? '' : 's'}. Revisa las tarjetas marcadas en rojo.`
+        : '✓ No se han encontrado diferencias en los conceptos comparados.';
+      comparisonSaved.hidden = false;
+      confirmComparisonButton.dataset.action = 'back';
+      confirmComparisonButton.textContent = 'Volver al resumen';
+    }
+
     function renderPayrollComparison(extracted, confirmed = false, review = null) {
       comparisonFields.textContent = '';
       comparisonInputs = new Map();
@@ -3761,14 +3781,7 @@
         input.placeholder = 'No aparece';
         input.value = payrollValue;
         input.addEventListener('input', () => {
-          card.classList.remove('ok', 'issue');
-          status.className = 'comparison-status';
-          status.textContent = input.value.trim() ? 'Revisado' : 'Por comparar';
-          difference.textContent = 'Confirma la cifra para calcular el desfase.';
-          comparisonResult.hidden = true;
-          comparisonSaved.hidden = true;
-          confirmComparisonButton.dataset.action = 'save';
-          confirmComparisonButton.textContent = 'Guardar revisión mensual';
+          renderLiveComparison();
         });
         payrollColumn.appendChild(payrollLabel);
         payrollColumn.appendChild(input);
@@ -3793,8 +3806,8 @@
       comparisonError.textContent = '';
       comparisonSaved.hidden = true;
       confirmComparisonButton.disabled = false;
-      confirmComparisonButton.dataset.action = confirmed ? 'back' : 'save';
-      confirmComparisonButton.textContent = confirmed ? 'Volver al resumen' : 'Guardar revisión mensual';
+      confirmComparisonButton.dataset.action = 'back';
+      confirmComparisonButton.textContent = 'Volver al resumen';
       comparisonForm.hidden = false;
       comparisonResult.hidden = true;
 
@@ -3803,6 +3816,8 @@
         renderComparisonResult(review);
         comparisonSaved.textContent = '✓ Revisión mensual guardada en tu historial privado.';
         comparisonSaved.hidden = false;
+      } else {
+        renderLiveComparison();
       }
     }
 
