@@ -2470,8 +2470,8 @@
     }
 
     async function uploadMonthlyReview(review) {
-      const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !activeSession?.access_token) throw new Error('NO_SESSION');
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('NO_SESSION');
 
       const path = storagePath('review')
         .split('/')
@@ -2487,7 +2487,7 @@
             method: 'POST',
             headers: {
               'apikey': SUPABASE_PUBLISHABLE_KEY,
-              'Authorization': `Bearer ${activeSession.access_token}`,
+              'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
               'cache-control': 'max-age=0',
               'x-upsert': 'true'
