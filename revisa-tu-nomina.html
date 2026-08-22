@@ -2494,6 +2494,7 @@
             },
             body: JSON.stringify(review),
             cache: 'no-store',
+            keepalive: true,
             signal: controller.signal
           }
         );
@@ -2860,7 +2861,11 @@
           ? `Continuar revisión de ${label}`
           : `Analizar y comparar ${label}`);
       const readyStatus = document.getElementById('analysis-ready-status');
-      readyStatus.textContent = savedReview?.status === 'complete'
+      readyStatus.textContent = savedReview?.syncStatus === 'pending'
+        ? '⏳ Comparación confirmada; sincronizando con tu historial privado.'
+        : savedReview?.syncStatus === 'failed'
+          ? '⚠ Comparación confirmada, pendiente de sincronizar.'
+          : savedReview?.status === 'complete'
         ? (incidents
           ? `⚠ ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'} detectada${incidents === 1 ? '' : 's'}.`
           : '✓ No se detectaron diferencias en la última comparación.')
@@ -3724,8 +3729,8 @@
         ? `⚠ ${incidents} posible${incidents === 1 ? '' : 's'} incidencia${incidents === 1 ? '' : 's'} detectada${incidents === 1 ? '' : 's'}. Revisa las tarjetas marcadas en rojo.`
         : '✓ No se han encontrado diferencias en los conceptos comparados.';
       comparisonSaved.hidden = false;
-      confirmComparisonButton.dataset.action = 'back';
-      confirmComparisonButton.textContent = 'Volver al resumen';
+      confirmComparisonButton.dataset.action = 'confirm-live';
+      confirmComparisonButton.textContent = 'Confirmar comparación';
     }
 
     function renderPayrollComparison(extracted, confirmed = false, review = null) {
@@ -3806,8 +3811,8 @@
       comparisonError.textContent = '';
       comparisonSaved.hidden = true;
       confirmComparisonButton.disabled = false;
-      confirmComparisonButton.dataset.action = 'back';
-      confirmComparisonButton.textContent = 'Volver al resumen';
+      confirmComparisonButton.dataset.action = confirmed ? 'back' : 'confirm-live';
+      confirmComparisonButton.textContent = confirmed ? 'Volver al resumen' : 'Confirmar comparación';
       comparisonForm.hidden = false;
       comparisonResult.hidden = true;
 
@@ -3854,6 +3859,8 @@
       if (savedReview?.status === 'complete' && !force) {
         const savedPayroll = plainObjectToMap(savedReview.payroll);
         renderPayrollComparison(savedPayroll);
+        confirmComparisonButton.dataset.action = 'back';
+        confirmComparisonButton.textContent = 'Volver al resumen';
         setComparisonProgress('ready', '✓', 'Comparación preparada', 'Revisa en rojo cualquier posible incidencia detectada.');
         return;
       }
@@ -3957,39 +3964,25 @@
         updatedAt: new Date().toISOString()
       };
 
-      confirmComparisonButton.disabled = true;
-      confirmComparisonButton.textContent = 'Guardando revisión…';
-      try {
-        await uploadMonthlyReview(review);
-      } catch (error) {
-        console.error('Error al guardar la revisión mensual:', error);
-        comparisonError.textContent = 'No se ha podido guardar la revisión privada. Comprueba la conexión e inténtalo de nuevo.';
-        comparisonError.hidden = false;
-        confirmComparisonButton.disabled = false;
-        confirmComparisonButton.textContent = 'Guardar revisión mensual';
-        return;
-      }
-
       confirmedPayrollAnalyses.set(periodKey(), payrollValues);
-      monthlyReviews.set(periodKey(), review);
-      Object.entries(review.comparisons || {}).forEach(([key, result]) => {
-        applyComparisonCardResult(key, result);
-      });
-      renderComparisonResult(review);
-      comparisonDetectedCount.textContent = `${payrollValues.size} cantidades confirmadas en nómina`;
-      comparisonSaved.textContent = '✓ Revisión mensual guardada en tu historial privado.';
-      comparisonSaved.hidden = false;
-      confirmComparisonButton.disabled = false;
-      confirmComparisonButton.dataset.action = 'back';
-      confirmComparisonButton.textContent = 'Volver al resumen';
-      setComparisonProgress(
-        incidents ? 'warning' : 'ready',
-        incidents ? '!' : '✓',
-        incidents ? 'Revisión guardada con posibles incidencias' : 'Revisión mensual completada',
-        incidents ? 'Los desfases quedan registrados para poder revisarlos o reclamarlos.' : 'Las cantidades comparadas coinciden.'
-      );
+      const pendingReview = { ...review, syncStatus: 'pending' };
+      monthlyReviews.set(periodKey(), pendingReview);
       updatePeriodCards();
-      comparisonResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      showPeriodScreen();
+
+      void uploadMonthlyReview(review)
+        .then(() => {
+          monthlyReviews.set(review.period, review);
+          if (periodKey() === review.period) updatePeriodCards();
+        })
+        .catch((error) => {
+          console.error('Error al sincronizar la comparación mensual:', error);
+          monthlyReviews.set(review.period, { ...review, syncStatus: 'failed' });
+          if (periodKey() === review.period) {
+            updatePeriodCards();
+            showPeriodMessage('La comparación está confirmada, pero queda pendiente de sincronizar.', true);
+          }
+        });
     }
 
     function startMonthlyReview() {
