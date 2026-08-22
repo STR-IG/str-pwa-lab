@@ -2469,16 +2469,45 @@
       }
     }
 
+    function waitForMilliseconds(milliseconds) {
+      return new Promise((resolve) => setTimeout(resolve, milliseconds));
+    }
+
+    function withRequestTimeout(promise, milliseconds) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(
+          () => reject(new Error('REQUEST_TIMEOUT')),
+          milliseconds
+        ))
+      ]);
+    }
+
     async function uploadMonthlyReview(review) {
       const payload = new Blob([JSON.stringify(review)], { type: 'application/json' });
-      const { error } = await supabase.storage
+      const uploadRequest = supabase.storage
         .from(STORAGE_BUCKET)
         .upload(storagePath('review'), payload, {
           cacheControl: '0',
           contentType: 'application/json',
           upsert: true
         });
-      if (error) throw error;
+
+      try {
+        const { error } = await withRequestTimeout(uploadRequest, 25000);
+        if (error) throw error;
+      } catch (error) {
+        if (error?.message !== 'REQUEST_TIMEOUT') throw error;
+
+        await waitForMilliseconds(1500);
+        const storedReview = await withRequestTimeout(
+          downloadMonthlyReview(),
+          8000
+        ).catch(() => null);
+        const confirmed = storedReview?.updatedAt === review.updatedAt
+          && storedReview?.status === review.status;
+        if (!confirmed) throw error;
+      }
     }
 
     async function invalidateStoredReviewIfNeeded() {
