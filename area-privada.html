@@ -1396,7 +1396,7 @@
           INVALID_MONTH: 'Selecciona correctamente el mes de la nómina que contiene la V e inténtalo de nuevo.',
           INVALID_RESULT: 'No hemos podido completar el cálculo con estas capturas. Repite las imágenes con la tabla completa y bien enfocada.'
         };
-        setStatus(uploadMessage, messages[error.message] || 'No se ha podido completar la lectura y el cálculo. Conservamos las capturas para que puedas intentarlo de nuevo.');
+        setStatus(uploadMessage, messages[error.message] || 'No se ha podido completar la lectura y el cálculo. Los recortes permanecen temporalmente en este dispositivo para que puedas intentarlo de nuevo.');
       } finally {
         readingInProgress = false;
         readingProgress.hidden = true;
@@ -1433,5 +1433,6 @@
       if (savedEmail) showCodeStep(savedEmail);
     }
   </script>
+  <script src="payroll-crop-guard.js?v=1"></script>
 </body>
 </html>
