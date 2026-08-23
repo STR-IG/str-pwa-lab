@@ -754,9 +754,9 @@
           <h2 class="member-title">Sube tus tres nóminas</h2>
           <p class="member-copy">Añádelas por orden, de la más antigua a la más reciente.</p>
           <div class="payroll-period">
-            <label for="first-payroll-month">Mes de la nómina 1 · la más antigua</label>
-            <input id="first-payroll-month" type="month" required>
-            <p>Indica aquí el mes. No es necesario que aparezca ninguna fecha en las capturas; los dos meses siguientes se asignarán automáticamente.</p>
+            <label for="v-payroll-month">Mes de la nómina que contiene la V</label>
+            <input id="v-payroll-month" type="month" required>
+            <p>Indica el mes en el que aparecen tus días V. La aplicación asignará a las tres capturas los tres meses inmediatamente anteriores.</p>
           </div>
           <div class="upload-list">
             <div class="upload-card" data-upload-card="0">
@@ -850,7 +850,7 @@
     const uploadMessage = document.getElementById('upload-message');
     const readingProgress = document.getElementById('reading-progress');
     const readPayrollsButton = document.getElementById('read-payrolls');
-    const firstPayrollMonthInput = document.getElementById('first-payroll-month');
+    const vPayrollMonthInput = document.getElementById('v-payroll-month');
     const instructionsScreen = document.getElementById('instructions-screen');
     const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
     let pendingEmail = '';
@@ -975,14 +975,14 @@
       return /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
     }
 
-    function payrollMonthAt(firstMonth, offset) {
-      const [year, month] = firstMonth.split('-').map(Number);
-      const date = new Date(Date.UTC(year, month - 1 + offset, 1));
+    function payrollMonthBeforeV(vMonth, offset) {
+      const [year, month] = vMonth.split('-').map(Number);
+      const date = new Date(Date.UTC(year, month - 4 + offset, 1));
       return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
     }
 
     function canReadPayrolls() {
-      return isValidPayrollMonth(firstPayrollMonthInput.value)
+      return isValidPayrollMonth(vPayrollMonthInput.value)
         && selectedFiles.every(Boolean);
     }
 
@@ -1018,7 +1018,7 @@
       payrollReadings = [null, null, null];
       dailyValue = 0;
       vacationDays = 1;
-      firstPayrollMonthInput.value = '';
+      vPayrollMonthInput.value = '';
       document.querySelectorAll('[data-file-index]').forEach((input) => { input.value = ''; });
       [0, 1, 2].forEach((index) => {
         document.querySelector(`[data-upload-card="${index}"]`).classList.remove('ready');
@@ -1123,7 +1123,7 @@
     document.getElementById('sign-out-upload').addEventListener('click', signOut);
     document.getElementById('sign-out-result').addEventListener('click', signOut);
 
-    firstPayrollMonthInput.addEventListener('input', () => {
+    vPayrollMonthInput.addEventListener('input', () => {
       readPayrollsButton.disabled = readingInProgress || !canReadPayrolls();
       setStatus(uploadMessage);
     });
@@ -1146,7 +1146,7 @@
 
     readPayrollsButton.addEventListener('click', async () => {
       if (readingInProgress || !canReadPayrolls()) return;
-      const firstMonth = firstPayrollMonthInput.value;
+      const vMonth = vPayrollMonthInput.value;
       readingInProgress = true;
       readPayrollsButton.disabled = true;
       readPayrollsButton.textContent = 'Leyendo…';
@@ -1161,7 +1161,7 @@
           const result = await callPrivateFunction(READ_V_ENDPOINT, { imageDataUrl }, 90000);
           if (result.isPayroll !== true) throw new Error('NOT_PAYROLL');
           readings.push({
-            month: payrollMonthAt(firstMonth, index),
+            month: payrollMonthBeforeV(vMonth, index),
             concepts: Array.isArray(result.concepts) ? result.concepts : [],
             specialFlags: Array.isArray(result.specialFlags) ? result.specialFlags : []
           });
@@ -1183,7 +1183,7 @@
           MONTHS_NOT_CONSECUTIVE: 'Las tres nóminas deben ser de meses consecutivos y estar colocadas de la más antigua a la más reciente.',
           CASE_REQUIRES_REVIEW: 'Tu situación requiere una revisión personalizada. Ponte en contacto con STR.',
           INSUFFICIENT_DATA: 'No hemos podido leer todas las cantidades e importes necesarios. Repite las capturas con la tabla completa y bien enfocada.',
-          INVALID_MONTH: 'Selecciona correctamente el mes de la primera nómina e inténtalo de nuevo.',
+          INVALID_MONTH: 'Selecciona correctamente el mes de la nómina que contiene la V e inténtalo de nuevo.',
           INVALID_RESULT: 'No hemos podido completar el cálculo con estas capturas. Repite las imágenes con la tabla completa y bien enfocada.'
         };
         setStatus(uploadMessage, messages[error.message] || 'No se ha podido completar la lectura y el cálculo. Conservamos las capturas para que puedas intentarlo de nuevo.');
