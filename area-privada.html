@@ -894,7 +894,8 @@
 
     const SUPABASE_URL = 'https://icneigdnuntzugisexaz.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
-    const OTP_ENDPOINT = `${SUPABASE_URL}/functions/v1/request-private-otp`;
+    const OTP_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-request-custom-otp`;
+    const VERIFY_OTP_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-verify-custom-otp`;
     const READ_V_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-read-v-payroll`;
     const CALCULATE_V_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-calculate-v`;
 
@@ -1233,11 +1234,43 @@
       verifyCodeButton.textContent = 'Verificando…';
       codeMessage.classList.remove('show');
 
-      const { data, error } = await supabase.auth.verifyOtp({
-        email: pendingEmail,
-        token,
-        type: 'email'
-      });
+      let data;
+      let error;
+
+      try {
+        const response = await fetch(VERIFY_OTP_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({ email: pendingEmail, code: token })
+        });
+        const verification = await response.json().catch(() => ({}));
+
+        if (!verification?.ok || !verification?.verified || !verification?.token_hash) {
+          codeMessage.textContent = verification?.reason === 'locked'
+            ? 'Código bloqueado por exceso de intentos. Solicita uno nuevo.'
+            : verification?.reason === 'not_allowed'
+              ? 'Este correo no tiene acceso al área privada. Ponte en contacto con tu delegado sindical.'
+              : 'El código no es correcto, ya se ha usado o ha caducado.';
+          codeMessage.classList.add('show');
+          verifyCodeButton.disabled = false;
+          verifyCodeButton.textContent = 'Entrar';
+          return;
+        }
+
+        ({ data, error } = await supabase.auth.verifyOtp({
+          token_hash: verification.token_hash,
+          type: verification.token_type || 'magiclink'
+        }));
+      } catch (_error) {
+        codeMessage.textContent = 'No se ha podido completar la verificación. Comprueba tu conexión e inténtalo de nuevo.';
+        codeMessage.classList.add('show');
+        verifyCodeButton.disabled = false;
+        verifyCodeButton.textContent = 'Entrar';
+        return;
+      }
 
       if (error || !data.session) {
         codeMessage.textContent = 'El código no es correcto o ha caducado. Solicita uno nuevo e inténtalo otra vez.';
