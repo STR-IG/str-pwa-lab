@@ -202,6 +202,11 @@
     .member-screen { display: none; }
     .member-screen.active { display: block; }
 
+    body.member-mode main { padding-top: 22px; }
+    body.member-mode .lock,
+    body.member-mode main > h1,
+    body.member-mode main > .intro { display: none; }
+
     .instructions-heading {
       margin: 0 0 8px;
       text-align: center;
@@ -469,6 +474,283 @@
       font-size: 12px;
       line-height: 1.45;
     }
+
+    .v-intro-card {
+      display: grid;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .v-intro-card .member-copy {
+      margin-bottom: 0;
+      text-align: left;
+    }
+
+    .v-intro-point {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .v-intro-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: #fff0f1;
+      font-size: 20px;
+    }
+
+    .v-intro-point strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .v-intro-point p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .upload-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .upload-card {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr);
+      gap: 13px;
+      align-items: center;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: white;
+    }
+
+    .upload-card.ready {
+      border-color: #9ed6b5;
+      background: #f4fbf7;
+    }
+
+    .upload-preview {
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 70px;
+      overflow: hidden;
+      border-radius: 11px;
+      color: var(--muted);
+      background: #f0f0f2;
+      font-size: 25px;
+    }
+
+    .upload-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-card strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .upload-file-name {
+      display: block;
+      overflow: hidden;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .upload-action {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #efb3b7;
+      border-radius: 999px;
+      color: var(--red-dark);
+      background: white;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .upload-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .reading-progress {
+      margin-top: 14px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .review-payroll {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: white;
+    }
+
+    .review-payroll summary {
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .review-payroll-body {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .review-month-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 150px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .concept-head,
+    .review-concept {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px 105px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .concept-head {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .concept-name-wrap {
+      min-width: 0;
+    }
+
+    .concept-name-wrap input,
+    .review-concept input,
+    .review-month-row input {
+      min-height: 44px;
+      padding: 9px 10px;
+      font-size: 13px;
+    }
+
+    .concept-code-input {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px !important;
+    }
+
+    .add-concept {
+      width: auto;
+      min-height: 40px;
+      margin-top: 0;
+      padding: 8px 14px;
+      border: 1px dashed #c7c7cb;
+      border-radius: 12px;
+      color: var(--ink);
+      background: white;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .review-help {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .v-result-card {
+      text-align: center;
+    }
+
+    .v-daily-value {
+      display: block;
+      margin: 8px 0 22px;
+      color: #126537;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .days-selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin: 12px 0 18px;
+    }
+
+    .counter-button {
+      width: 48px;
+      height: 48px;
+      border: 1px solid #cfcfd3;
+      border-radius: 50%;
+      color: var(--ink);
+      background: white;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .days-count {
+      min-width: 76px;
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .v-total {
+      margin: 0;
+      color: var(--red-dark);
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .criteria-note {
+      margin: 18px 0 0;
+      padding: 12px;
+      border-radius: 12px;
+      color: #365c45;
+      background: #f0faf4;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 420px) {
+      main { padding-top: 22px; }
+      .panel { padding: 20px 16px; }
+      .review-month-row { grid-template-columns: 1fr; }
+      .concept-head { display: none; }
+      .review-concept {
+        grid-template-columns: 1fr 1fr;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+      }
+      .concept-name-wrap { grid-column: 1 / -1; }
+    }
   </style>
 </head>
 <body>
@@ -502,85 +784,104 @@
 
       <div id="member-area" class="step">
         <div id="instructions-screen" class="member-screen active">
-          <div class="verified" aria-hidden="true">✓</div>
-          <h2 class="instructions-heading">Cómo usar Calcula tu V</h2>
-          <p class="instructions-intro">Antes de empezar, prepara las tres nóminas inmediatamente anteriores al inicio de tus vacaciones.</p>
-
-          <ol class="instructions-list">
-            <li class="instruction-card">
-              <span class="instruction-number">1</span>
+          <div class="verified" aria-hidden="true">V</div>
+          <h2 class="instructions-heading">Calcula tu V</h2>
+          <div class="v-intro-card">
+            <p class="member-copy">Comprueba cuánto te corresponde por tus días de vacaciones.</p>
+            <div class="v-intro-point">
+              <span class="v-intro-icon" aria-hidden="true">📄</span>
               <div>
-                <strong>Prepara las tres nóminas</strong>
-                <p>Deben ser tres meses consecutivos, colocados del más antiguo al más reciente.</p>
+                <strong>Prepara tres nóminas</strong>
+                <p>Necesitarás las tres nóminas inmediatamente anteriores al inicio de tus vacaciones.</p>
               </div>
-            </li>
-            <li class="instruction-card">
-              <span class="instruction-number">2</span>
+            </div>
+            <div class="v-intro-point">
+              <span class="v-intro-icon" aria-hidden="true">📸</span>
               <div>
-                <strong>Indica los días laborales</strong>
-                <p>Escribe los días laborales de cada mes según tu calendario. No copies los días que aparecen en «Plus de turno».</p>
+                <strong>Haz una captura de cada nómina</strong>
+                <p>Solo necesitamos la zona de conceptos e importes.</p>
               </div>
-            </li>
-            <li class="instruction-card">
-              <span class="instruction-number">3</span>
+            </div>
+            <div class="v-intro-point">
+              <span class="v-intro-icon" aria-hidden="true">🔒</span>
               <div>
-                <strong>Copia el importe de cada plus</strong>
-                <p>Busca el concepto en la nómina y copia únicamente su cantidad de la columna <span class="payroll-column">DEVENGOS</span>. No copies «Cantidad» ni «Importe diario».</p>
+                <strong>Protege tus datos</strong>
+                <p>No incluyas nombre, DNI, número de empleado, cuenta bancaria ni otros datos personales.</p>
               </div>
-            </li>
-            <li class="instruction-card">
-              <span class="instruction-number">4</span>
-              <div>
-                <strong>Rellena solo los pluses de tu nómina</strong>
-                <p>Introduce únicamente los pluses que aparezcan en esa nómina. Los demás déjalos vacíos.</p>
-              </div>
-            </li>
-            <li class="instruction-card">
-              <span class="instruction-number">5</span>
-              <div>
-                <strong>Indica tus días de vacaciones</strong>
-                <p>La herramienta mostrará el importe de la V por día y el total correspondiente a esos días.</p>
-              </div>
-            </li>
-          </ol>
-
-          <div class="instructions-warning"><strong>Importante:</strong> no introduzcas el Plus de rotatividad, las Dietas festivos ni los Pluses vacaciones. La propia calculadora te recordará todos los conceptos excluidos.</div>
-          <button id="start-calculator" class="primary" type="button">Entendido, empezar</button>
+            </div>
+            <p class="review-help">La herramienta leerá las capturas y te mostrará los datos detectados para que los compruebes antes de calcular.</p>
+          </div>
+          <button id="start-calculator" class="primary" type="button">Empezar</button>
           <button id="sign-out-instructions" class="secondary" type="button">Cerrar sesión</button>
         </div>
 
-        <div id="calculator-screen" class="member-screen">
-          <div class="private-tool">
-            <h2 class="calculator-heading">Calcula tu V</h2>
-            <p class="calculator-intro">Introduce los datos de los tres meses anteriores al inicio de tus vacaciones.</p>
-
-            <p id="calculator-loading" class="help">Cargando los conceptos de la nómina…</p>
-            <form id="v-form" hidden>
-              <div id="months-container"></div>
-
-              <div class="field" style="margin-top:16px;">
-                <label for="vacation-days">Días de vacaciones que quieres calcular</label>
-                <input id="vacation-days" name="vacation-days" type="number" inputmode="numeric" min="1" max="25" step="1" placeholder="Ejemplo: 2" required>
+        <div id="upload-screen" class="member-screen">
+          <h2 class="member-title">Sube tus tres nóminas</h2>
+          <p class="member-copy">Añádelas por orden, de la más antigua a la más reciente.</p>
+          <div class="upload-list">
+            <div class="upload-card" data-upload-card="0">
+              <div class="upload-preview" data-upload-preview="0" aria-hidden="true">1</div>
+              <div>
+                <strong>Nómina 1 · la más antigua</strong>
+                <span class="upload-file-name" data-file-name="0">Ninguna captura seleccionada</span>
+                <label class="upload-action" for="payroll-file-0">Añadir captura</label>
+                <input id="payroll-file-0" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp" data-file-index="0">
               </div>
-
-              <div class="excluded-box">
-                <strong>No introduzcas estos conceptos:</strong>
-                <ul id="excluded-list"></ul>
+            </div>
+            <div class="upload-card" data-upload-card="1">
+              <div class="upload-preview" data-upload-preview="1" aria-hidden="true">2</div>
+              <div>
+                <strong>Nómina 2</strong>
+                <span class="upload-file-name" data-file-name="1">Ninguna captura seleccionada</span>
+                <label class="upload-action" for="payroll-file-1">Añadir captura</label>
+                <input id="payroll-file-1" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp" data-file-index="1">
               </div>
-
-              <button id="calculate-v" class="primary" type="submit">Calcular mi V</button>
-              <p id="calculator-message" class="status"></p>
-              <div id="calculator-result" class="calculator-result">
-                <span class="result-label">Tu V por cada día de vacaciones</span>
-                <strong id="daily-result" class="result-value"></strong>
-                <p id="total-result" class="result-detail"></p>
-                <p id="formula-detail" class="result-detail" style="margin-top:6px !important;"></p>
+            </div>
+            <div class="upload-card" data-upload-card="2">
+              <div class="upload-preview" data-upload-preview="2" aria-hidden="true">3</div>
+              <div>
+                <strong>Nómina 3 · la más reciente</strong>
+                <span class="upload-file-name" data-file-name="2">Ninguna captura seleccionada</span>
+                <label class="upload-action" for="payroll-file-2">Añadir captura</label>
+                <input id="payroll-file-2" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp" data-file-index="2">
               </div>
-              <p class="calculate-note">El cálculo se realiza de forma protegida. Los meses y los importes introducidos no se guardan.</p>
-            </form>
+            </div>
           </div>
+          <button id="read-payrolls" class="primary" type="button" disabled>Leer mis nóminas</button>
+          <p id="upload-message" class="status"></p>
+          <p id="reading-progress" class="reading-progress" hidden></p>
+          <p class="calculate-note">Las capturas se envían al servicio de IA de OpenAI únicamente para su lectura. STR no las guarda en el historial.</p>
           <button id="show-instructions" class="secondary" type="button">Ver de nuevo las instrucciones</button>
-          <button id="sign-out-calculator" class="secondary" type="button">Cerrar sesión</button>
+          <button id="sign-out-upload" class="secondary" type="button">Cerrar sesión</button>
+        </div>
+
+        <div id="review-screen" class="member-screen">
+          <h2 class="member-title">Comprueba la lectura</h2>
+          <p class="member-copy">Revisa los meses, las cantidades y los importes. Puedes corregir cualquier dato antes de calcular.</p>
+          <div id="review-list" class="review-list"></div>
+          <button id="calculate-v" class="primary" type="button">Confirmar y calcular mi V</button>
+          <p id="calculator-message" class="status"></p>
+          <button id="back-to-uploads" class="secondary" type="button">Volver a las capturas</button>
+          <button id="sign-out-review" class="secondary" type="button">Cerrar sesión</button>
+        </div>
+
+        <div id="result-screen" class="member-screen">
+          <div class="verified" aria-hidden="true">✓</div>
+          <div class="v-result-card">
+            <h2 class="member-title">Tu V</h2>
+            <p class="member-copy">Valor de 1 día V</p>
+            <strong id="daily-result" class="v-daily-value">0,00 €</strong>
+            <p class="member-copy">¿Cuántos días V quieres calcular?</p>
+            <div class="days-selector">
+              <button id="decrease-days" class="counter-button" type="button" aria-label="Restar un día">−</button>
+              <span id="days-count" class="days-count">1 día</span>
+              <button id="increase-days" class="counter-button" type="button" aria-label="Añadir un día">+</button>
+            </div>
+            <p id="total-result" class="v-total">Total: 0,00 €</p>
+            <p class="criteria-note">🔒 Cálculo realizado con los criterios configurados por STR.</p>
+          </div>
+          <button id="start-over" class="primary" type="button">Calcular con otras nóminas</button>
+          <button id="sign-out-result" class="secondary" type="button">Cerrar sesión</button>
         </div>
       </div>
     </section>
@@ -594,6 +895,8 @@
     const SUPABASE_URL = 'https://icneigdnuntzugisexaz.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
     const OTP_ENDPOINT = `${SUPABASE_URL}/functions/v1/request-private-otp`;
+    const READ_V_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-read-v-payroll`;
+    const CALCULATE_V_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-calculate-v`;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       auth: {
@@ -611,19 +914,25 @@
     const sendCodeButton = document.getElementById('send-code');
     const verifyCodeButton = document.getElementById('verify-code');
     const intro = document.getElementById('intro');
-    const vForm = document.getElementById('v-form');
+    const memberScreens = [...document.querySelectorAll('.member-screen')];
+    const uploadScreen = document.getElementById('upload-screen');
+    const reviewScreen = document.getElementById('review-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const uploadMessage = document.getElementById('upload-message');
+    const readingProgress = document.getElementById('reading-progress');
+    const readPayrollsButton = document.getElementById('read-payrolls');
     const calculatorMessage = document.getElementById('calculator-message');
-    const calculatorLoading = document.getElementById('calculator-loading');
-    const monthsContainer = document.getElementById('months-container');
-    const excludedList = document.getElementById('excluded-list');
-    const calculatorResult = document.getElementById('calculator-result');
     const calculateButton = document.getElementById('calculate-v');
     const instructionsScreen = document.getElementById('instructions-screen');
-    const calculatorScreen = document.getElementById('calculator-screen');
+    const reviewList = document.getElementById('review-list');
     const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
     let pendingEmail = '';
-    let calculatorFields = [];
-    let calculatorReady = false;
+    let selectedFiles = [null, null, null];
+    let previewUrls = [null, null, null];
+    let payrollReadings = [null, null, null];
+    let dailyValue = 0;
+    let vacationDays = 1;
+    let readingInProgress = false;
 
     function activateStep(step) {
       emailForm.classList.remove('active');
@@ -635,6 +944,7 @@
     function showSignedOut() {
       pendingEmail = '';
       sessionStorage.removeItem('strPendingEmail');
+      document.body.classList.remove('member-mode');
       activateStep(emailForm);
       intro.textContent = 'Introduce el correo personal que facilitaste a STR. Te enviaremos un código de 6 dígitos para verificar tu acceso.';
     }
@@ -642,130 +952,255 @@
     function showCodeStep(email) {
       pendingEmail = email;
       sessionStorage.setItem('strPendingEmail', email);
+      document.body.classList.remove('member-mode');
       activateStep(codeForm);
       intro.textContent = 'Introduce el código de 6 dígitos que hemos enviado a tu correo.';
       document.getElementById('otp-code').value = '';
       document.getElementById('otp-code').focus();
     }
 
-    function showSignedIn(session) {
-      sessionStorage.removeItem('strPendingEmail');
-      activateStep(memberArea);
-      intro.textContent = 'Área exclusiva para personas afiliadas a STR.';
-      instructionsScreen.classList.add('active');
-      calculatorScreen.classList.remove('active');
-      loadCalculator();
+    function showMemberScreen(screen, description) {
+      memberScreens.forEach((item) => item.classList.toggle('active', item === screen));
+      intro.textContent = description;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function showCalculatorScreen() {
-      instructionsScreen.classList.remove('active');
-      calculatorScreen.classList.add('active');
-      intro.textContent = 'Introduce los importes tal como aparecen en la columna «Devengos» de tus nóminas.';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function showSignedIn() {
+      sessionStorage.removeItem('strPendingEmail');
+      document.body.classList.add('member-mode');
+      activateStep(memberArea);
+      showMemberScreen(instructionsScreen, 'Área exclusiva para personas afiliadas a STR.');
+    }
+
+    function showUploadScreen() {
+      showMemberScreen(uploadScreen, 'Sube únicamente las tres capturas necesarias para calcular tu V.');
     }
 
     function showInstructionsScreen() {
-      calculatorScreen.classList.remove('active');
-      instructionsScreen.classList.add('active');
-      intro.textContent = 'Lee estos pasos antes de introducir los datos de tus nóminas.';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showMemberScreen(instructionsScreen, 'Lee estas indicaciones antes de subir las nóminas.');
     }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    function setStatus(element, message = '') {
+      element.textContent = message;
+      element.classList.toggle('show', Boolean(message));
     }
 
-    function plusRows(fields, monthIndex) {
-      return fields.map((field) => `
-        <div class="plus-row">
-          <label class="plus-label" for="${escapeHtml(field.key)}-${monthIndex}">
-            ${field.code ? `<span class="concept-code">${escapeHtml(field.code)}</span>` : ''}${escapeHtml(field.label)}
-          </label>
-          <input
-            id="${escapeHtml(field.key)}-${monthIndex}"
-            type="number"
-            inputmode="decimal"
-            min="0"
-            max="10000"
-            step="0.01"
-            placeholder="0,00 €"
-            data-plus-key="${escapeHtml(field.key)}"
-            data-month-index="${monthIndex}"
-          >
-        </div>
-      `).join('');
-    }
+    function imageFileToJpegDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file);
+        const image = new Image();
 
-    function renderMonthCard(monthIndex) {
-      const usual = calculatorFields.filter((field) => field.group === 'usual');
-      const other = calculatorFields.filter((field) => field.group === 'other');
-      const titles = ['Primer mes', 'Segundo mes', 'Tercer mes'];
+        image.onload = () => {
+          try {
+            const scale = Math.min(1, 1800 / image.naturalWidth, 2600 / image.naturalHeight);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+            const context = canvas.getContext('2d', { alpha: false });
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.92));
+          } catch (error) {
+            reject(error);
+          } finally {
+            URL.revokeObjectURL(objectUrl);
+          }
+        };
 
-      return `
-        <div class="month-card" data-month-card="${monthIndex}">
-          <h4>${titles[monthIndex - 1]}</h4>
-          <div class="field">
-            <label for="month-${monthIndex}">Mes</label>
-            <input id="month-${monthIndex}" type="month" required>
-          </div>
-          <div class="field">
-            <label for="days-${monthIndex}">Días laborales de calendario</label>
-            <input id="days-${monthIndex}" type="number" inputmode="numeric" min="1" max="31" step="1" placeholder="Ejemplo: 18" required>
-            <span class="field-hint">No son los días que aparecen en «Plus de turno».</span>
-          </div>
-          <div class="plus-list">${plusRows(usual, monthIndex)}</div>
-          ${other.length ? `
-            <details class="other-pluses">
-              <summary>Otros pluses que pueden aparecer</summary>
-              <div class="plus-list">${plusRows(other, monthIndex)}</div>
-            </details>
-          ` : ''}
-          <div class="month-total">
-            <span>Total del mes</span>
-            <span id="month-total-${monthIndex}">0,00 €</span>
-          </div>
-        </div>
-      `;
-    }
-
-    function monthSubtotal(monthIndex) {
-      return [...document.querySelectorAll(`[data-month-index="${monthIndex}"]`)]
-        .reduce((total, input) => total + (Number(input.value) || 0), 0);
-    }
-
-    function updateMonthTotals() {
-      for (let index = 1; index <= 3; index++) {
-        const total = document.getElementById(`month-total-${index}`);
-        if (total) total.textContent = euro.format(monthSubtotal(index));
-      }
-    }
-
-    async function loadCalculator() {
-      if (calculatorReady) return;
-      calculatorLoading.textContent = 'Cargando los conceptos de la nómina…';
-      calculatorMessage.classList.remove('show');
-
-      const { data, error } = await supabase.functions.invoke('calculate-v', {
-        body: { action: 'config' }
+        image.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('INVALID_IMAGE'));
+        };
+        image.src = objectUrl;
       });
+    }
 
-      if (error || !Array.isArray(data?.fields)) {
-        calculatorLoading.textContent = 'No se ha podido cargar la calculadora. Cierra la sesión y vuelve a intentarlo.';
-        return;
+    async function callPrivateFunction(endpoint, body, timeoutMs) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('NO_SESSION');
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': SUPABASE_PUBLISHABLE_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data?.error) throw new Error(data?.error || `HTTP_${response.status}`);
+        return data;
+      } catch (error) {
+        if (error?.name === 'AbortError') throw new Error('REQUEST_TIMEOUT');
+        throw error;
+      } finally {
+        clearTimeout(timeout);
       }
+    }
 
-      calculatorFields = data.fields;
-      monthsContainer.innerHTML = [1, 2, 3].map(renderMonthCard).join('');
-      excludedList.innerHTML = (data.excluded || []).map((concept) => `<li>${escapeHtml(concept)}</li>`).join('');
-      calculatorLoading.hidden = true;
-      vForm.hidden = false;
-      calculatorReady = true;
-      updateMonthTotals();
+    function updateUploadCard(index, file) {
+      const card = document.querySelector(`[data-upload-card="${index}"]`);
+      const preview = document.querySelector(`[data-upload-preview="${index}"]`);
+      const fileName = document.querySelector(`[data-file-name="${index}"]`);
+
+      if (previewUrls[index]) URL.revokeObjectURL(previewUrls[index]);
+      previewUrls[index] = URL.createObjectURL(file);
+      preview.replaceChildren();
+      const image = document.createElement('img');
+      image.src = previewUrls[index];
+      image.alt = '';
+      preview.appendChild(image);
+      fileName.textContent = file.name;
+      card.classList.add('ready');
+      readPayrollsButton.disabled = readingInProgress || selectedFiles.some((item) => !item);
+    }
+
+    function createConceptRow(concept = {}) {
+      const row = document.createElement('div');
+      row.className = 'review-concept';
+      row.dataset.conceptRow = 'true';
+
+      const nameWrap = document.createElement('div');
+      nameWrap.className = 'concept-name-wrap';
+      const name = document.createElement('input');
+      name.className = 'review-name';
+      name.type = 'text';
+      name.value = concept.name || '';
+      name.placeholder = 'Nombre del concepto';
+      name.setAttribute('aria-label', 'Nombre del concepto');
+      const code = document.createElement('input');
+      code.className = 'review-code concept-code-input';
+      code.type = 'text';
+      code.value = concept.code || '';
+      code.placeholder = 'Código';
+      code.setAttribute('aria-label', 'Código del concepto');
+      nameWrap.append(name, code);
+
+      const quantity = document.createElement('input');
+      quantity.className = 'review-quantity';
+      quantity.type = 'text';
+      quantity.inputMode = 'decimal';
+      quantity.value = concept.quantity || '';
+      quantity.placeholder = 'Cantidad';
+      quantity.setAttribute('aria-label', 'Cantidad');
+
+      const devengos = document.createElement('input');
+      devengos.className = 'review-devengos';
+      devengos.type = 'text';
+      devengos.inputMode = 'decimal';
+      devengos.value = concept.devengos || '';
+      devengos.placeholder = 'Devengos';
+      devengos.setAttribute('aria-label', 'Devengos');
+      row.append(nameWrap, quantity, devengos);
+      return row;
+    }
+
+    function renderReview() {
+      reviewList.replaceChildren();
+      const titles = ['Nómina 1 · la más antigua', 'Nómina 2', 'Nómina 3 · la más reciente'];
+
+      payrollReadings.forEach((reading, index) => {
+        const details = document.createElement('details');
+        details.className = 'review-payroll';
+        details.dataset.payrollIndex = String(index);
+        details.open = true;
+
+        const summary = document.createElement('summary');
+        summary.textContent = titles[index];
+        const body = document.createElement('div');
+        body.className = 'review-payroll-body';
+
+        const monthRow = document.createElement('div');
+        monthRow.className = 'review-month-row';
+        const monthText = document.createElement('strong');
+        monthText.textContent = 'Mes detectado';
+        const month = document.createElement('input');
+        month.className = 'review-month';
+        month.type = 'month';
+        month.value = reading.month || '';
+        month.setAttribute('aria-label', `Mes de la nómina ${index + 1}`);
+        monthRow.append(monthText, month);
+
+        const head = document.createElement('div');
+        head.className = 'concept-head';
+        ['Concepto', 'Cantidad', 'Devengos'].forEach((text) => {
+          const label = document.createElement('span');
+          label.textContent = text;
+          head.appendChild(label);
+        });
+
+        const rows = document.createElement('div');
+        rows.className = 'review-payroll-body concept-rows';
+        (reading.concepts || []).forEach((concept) => rows.appendChild(createConceptRow(concept)));
+
+        const add = document.createElement('button');
+        add.className = 'add-concept';
+        add.type = 'button';
+        add.textContent = '+ Añadir un concepto que falte';
+        add.addEventListener('click', () => rows.appendChild(createConceptRow()));
+
+        body.append(monthRow, head, rows, add);
+        if (reading.specialFlags?.length) {
+          const warning = document.createElement('p');
+          warning.className = 'instructions-warning';
+          warning.textContent = 'La lectura ha detectado una posible situación especial. Revisa los datos; la herramienta te avisará si necesita una revisión personalizada.';
+          body.appendChild(warning);
+        }
+        details.append(summary, body);
+        reviewList.appendChild(details);
+      });
+    }
+
+    function collectReviewedPayrolls() {
+      return [...reviewList.querySelectorAll('[data-payroll-index]')].map((payroll) => {
+        const concepts = [...payroll.querySelectorAll('[data-concept-row]')].map((row) => ({
+          code: row.querySelector('.review-code').value.trim(),
+          name: row.querySelector('.review-name').value.trim(),
+          quantity: row.querySelector('.review-quantity').value.trim(),
+          devengos: row.querySelector('.review-devengos').value.trim()
+        })).filter((concept) => concept.name || concept.code);
+        const index = Number(payroll.dataset.payrollIndex);
+        return {
+          month: payroll.querySelector('.review-month').value,
+          concepts,
+          specialFlags: payrollReadings[index]?.specialFlags || []
+        };
+      });
+    }
+
+    function updateResult() {
+      document.getElementById('daily-result').textContent = euro.format(dailyValue);
+      document.getElementById('days-count').textContent = `${vacationDays} ${vacationDays === 1 ? 'día' : 'días'}`;
+      document.getElementById('total-result').textContent = `Total: ${euro.format(dailyValue * vacationDays)}`;
+      document.getElementById('decrease-days').disabled = vacationDays <= 1;
+      document.getElementById('increase-days').disabled = vacationDays >= 25;
+    }
+
+    function resetCalculator() {
+      previewUrls.forEach((url) => { if (url) URL.revokeObjectURL(url); });
+      selectedFiles = [null, null, null];
+      previewUrls = [null, null, null];
+      payrollReadings = [null, null, null];
+      dailyValue = 0;
+      vacationDays = 1;
+      document.querySelectorAll('[data-file-index]').forEach((input) => { input.value = ''; });
+      [0, 1, 2].forEach((index) => {
+        document.querySelector(`[data-upload-card="${index}"]`).classList.remove('ready');
+        const preview = document.querySelector(`[data-upload-preview="${index}"]`);
+        preview.replaceChildren(document.createTextNode(String(index + 1)));
+        document.querySelector(`[data-file-name="${index}"]`).textContent = 'Ninguna captura seleccionada';
+      });
+      readPayrollsButton.disabled = true;
+      readingProgress.hidden = true;
+      setStatus(uploadMessage);
+      setStatus(calculatorMessage);
+      reviewList.replaceChildren();
     }
 
     async function isAuthorizedSession(session) {
@@ -848,7 +1283,7 @@
       showSignedOut();
     });
 
-    document.getElementById('start-calculator').addEventListener('click', showCalculatorScreen);
+    document.getElementById('start-calculator').addEventListener('click', showUploadScreen);
     document.getElementById('show-instructions').addEventListener('click', showInstructionsScreen);
 
     async function signOut() {
@@ -857,59 +1292,108 @@
     }
 
     document.getElementById('sign-out-instructions').addEventListener('click', signOut);
-    document.getElementById('sign-out-calculator').addEventListener('click', signOut);
+    document.getElementById('sign-out-upload').addEventListener('click', signOut);
+    document.getElementById('sign-out-review').addEventListener('click', signOut);
+    document.getElementById('sign-out-result').addEventListener('click', signOut);
 
-    vForm.addEventListener('input', (event) => {
-      if (event.target.matches('[data-plus-key]')) updateMonthTotals();
+    document.querySelectorAll('[data-file-index]').forEach((input) => {
+      input.addEventListener('change', () => {
+        const index = Number(input.dataset.fileIndex);
+        const file = input.files?.[0];
+        if (!file) return;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 15 * 1024 * 1024) {
+          input.value = '';
+          setStatus(uploadMessage, 'La captura debe ser una imagen JPG, PNG o WEBP de menos de 15 MB.');
+          return;
+        }
+        selectedFiles[index] = file;
+        updateUploadCard(index, file);
+        setStatus(uploadMessage);
+      });
     });
 
-    vForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!calculatorReady) return;
+    readPayrollsButton.addEventListener('click', async () => {
+      if (readingInProgress || selectedFiles.some((file) => !file)) return;
+      readingInProgress = true;
+      readPayrollsButton.disabled = true;
+      readPayrollsButton.textContent = 'Leyendo…';
+      setStatus(uploadMessage);
+      readingProgress.hidden = false;
 
-      calculatorMessage.classList.remove('show');
-      calculatorResult.classList.remove('show');
+      try {
+        const readings = [];
+        for (let index = 0; index < 3; index += 1) {
+          readingProgress.textContent = `Leyendo nómina ${index + 1} de 3…`;
+          const imageDataUrl = await imageFileToJpegDataUrl(selectedFiles[index]);
+          const result = await callPrivateFunction(READ_V_ENDPOINT, { imageDataUrl }, 90000);
+          if (result.isPayroll !== true) throw new Error('NOT_PAYROLL');
+          readings.push({
+            month: result.month || '',
+            concepts: Array.isArray(result.concepts) ? result.concepts : [],
+            specialFlags: Array.isArray(result.specialFlags) ? result.specialFlags : []
+          });
+        }
+        payrollReadings = readings;
+        renderReview();
+        showMemberScreen(reviewScreen, 'Comprueba los datos que la IA ha leído antes de calcular.');
+      } catch (error) {
+        const messages = {
+          NOT_PAYROLL: 'Una de las capturas no parece contener una nómina. Comprueba las tres imágenes.',
+          REQUEST_TIMEOUT: 'La lectura está tardando demasiado. Comprueba la conexión y vuelve a intentarlo.',
+          NO_SESSION: 'Tu sesión ha caducado. Cierra la sesión y solicita un nuevo código.',
+          OPENAI_UNAVAILABLE: 'La lectura por IA no está disponible ahora mismo. Inténtalo de nuevo en unos minutos.'
+        };
+        setStatus(uploadMessage, messages[error.message] || 'No se han podido leer las tres nóminas. Conservamos las capturas para que puedas intentarlo de nuevo.');
+      } finally {
+        readingInProgress = false;
+        readingProgress.hidden = true;
+        readPayrollsButton.disabled = selectedFiles.some((file) => !file);
+        readPayrollsButton.textContent = 'Leer mis nóminas';
+      }
+    });
+
+    document.getElementById('back-to-uploads').addEventListener('click', showUploadScreen);
+
+    calculateButton.addEventListener('click', async () => {
+      setStatus(calculatorMessage);
       calculateButton.disabled = true;
       calculateButton.textContent = 'Calculando…';
-
-      const months = [1, 2, 3].map((index) => {
-        const amounts = {};
-        document.querySelectorAll(`[data-month-index="${index}"]`).forEach((input) => {
-          amounts[input.dataset.plusKey] = input.value || 0;
-        });
-
-        return {
-          month: document.getElementById(`month-${index}`).value,
-          days: Number(document.getElementById(`days-${index}`).value),
-          amounts
+      try {
+        const payrolls = collectReviewedPayrolls();
+        const result = await callPrivateFunction(CALCULATE_V_ENDPOINT, { payrolls }, 30000);
+        dailyValue = Number(result.dailyValue);
+        if (!Number.isFinite(dailyValue) || dailyValue <= 0) throw new Error('INVALID_RESULT');
+        vacationDays = 1;
+        updateResult();
+        showMemberScreen(resultScreen, 'Resultado calculado con los criterios configurados por STR.');
+      } catch (error) {
+        const messages = {
+          MONTHS_NOT_CONSECUTIVE: 'Los tres meses deben ser consecutivos y estar colocados del más antiguo al más reciente.',
+          CASE_REQUIRES_REVIEW: 'Tu situación requiere una revisión personalizada. Ponte en contacto con STR.',
+          INSUFFICIENT_DATA: 'Faltan cantidades o importes necesarios. Revisa los datos detectados antes de calcular.',
+          INVALID_MONTH: 'Revisa el mes de cada una de las tres nóminas.',
+          NO_SESSION: 'Tu sesión ha caducado. Cierra la sesión y solicita un nuevo código.'
         };
-      });
-
-      const { data, error } = await supabase.functions.invoke('calculate-v', {
-        body: {
-          action: 'calculate',
-          months,
-          vacationDays: Number(document.getElementById('vacation-days').value)
-        }
-      });
-
-      calculateButton.disabled = false;
-      calculateButton.textContent = 'Calcular mi V';
-
-      if (error || data?.error) {
-        const errorCode = data?.error || '';
-        calculatorMessage.textContent = errorCode === 'MONTHS_NOT_CONSECUTIVE'
-          ? 'Los tres meses deben ser consecutivos y estar colocados del más antiguo al más reciente.'
-          : 'Revisa los meses, los días laborales y los importes introducidos e inténtalo de nuevo.';
-        calculatorMessage.classList.add('show');
-        return;
+        setStatus(calculatorMessage, messages[error.message] || 'No se ha podido completar el cálculo. Revisa los datos e inténtalo de nuevo.');
+      } finally {
+        calculateButton.disabled = false;
+        calculateButton.textContent = 'Confirmar y calcular mi V';
       }
+    });
 
-      document.getElementById('daily-result').textContent = euro.format(data.dailyValue);
-      document.getElementById('total-result').textContent = `${data.vacationDays} ${data.vacationDays === 1 ? 'día' : 'días'} de vacaciones: ${euro.format(data.totalVacation)}`;
-      document.getElementById('formula-detail').textContent = `${euro.format(data.totalComplements)} en pluses ÷ ${data.totalDays} días laborales`;
-      calculatorResult.classList.add('show');
-      calculatorResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('decrease-days').addEventListener('click', () => {
+      vacationDays = Math.max(1, vacationDays - 1);
+      updateResult();
+    });
+
+    document.getElementById('increase-days').addEventListener('click', () => {
+      vacationDays = Math.min(25, vacationDays + 1);
+      updateResult();
+    });
+
+    document.getElementById('start-over').addEventListener('click', () => {
+      resetCalculator();
+      showUploadScreen();
     });
 
     const { data: { session } } = await supabase.auth.getSession();
