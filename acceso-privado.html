@@ -102,9 +102,16 @@
       codeInput.value='';
       codeInput.focus();
     }
-    async function authorized(){
-      const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
-      return !error && data===true;
+    const wait=(ms)=>new Promise(resolve=>setTimeout(resolve,ms));
+    async function authorizationStatus(retries=1){
+      let lastError=null;
+      for(let attempt=0;attempt<=retries;attempt+=1){
+        const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
+        if(!error) return {allowed:data===true,error:null};
+        lastError=error;
+        if(attempt<retries) await wait(300);
+      }
+      return {allowed:false,error:lastError};
     }
 
     codeInput.addEventListener('input',()=>{codeInput.value=cleanCode(codeInput.value)});
@@ -117,7 +124,15 @@
       sendButton.textContent='Enviando…';
       clearStatus(sendStatus);
       try{
-        await fetch(REQUEST,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email})});
+        const response=await fetch(REQUEST,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify({email})});
+        const result=await response.json().catch(()=>({}));
+        if(!response.ok || result?.sent===false){
+          const msg=result?.reason==='rate_limited'
+            ? 'Espera un minuto antes de solicitar otro código.'
+            : 'No se ha podido enviar el código. Inténtalo de nuevo dentro de unos minutos.';
+          showStatus(sendStatus,msg,'bad');
+          return;
+        }
         showStatus(sendStatus,'Si el correo está autorizado, recibirás un código de acceso.','ok');
         setTimeout(()=>showCodeStep(email),350);
       }catch(_){
@@ -152,7 +167,7 @@
 
         const {data,error}=await supabase.auth.verifyOtp({
           token_hash:result.token_hash,
-          type:result.token_type || 'magiclink'
+          type:'email'
         });
 
         if(error || !data?.session){
@@ -160,7 +175,12 @@
           return;
         }
 
-        if(!(await authorized())){
+        const access=await authorizationStatus(2);
+        if(access.error){
+          showStatus(verifyStatus,'La sesión se ha iniciado, pero no hemos podido comprobar el acceso. Pulsa Entrar de nuevo.','bad');
+          return;
+        }
+        if(!access.allowed){
           await supabase.auth.signOut();
           showStatus(verifyStatus,'Este correo no tiene acceso al área privada. Ponte en contacto con tu delegado sindical.','bad');
           return;
@@ -180,11 +200,16 @@
     document.getElementById('change-email').addEventListener('click',showEmailStep);
 
     const {data:{session}}=await supabase.auth.getSession();
-    if(session && await authorized()){
-      enterPrivateArea();
-    }else if(session){
-      await supabase.auth.signOut();
-      showEmailStep();
+    if(session){
+      const access=await authorizationStatus(2);
+      if(access.allowed){
+        enterPrivateArea();
+      }else if(!access.error){
+        await supabase.auth.signOut();
+        showEmailStep();
+      }else{
+        showStatus(sendStatus,'No hemos podido comprobar la sesión. Recarga la página para volver a intentarlo.','bad');
+      }
     }else{
       const saved=sessionStorage.getItem('strLabPendingEmail');
       if(saved){
@@ -195,3 +220,4 @@
   </script>
 </body>
 </html>
+
