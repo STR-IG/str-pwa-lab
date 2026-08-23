@@ -1467,6 +1467,68 @@
       background: white;
     }
 
+    .crop-editor {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid #d8dee8;
+      border-radius: 16px;
+      background: #f7f9fc;
+    }
+
+    .crop-editor[hidden] { display: none; }
+
+    .crop-editor h3 { margin: 0 0 6px; }
+    .crop-editor p { margin: 0 0 12px; color: #4b5563; }
+
+    .crop-stage {
+      position: relative;
+      width: min(100%, 920px);
+      margin: 0 auto;
+      line-height: 0;
+      touch-action: none;
+      user-select: none;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #20242b;
+    }
+
+    .crop-stage img {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+
+    .crop-selection {
+      position: absolute;
+      border: 3px solid #ffcf33;
+      background: rgba(255, 207, 51, .08);
+      box-shadow: 0 0 0 9999px rgba(8, 15, 25, .62);
+      cursor: move;
+      box-sizing: border-box;
+    }
+
+    .crop-handle {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      background: #b7192e;
+    }
+
+    .crop-handle.nw { left: -13px; top: -13px; cursor: nwse-resize; }
+    .crop-handle.ne { right: -13px; top: -13px; cursor: nesw-resize; }
+    .crop-handle.sw { left: -13px; bottom: -13px; cursor: nesw-resize; }
+    .crop-handle.se { right: -13px; bottom: -13px; cursor: nwse-resize; }
+
+    .crop-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
     .preview-label {
       display: flex;
       align-items: center;
@@ -1858,8 +1920,8 @@
         </div>
 
         <div class="privacy-warning">
-          <strong>🔒 Antes de seleccionar la imagen</strong>
-          Recórtala o tapa cualquier dato que permita identificarte.
+          <strong>🔒 Antes de guardar la imagen</strong>
+          Recorta o tapa cualquier dato que permita identificarte. Para el registro de jornada podrás ajustar el recorte en el visor.
           <ul class="privacy-list">
             <li>No deben verse nombre, DNI/NIE, número de empleado ni Seguridad Social.</li>
             <li>Oculta domicilio, cuenta bancaria, códigos QR o de barras.</li>
@@ -1869,13 +1931,31 @@
 
         <label class="confirmation" for="privacy-confirmation">
           <input id="privacy-confirmation" type="checkbox">
-          <span>He recortado la imagen y confirmo que no contiene datos personales.</span>
+          <span>He comprobado el recorte y confirmo que no contiene datos personales.</span>
         </label>
 
         <input id="document-image" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
         <button id="select-image" class="secondary select-image" type="button" disabled><span aria-hidden="true">▣</span> Seleccionar imagen</button>
         <p id="select-hint" class="select-hint">Marca primero la casilla de aceptación.</p>
         <p id="file-error" class="error" role="alert" hidden></p>
+
+        <section id="timesheet-crop-editor" class="crop-editor" aria-labelledby="crop-editor-title" hidden>
+          <h3 id="crop-editor-title">Recorta el registro de jornada</h3>
+          <p>Mueve el marco y arrastra sus esquinas. Deja dentro todo desde «REGISTRO DE JORNADA» hacia abajo y excluye la cabecera con datos personales.</p>
+          <div id="crop-stage" class="crop-stage">
+            <img id="crop-source-image" alt="Hoja completa del registro de jornada">
+            <div id="crop-selection" class="crop-selection" role="application" aria-label="Área de recorte ajustable">
+              <span class="crop-handle nw" data-crop-handle="nw"></span>
+              <span class="crop-handle ne" data-crop-handle="ne"></span>
+              <span class="crop-handle sw" data-crop-handle="sw"></span>
+              <span class="crop-handle se" data-crop-handle="se"></span>
+            </div>
+          </div>
+          <div class="crop-actions">
+            <button id="cancel-crop" class="secondary" type="button">Cancelar</button>
+            <button id="confirm-crop" class="primary" type="button">Confirmar recorte</button>
+          </div>
+        </section>
 
         <div id="privacy-scan" class="privacy-scan" role="status" aria-live="polite" hidden>
           <span id="privacy-scan-icon" class="privacy-scan-icon" aria-hidden="true">🔎</span>
@@ -2018,6 +2098,12 @@
     const changeImageButton = document.getElementById('change-image');
     const confirmImageButton = document.getElementById('confirm-image');
     const previewStatusText = document.getElementById('preview-status-text');
+    const cropEditor = document.getElementById('timesheet-crop-editor');
+    const cropStage = document.getElementById('crop-stage');
+    const cropSourceImage = document.getElementById('crop-source-image');
+    const cropSelection = document.getElementById('crop-selection');
+    const confirmCropButton = document.getElementById('confirm-crop');
+    const cancelCropButton = document.getElementById('cancel-crop');
     const periodMessage = document.getElementById('period-reset-note');
     const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
     const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
@@ -2197,6 +2283,10 @@
     const workSchedules = new Map();
     let privacyScanState = 'idle';
     let privacyScanVersion = 0;
+    let pendingTimesheetFile = null;
+    let pendingTimesheetUrl = '';
+    let cropRect = { x: 0, y: 0.14, width: 1, height: 0.86 };
+    let cropGesture = null;
     let workingOcrText = '';
     let ocrWorkerPromise = null;
     let ocrQueue = Promise.resolve();
@@ -4005,6 +4095,7 @@
     function resetDocumentScreen() {
       privacyScanVersion += 1;
       savingDocument = false;
+      closeTimesheetCrop();
       setPrivacyScanState('idle');
       privacyConfirmation.checked = false;
       fileInput.value = '';
@@ -4025,8 +4116,9 @@
       preview.hidden = !hasImage;
       preview.classList.toggle('scan-blocked', privacyBlocked);
       documentActions.hidden = !hasImage;
-      selectImageButton.disabled = savingDocument || checkingPrivacy || !privacyConfirmation.checked;
-      changeImageButton.disabled = savingDocument || checkingPrivacy || !privacyConfirmation.checked;
+      const selectionNeedsConsent = activeKind !== 'timesheet' && !privacyConfirmation.checked;
+      selectImageButton.disabled = savingDocument || checkingPrivacy || selectionNeedsConsent;
+      changeImageButton.disabled = savingDocument || checkingPrivacy || selectionNeedsConsent;
       changeImageButton.textContent = privacyBlocked ? 'Recortar o cambiar imagen' : 'Cambiar imagen';
       confirmImageButton.disabled = savingDocument || !hasImage || (needsUpload && !readyToUpload);
       confirmImageButton.textContent = savingDocument
@@ -4064,6 +4156,8 @@
 
       if (workingSaved) {
         selectHint.textContent = 'La imagen ya está guardada. Marca la casilla solo si quieres sustituirla.';
+      } else if (kind === 'timesheet') {
+        selectHint.textContent = 'Selecciona la hoja completa; podrás recortarla dentro de la aplicación.';
       }
 
       const copy = documentCopy[kind];
@@ -4142,9 +4236,128 @@
     }
 
     function chooseImage() {
-      if (!privacyConfirmation.checked) return;
+      if (activeKind !== 'timesheet' && !privacyConfirmation.checked) return;
       fileInput.value = '';
       fileInput.click();
+    }
+
+    function renderCropSelection() {
+      cropSelection.style.left = `${cropRect.x * 100}%`;
+      cropSelection.style.top = `${cropRect.y * 100}%`;
+      cropSelection.style.width = `${cropRect.width * 100}%`;
+      cropSelection.style.height = `${cropRect.height * 100}%`;
+    }
+
+    function closeTimesheetCrop() {
+      cropGesture = null;
+      pendingTimesheetFile = null;
+      if (pendingTimesheetUrl) URL.revokeObjectURL(pendingTimesheetUrl);
+      pendingTimesheetUrl = '';
+      cropSourceImage.removeAttribute('src');
+      cropEditor.hidden = true;
+    }
+
+    function openTimesheetCrop(file) {
+      closeTimesheetCrop();
+      pendingTimesheetFile = file;
+      pendingTimesheetUrl = URL.createObjectURL(file);
+      cropRect = { x: 0, y: 0.14, width: 1, height: 0.86 };
+      cropSourceImage.onload = () => {
+        renderCropSelection();
+        cropEditor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      cropSourceImage.src = pendingTimesheetUrl;
+      cropEditor.hidden = false;
+      preview.hidden = true;
+      documentActions.hidden = true;
+      setPrivacyScanState('idle');
+      selectHint.textContent = 'Ajusta el marco y confirma el recorte antes de comprobar la privacidad.';
+    }
+
+    function cropPointerPosition(event) {
+      const bounds = cropStage.getBoundingClientRect();
+      return {
+        x: Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width)),
+        y: Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height))
+      };
+    }
+
+    function beginCropGesture(event) {
+      if (!pendingTimesheetFile) return;
+      event.preventDefault();
+      const point = cropPointerPosition(event);
+      cropGesture = {
+        pointerId: event.pointerId,
+        handle: event.target.dataset.cropHandle || 'move',
+        start: point,
+        rect: { ...cropRect }
+      };
+      cropSelection.setPointerCapture(event.pointerId);
+    }
+
+    function moveCropGesture(event) {
+      if (!cropGesture || cropGesture.pointerId !== event.pointerId) return;
+      event.preventDefault();
+      const point = cropPointerPosition(event);
+      const dx = point.x - cropGesture.start.x;
+      const dy = point.y - cropGesture.start.y;
+      const start = cropGesture.rect;
+      const minSize = 0.08;
+      let left = start.x;
+      let top = start.y;
+      let right = start.x + start.width;
+      let bottom = start.y + start.height;
+
+      if (cropGesture.handle === 'move') {
+        left = Math.max(0, Math.min(1 - start.width, start.x + dx));
+        top = Math.max(0, Math.min(1 - start.height, start.y + dy));
+        right = left + start.width;
+        bottom = top + start.height;
+      } else {
+        if (cropGesture.handle.includes('w')) left = Math.max(0, Math.min(right - minSize, start.x + dx));
+        if (cropGesture.handle.includes('e')) right = Math.min(1, Math.max(left + minSize, start.x + start.width + dx));
+        if (cropGesture.handle.includes('n')) top = Math.max(0, Math.min(bottom - minSize, start.y + dy));
+        if (cropGesture.handle.includes('s')) bottom = Math.min(1, Math.max(top + minSize, start.y + start.height + dy));
+      }
+
+      cropRect = { x: left, y: top, width: right - left, height: bottom - top };
+      renderCropSelection();
+    }
+
+    function endCropGesture(event) {
+      if (!cropGesture || cropGesture.pointerId !== event.pointerId) return;
+      cropGesture = null;
+    }
+
+    async function buildCroppedTimesheet() {
+      if (!pendingTimesheetFile || !cropSourceImage.naturalWidth || !cropSourceImage.naturalHeight) return null;
+      const sourceFile = pendingTimesheetFile;
+      const canvas = document.createElement('canvas');
+      const sx = Math.round(cropRect.x * cropSourceImage.naturalWidth);
+      const sy = Math.round(cropRect.y * cropSourceImage.naturalHeight);
+      const sw = Math.max(1, Math.round(cropRect.width * cropSourceImage.naturalWidth));
+      const sh = Math.max(1, Math.round(cropRect.height * cropSourceImage.naturalHeight));
+      canvas.width = sw;
+      canvas.height = sh;
+      canvas.getContext('2d').drawImage(cropSourceImage, sx, sy, sw, sh, 0, 0, sw, sh);
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.94));
+      if (!blob) return null;
+      const baseName = sourceFile.name.replace(/\.[^.]+$/, '') || 'registro-jornada';
+      return new File([blob], `${baseName}-recortado.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+    }
+
+    async function acceptSelectedFile(file) {
+      const storedUrl = documents[activeKind].url;
+      if (workingUrl && workingUrl !== storedUrl) URL.revokeObjectURL(workingUrl);
+      workingFile = file;
+      workingUrl = URL.createObjectURL(file);
+      workingSaved = false;
+      workingOcrText = '';
+      const scanVersion = ++privacyScanVersion;
+      setPrivacyScanState('checking');
+      renderWorkingPreview();
+      preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      await checkSelectedFilePrivacy(file, scanVersion);
     }
 
     async function showSelectedFile(file) {
@@ -4163,17 +4376,12 @@
         return;
       }
 
-      const storedUrl = documents[activeKind].url;
-      if (workingUrl && workingUrl !== storedUrl) URL.revokeObjectURL(workingUrl);
-      workingFile = file;
-      workingUrl = URL.createObjectURL(file);
-      workingSaved = false;
-      workingOcrText = '';
-      const scanVersion = ++privacyScanVersion;
-      setPrivacyScanState('checking');
-      renderWorkingPreview();
-      preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      await checkSelectedFilePrivacy(file, scanVersion);
+      if (activeKind === 'timesheet') {
+        openTimesheetCrop(file);
+        return;
+      }
+
+      await acceptSelectedFile(file);
     }
 
     async function confirmImage() {
@@ -4234,10 +4442,14 @@
 
     privacyConfirmation.addEventListener('change', () => {
       selectHint.textContent = privacyConfirmation.checked
-        ? 'Selecciona una imagen recortada. Se comprobará en este dispositivo antes de guardarse.'
+        ? (activeKind === 'timesheet'
+          ? 'Selecciona la hoja completa. Tras confirmar el recorte se comprobará en este dispositivo.'
+          : 'Selecciona una imagen recortada. Se comprobará en este dispositivo antes de guardarse.')
         : (workingSaved
           ? 'La imagen ya está guardada. Marca la casilla solo si quieres sustituirla.'
-          : 'Marca primero la casilla de aceptación.');
+          : (activeKind === 'timesheet'
+            ? 'Selecciona la hoja completa; podrás recortarla dentro de la aplicación.'
+            : 'Marca primero la casilla de aceptación.'));
       renderWorkingPreview();
     });
 
@@ -4265,6 +4477,29 @@
     selectImageButton.addEventListener('click', chooseImage);
     changeImageButton.addEventListener('click', chooseImage);
     fileInput.addEventListener('change', (event) => showSelectedFile(event.target.files[0]));
+    cropSelection.addEventListener('pointerdown', beginCropGesture);
+    cropSelection.addEventListener('pointermove', moveCropGesture);
+    cropSelection.addEventListener('pointerup', endCropGesture);
+    cropSelection.addEventListener('pointercancel', endCropGesture);
+    cancelCropButton.addEventListener('click', () => {
+      closeTimesheetCrop();
+      selectHint.textContent = 'Selecciona la hoja completa; podrás recortarla dentro de la aplicación.';
+      renderWorkingPreview();
+    });
+    confirmCropButton.addEventListener('click', async () => {
+      confirmCropButton.disabled = true;
+      confirmCropButton.textContent = 'Preparando recorte…';
+      const croppedFile = await buildCroppedTimesheet();
+      confirmCropButton.disabled = false;
+      confirmCropButton.textContent = 'Confirmar recorte';
+      if (!croppedFile) {
+        fileError.textContent = 'No se ha podido crear el recorte. Prueba con una imagen JPG, PNG o WEBP.';
+        fileError.hidden = false;
+        return;
+      }
+      closeTimesheetCrop();
+      await acceptSelectedFile(croppedFile);
+    });
     confirmImageButton.addEventListener('click', confirmImage);
     month.addEventListener('change', handlePeriodChange);
     year.addEventListener('change', handlePeriodChange);
@@ -4310,3 +4545,4 @@
   </script>
 </body>
 </html>
+
