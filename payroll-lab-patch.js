@@ -83,6 +83,103 @@
       .trim();
   }
 
+  function normalizedScreenTitle() {
+    return normalizeLine(document.getElementById('document-screen-title')?.textContent || '');
+  }
+
+  function isPayrollScreen() {
+    return normalizedScreenTitle().includes('NOMINA');
+  }
+
+  function loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('IMAGE_LOAD_FAILED')); };
+      img.src = url;
+    });
+  }
+
+  function canvasToBlob(canvas, type = 'image/jpeg', quality = 0.95) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('CROP_FAILED')), type, quality);
+    });
+  }
+
+  async function cropPayroll(file) {
+    const img = await loadImage(file);
+    const ratio = img.naturalHeight / Math.max(1, img.naturalWidth);
+    if (ratio < 1.08) return file;
+
+    // Nómina Grifols: conservamos la franja central de «Devengos y deducciones».
+    // Se elimina la cabecera identificativa y la zona inferior con datos ajenos
+    // a la comparación mensual.
+    const startY = Math.round(img.naturalHeight * 0.35);
+    const endY = Math.round(img.naturalHeight * 0.82);
+    const cropHeight = Math.max(1, endY - startY);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = cropHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, startY, img.naturalWidth, cropHeight, 0, 0, canvas.width, canvas.height);
+
+    const blob = await canvasToBlob(canvas);
+    const baseName = (file.name || 'nomina').replace(/\.[^.]+$/, '');
+    return new File([blob], `${baseName}-solo-devengos.jpg`, {
+      type: 'image/jpeg',
+      lastModified: Date.now()
+    });
+  }
+
+  function setPayrollCropNotice() {
+    const instruction = document.getElementById('instruction-text');
+    if (instruction && isPayrollScreen()) {
+      instruction.textContent = 'Sube la nómina completa. El LAB eliminará la cabecera con datos personales y conservará la zona «Devengos y deducciones» para que la revises antes de guardarla.';
+    }
+  }
+
+  const documentInput = document.getElementById('document-image');
+  if (documentInput && typeof DataTransfer !== 'undefined') {
+    documentInput.addEventListener('change', async event => {
+      if (!isPayrollScreen() || documentInput.dataset.strigPayrollCropReady === '1') {
+        delete documentInput.dataset.strigPayrollCropReady;
+        return;
+      }
+
+      const file = event.target.files && event.target.files[0];
+      if (!file || !String(file.type || '').startsWith('image/')) return;
+
+      // Interceptamos antes del lector principal para que privacidad y OCR reciban
+      // únicamente el recorte anonimizado, nunca la nómina completa.
+      event.stopImmediatePropagation();
+      setPayrollCropNotice();
+
+      try {
+        const cropped = await cropPayroll(file);
+        const dt = new DataTransfer();
+        dt.items.add(cropped);
+        documentInput.files = dt.files;
+        documentInput.dataset.strigPayrollCropReady = '1';
+        documentInput.dispatchEvent(new Event('change', { bubbles: true }));
+      } catch (error) {
+        console.error('LAB payroll crop error', error);
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        documentInput.files = dt.files;
+        documentInput.dataset.strigPayrollCropReady = '1';
+        documentInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }, true);
+  }
+
+  document.getElementById('open-payroll')?.addEventListener('click', () => {
+    setTimeout(setPayrollCropNotice, 0);
+  });
+
   function rawNumericCandidates(value) {
     return (normalizeLine(value).match(/[-+]?\d+(?:[.,]\d+)?/g) || []);
   }
@@ -172,12 +269,11 @@
         preserve_interword_spaces: '1'
       });
       const text = result?.data?.text || '';
-      let recovered = 0;
 
       for (const config of missing) {
         const input = config.ids.map((id) => document.getElementById(id)).find(Boolean);
         const value = findQuantity(text, config);
-        if (markAsAutoRead(input, value)) recovered += 1;
+        markAsAutoRead(input, value);
       }
 
       updateSafeWording();
