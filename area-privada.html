@@ -754,15 +754,15 @@
           <h2 class="member-title">Sube tus tres nóminas</h2>
           <p class="member-copy">Añádelas por orden, de la más antigua a la más reciente.</p>
           <div class="payroll-period">
-            <label for="v-payroll-month">Mes de la nómina que contiene la V</label>
+            <label for="v-payroll-month">Mes para el que quieres calcular la V</label>
             <input id="v-payroll-month" type="month" required>
-            <p>Indica el mes en el que aparecen tus días V. La aplicación asignará a las tres capturas los tres meses inmediatamente anteriores.</p>
+            <p>Al elegirlo, verás debajo los tres meses de nómina que debes subir.</p>
           </div>
           <div class="upload-list">
             <div class="upload-card" data-upload-card="0">
               <div class="upload-preview" data-upload-preview="0" aria-hidden="true">1</div>
               <div>
-                <strong>Nómina 1 · la más antigua</strong>
+                <strong data-payroll-month-label="0">Nómina 1 · la más antigua</strong>
                 <span class="upload-file-name" data-file-name="0">Ninguna captura seleccionada</span>
                 <label class="upload-action" for="payroll-file-0">Añadir captura</label>
                 <input id="payroll-file-0" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp" data-file-index="0">
@@ -771,7 +771,7 @@
             <div class="upload-card" data-upload-card="1">
               <div class="upload-preview" data-upload-preview="1" aria-hidden="true">2</div>
               <div>
-                <strong>Nómina 2</strong>
+                <strong data-payroll-month-label="1">Nómina 2</strong>
                 <span class="upload-file-name" data-file-name="1">Ninguna captura seleccionada</span>
                 <label class="upload-action" for="payroll-file-1">Añadir captura</label>
                 <input id="payroll-file-1" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp" data-file-index="1">
@@ -780,7 +780,7 @@
             <div class="upload-card" data-upload-card="2">
               <div class="upload-preview" data-upload-preview="2" aria-hidden="true">3</div>
               <div>
-                <strong>Nómina 3 · la más reciente</strong>
+                <strong data-payroll-month-label="2">Nómina 3 · la más reciente</strong>
                 <span class="upload-file-name" data-file-name="2">Ninguna captura seleccionada</span>
                 <label class="upload-action" for="payroll-file-2">Añadir captura</label>
                 <input id="payroll-file-2" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp" data-file-index="2">
@@ -853,6 +853,11 @@
     const vPayrollMonthInput = document.getElementById('v-payroll-month');
     const instructionsScreen = document.getElementById('instructions-screen');
     const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+    const payrollMonthFormatter = new Intl.DateTimeFormat('es-ES', {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC'
+    });
     let pendingEmail = '';
     let selectedFiles = [null, null, null];
     let previewUrls = [null, null, null];
@@ -981,6 +986,20 @@
       return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
     }
 
+    function updatePayrollMonthLabels() {
+      const defaults = ['Nómina 1 · la más antigua', 'Nómina 2', 'Nómina 3 · la más reciente'];
+      document.querySelectorAll('[data-payroll-month-label]').forEach((label) => {
+        const index = Number(label.dataset.payrollMonthLabel);
+        if (!isValidPayrollMonth(vPayrollMonthInput.value)) {
+          label.textContent = defaults[index];
+          return;
+        }
+        const assignedMonth = payrollMonthBeforeV(vPayrollMonthInput.value, index);
+        const [year, month] = assignedMonth.split('-').map(Number);
+        label.textContent = `Nómina de ${payrollMonthFormatter.format(new Date(Date.UTC(year, month - 1, 1)))}`;
+      });
+    }
+
     function canReadPayrolls() {
       return isValidPayrollMonth(vPayrollMonthInput.value)
         && selectedFiles.every(Boolean);
@@ -1019,6 +1038,7 @@
       dailyValue = 0;
       vacationDays = 1;
       vPayrollMonthInput.value = '';
+      updatePayrollMonthLabels();
       document.querySelectorAll('[data-file-index]').forEach((input) => { input.value = ''; });
       [0, 1, 2].forEach((index) => {
         document.querySelector(`[data-upload-card="${index}"]`).classList.remove('ready');
@@ -1124,6 +1144,7 @@
     document.getElementById('sign-out-result').addEventListener('click', signOut);
 
     vPayrollMonthInput.addEventListener('input', () => {
+      updatePayrollMonthLabels();
       readPayrollsButton.disabled = readingInProgress || !canReadPayrolls();
       setStatus(uploadMessage);
     });
