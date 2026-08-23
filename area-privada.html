@@ -1378,13 +1378,14 @@
         }
         payrollReadings = readings;
         readingProgress.textContent = 'Calculando tu V…';
-        const calculation = await callPrivateFunction(CALCULATE_V_ENDPOINT, { payrolls: payrollReadings }, 30000);
+        const calculation = await callPrivateFunction(CALCULATE_V_ENDPOINT, { payrolls: payrollReadings, vMonth }, 30000);
         dailyValue = Number(calculation.dailyValue);
         if (!Number.isFinite(dailyValue) || dailyValue <= 0) throw new Error('INVALID_RESULT');
         updateResult();
         showMemberScreen(resultScreen, 'Resultado calculado con los criterios configurados por STR.');
       } catch (error) {
         const messages = {
+          ALREADY_CALCULATED: 'Ya has comprobado la V de este mes. Cada afiliado puede realizar una sola comprobación por mes.',
           NOT_PAYROLL: 'Una de las capturas no parece contener una nómina. Comprueba las cuatro imágenes.',
           VACATION_PAYMENT_NOT_FOUND: 'No hemos podido leer «Pluses vacaciones» con su cantidad y su importe. Repite la captura de la nómina con la V mostrando esa fila completa.',
           REQUEST_TIMEOUT: 'La lectura está tardando demasiado. Comprueba la conexión y vuelve a intentarlo.',
