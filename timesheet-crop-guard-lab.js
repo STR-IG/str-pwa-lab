@@ -4,7 +4,9 @@
 
   const TARGET_TITLE = 'resumen de variables del mes';
   const FULL_PAGE_MIN_RATIO = 1.15;
-  const TOP_CROP_RATIO = 0.152;
+  const TIMESHEET_TOP_CROP_RATIO = 0.152;
+  const PAYROLL_TOP_CROP_RATIO = 0.20;
+  const PAYROLL_BOTTOM_CROP_RATIO = 0.82;
 
   const ALLOWED_VARIABLES = [
     { key: 'comidas_can_guasch', labels: ['comidas can guasch', 'comida can guasch', 'can guasch'] },
@@ -79,9 +81,12 @@
     };
   }
 
-  function isTimesheetScreen() {
+  function currentDocumentKind() {
     const title = document.getElementById('document-screen-title');
-    return title && normalize(title.textContent).includes('registro de jornada');
+    const text = normalize(title?.textContent || '');
+    if (text.includes('registro de jornada')) return 'timesheet';
+    if (text.includes('nomina')) return 'payroll';
+    return '';
   }
 
   function loadImage(file) {
@@ -100,13 +105,14 @@
     });
   }
 
-  async function cropTimesheetHeader(file) {
+  async function cropImage(file, topRatio, bottomRatio, fallbackName) {
     const img = await loadImage(file);
     const ratio = img.naturalHeight / Math.max(1, img.naturalWidth);
     if (ratio < FULL_PAGE_MIN_RATIO) return file;
 
-    const cropY = Math.round(img.naturalHeight * TOP_CROP_RATIO);
-    const cropHeight = Math.max(1, img.naturalHeight - cropY);
+    const cropY = Math.round(img.naturalHeight * topRatio);
+    const cropBottom = Math.round(img.naturalHeight * bottomRatio);
+    const cropHeight = Math.max(1, cropBottom - cropY);
     const canvas = document.createElement('canvas');
     canvas.width = img.naturalWidth;
     canvas.height = cropHeight;
@@ -116,21 +122,33 @@
     ctx.drawImage(img, 0, cropY, img.naturalWidth, cropHeight, 0, 0, canvas.width, canvas.height);
 
     const blob = await canvasToBlob(canvas);
-    const baseName = (file.name || 'registro-jornada').replace(/\.[^.]+$/, '');
+    const baseName = (file.name || fallbackName).replace(/\.[^.]+$/, '');
     return new File([blob], `${baseName}-sin-datos-personales.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
   }
 
-  function setCropNotice() {
+  function cropTimesheet(file) {
+    return cropImage(file, TIMESHEET_TOP_CROP_RATIO, 1, 'registro-jornada');
+  }
+
+  function cropPayroll(file) {
+    return cropImage(file, PAYROLL_TOP_CROP_RATIO, PAYROLL_BOTTOM_CROP_RATIO, 'nomina');
+  }
+
+  function setCropNotice(kind = currentDocumentKind()) {
     const instruction = document.getElementById('instruction-text');
-    if (instruction && isTimesheetScreen()) {
+    if (!instruction) return;
+    if (kind === 'timesheet') {
       instruction.textContent = 'Sube la hoja completa. El LAB eliminará la cabecera con datos personales y te mostrará el recorte antes de guardarlo.';
+    } else if (kind === 'payroll') {
+      instruction.textContent = 'Sube la nómina completa. El LAB recortará la zona central de conceptos para ocultar la cabecera y la parte inferior con datos personales. Revisa la previsualización antes de guardarla.';
     }
   }
 
   const input = document.getElementById('document-image');
   if (input && typeof DataTransfer !== 'undefined') {
     input.addEventListener('change', async event => {
-      if (!isTimesheetScreen() || input.dataset.strigCropReady === '1') {
+      const kind = currentDocumentKind();
+      if (!kind || input.dataset.strigCropReady === '1') {
         delete input.dataset.strigCropReady;
         return;
       }
@@ -138,17 +156,17 @@
       if (!file || !String(file.type || '').startsWith('image/')) return;
 
       event.stopImmediatePropagation();
-      setCropNotice();
+      setCropNotice(kind);
 
       try {
-        const cropped = await cropTimesheetHeader(file);
+        const cropped = kind === 'timesheet' ? await cropTimesheet(file) : await cropPayroll(file);
         const dt = new DataTransfer();
         dt.items.add(cropped);
         input.files = dt.files;
         input.dataset.strigCropReady = '1';
         input.dispatchEvent(new Event('change', { bubbles: true }));
       } catch (error) {
-        console.error('LAB timesheet crop error', error);
+        console.error(`LAB ${kind} crop error`, error);
         const dt = new DataTransfer();
         dt.items.add(file);
         input.files = dt.files;
@@ -158,7 +176,8 @@
     }, true);
   }
 
-  document.getElementById('open-timesheet')?.addEventListener('click', () => setTimeout(setCropNotice, 0));
+  document.getElementById('open-timesheet')?.addEventListener('click', () => setTimeout(() => setCropNotice('timesheet'), 0));
+  document.getElementById('open-payroll')?.addEventListener('click', () => setTimeout(() => setCropNotice('payroll'), 0));
 
   window.STRIG_TIMESHEET_READER = {
     extractFromText,
