@@ -541,6 +541,22 @@
       line-height: 1.4;
     }
 
+    .upload-section-title {
+      display: block;
+      font-size: 15px;
+    }
+
+    .vacation-payroll-upload {
+      margin: 13px 0 16px;
+      border-color: #efb3b7;
+      background: #fff8f8;
+    }
+
+    .previous-payrolls-title {
+      margin: 20px 0 0;
+      font-size: 16px;
+    }
+
     .upload-card {
       display: grid;
       grid-template-columns: 58px minmax(0, 1fr);
@@ -672,6 +688,35 @@
       font-weight: 900;
     }
 
+    .v-comparison {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+      text-align: left;
+    }
+
+    .v-comparison-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: white;
+      font-size: 14px;
+    }
+
+    .v-comparison-row strong {
+      white-space: nowrap;
+    }
+
+    .v-comparison-difference {
+      border-color: #efb3b7;
+      color: var(--red-dark);
+      background: #fff6f7;
+      font-weight: 800;
+    }
+
     .criteria-note {
       margin: 18px 0 0;
       padding: 12px;
@@ -726,8 +771,8 @@
             <div class="v-intro-point">
               <span class="v-intro-icon" aria-hidden="true">📄</span>
               <div>
-                <strong>Prepara tres nóminas</strong>
-                <p>Necesitarás las tres nóminas inmediatamente anteriores al inicio de tus vacaciones.</p>
+                <strong>Prepara cuatro nóminas</strong>
+                <p>Necesitarás la nómina que contiene «Pluses vacaciones» y las tres nóminas inmediatamente anteriores.</p>
               </div>
             </div>
             <div class="v-intro-point">
@@ -744,20 +789,32 @@
                 <p>No incluyas nombre, DNI, número de empleado, cuenta bancaria, fechas ni otros datos personales.</p>
               </div>
             </div>
-            <p class="review-help">La herramienta leerá las tres capturas y calculará automáticamente tu V. Si falta algún dato imprescindible, te pedirá repetir la captura.</p>
+            <p class="review-help">La herramienta leerá las cuatro capturas, calculará tu V y comparará el resultado con lo pagado por Grifols.</p>
           </div>
           <button id="start-calculator" class="primary" type="button">Empezar</button>
           <button id="sign-out-instructions" class="secondary" type="button">Cerrar sesión</button>
         </div>
 
         <div id="upload-screen" class="member-screen">
-          <h2 class="member-title">Sube tus tres nóminas</h2>
-          <p class="member-copy">Añádelas por orden, de la más antigua a la más reciente.</p>
+          <h2 class="member-title">Sube tus nóminas</h2>
+          <p class="member-copy">Primero añade la nómina con la V y después las tres nóminas anteriores.</p>
           <div class="payroll-period">
-            <label for="v-payroll-month">Mes para el que quieres calcular la V</label>
+            <strong class="upload-section-title">1. Nómina que contiene «Pluses vacaciones»</strong>
+            <p>La cantidad de este concepto indica los días V y su devengo es lo pagado por Grifols.</p>
+            <div class="upload-card vacation-payroll-upload" data-v-upload-card>
+              <div class="upload-preview" data-v-upload-preview aria-hidden="true">V</div>
+              <div>
+                <strong>Nómina con la V</strong>
+                <span class="upload-file-name" data-v-file-name>Ninguna captura seleccionada</span>
+                <label class="upload-action" for="v-payroll-file">Añadir captura</label>
+                <input id="v-payroll-file" class="upload-input" type="file" accept="image/jpeg,image/png,image/webp">
+              </div>
+            </div>
+            <label for="v-payroll-month">Mes de esta nómina</label>
             <input id="v-payroll-month" type="month" required>
-            <p>Al elegirlo, verás debajo los tres meses de nómina que debes subir.</p>
+            <p>Al elegirlo, verás debajo los tres meses anteriores que debes subir.</p>
           </div>
+          <h3 class="previous-payrolls-title">2. Nóminas anteriores</h3>
           <div class="upload-list">
             <div class="upload-card" data-upload-card="0">
               <div class="upload-preview" data-upload-preview="0" aria-hidden="true">1</div>
@@ -787,7 +844,7 @@
               </div>
             </div>
           </div>
-          <button id="read-payrolls" class="primary" type="button" disabled>Leer y calcular mi V</button>
+          <button id="read-payrolls" class="primary" type="button" disabled>Leer y comparar mi V</button>
           <p id="upload-message" class="status"></p>
           <p id="reading-progress" class="reading-progress" hidden></p>
           <p class="calculate-note">Las capturas se envían al servicio de IA de OpenAI únicamente para su lectura. STR no las guarda en el historial.</p>
@@ -801,13 +858,26 @@
             <h2 class="member-title">Tu V</h2>
             <p class="member-copy">Valor de 1 día V</p>
             <strong id="daily-result" class="v-daily-value">0,00 €</strong>
-            <p class="member-copy">¿Cuántos días V quieres calcular?</p>
+            <p class="member-copy">Días detectados en «Pluses vacaciones»</p>
             <div class="days-selector">
               <button id="decrease-days" class="counter-button" type="button" aria-label="Restar un día">−</button>
               <span id="days-count" class="days-count">1 día</span>
               <button id="increase-days" class="counter-button" type="button" aria-label="Añadir un día">+</button>
             </div>
-            <p id="total-result" class="v-total">Total: 0,00 €</p>
+            <div class="v-comparison">
+              <div class="v-comparison-row">
+                <span>Nuestro cálculo</span>
+                <strong id="str-calculated-total">0,00 €</strong>
+              </div>
+              <div class="v-comparison-row">
+                <span>Pagado por Grifols</span>
+                <strong id="grifols-paid-total">0,00 €</strong>
+              </div>
+              <div class="v-comparison-row v-comparison-difference">
+                <span>Diferencia: cálculo menos Grifols</span>
+                <strong id="comparison-difference">0,00 €</strong>
+              </div>
+            </div>
             <p class="criteria-note">🔒 Cálculo realizado con los criterios configurados por STR.</p>
           </div>
           <button id="start-over" class="primary" type="button">Calcular con otras nóminas</button>
@@ -850,6 +920,7 @@
     const uploadMessage = document.getElementById('upload-message');
     const readingProgress = document.getElementById('reading-progress');
     const readPayrollsButton = document.getElementById('read-payrolls');
+    const vPayrollFileInput = document.getElementById('v-payroll-file');
     const vPayrollMonthInput = document.getElementById('v-payroll-month');
     const instructionsScreen = document.getElementById('instructions-screen');
     const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
@@ -859,10 +930,13 @@
       timeZone: 'UTC'
     });
     let pendingEmail = '';
+    let vPayrollFile = null;
+    let vPreviewUrl = null;
     let selectedFiles = [null, null, null];
     let previewUrls = [null, null, null];
     let payrollReadings = [null, null, null];
     let dailyValue = 0;
+    let grifolsPaidTotal = 0;
     let vacationDays = 1;
     let readingInProgress = false;
 
@@ -1002,7 +1076,25 @@
 
     function canReadPayrolls() {
       return isValidPayrollMonth(vPayrollMonthInput.value)
+        && Boolean(vPayrollFile)
         && selectedFiles.every(Boolean);
+    }
+
+    function updateVacationUploadCard(file) {
+      const card = document.querySelector('[data-v-upload-card]');
+      const preview = document.querySelector('[data-v-upload-preview]');
+      const fileName = document.querySelector('[data-v-file-name]');
+
+      if (vPreviewUrl) URL.revokeObjectURL(vPreviewUrl);
+      vPreviewUrl = URL.createObjectURL(file);
+      preview.replaceChildren();
+      const image = document.createElement('img');
+      image.src = vPreviewUrl;
+      image.alt = '';
+      preview.appendChild(image);
+      fileName.textContent = file.name;
+      card.classList.add('ready');
+      readPayrollsButton.disabled = readingInProgress || !canReadPayrolls();
     }
 
     function updateUploadCard(index, file) {
@@ -1023,22 +1115,64 @@
     }
 
     function updateResult() {
+      const calculatedTotal = dailyValue * vacationDays;
+      const rawDifference = calculatedTotal - grifolsPaidTotal;
+      const difference = Math.abs(rawDifference) < 0.005 ? 0 : rawDifference;
       document.getElementById('daily-result').textContent = euro.format(dailyValue);
       document.getElementById('days-count').textContent = `${vacationDays} ${vacationDays === 1 ? 'día' : 'días'}`;
-      document.getElementById('total-result').textContent = `Total: ${euro.format(dailyValue * vacationDays)}`;
+      document.getElementById('str-calculated-total').textContent = euro.format(calculatedTotal);
+      document.getElementById('grifols-paid-total').textContent = euro.format(grifolsPaidTotal);
+      document.getElementById('comparison-difference').textContent = `${difference > 0 ? '+' : ''}${euro.format(difference)}`;
       document.getElementById('decrease-days').disabled = vacationDays <= 1;
-      document.getElementById('increase-days').disabled = vacationDays >= 25;
+      document.getElementById('increase-days').disabled = vacationDays >= 31;
+    }
+
+    function parseReadNumber(value) {
+      let normalized = String(value ?? '').trim().replace(/\s+/g, '').replace(/\u20ac/g, '');
+      if (!normalized) return NaN;
+      if (normalized.includes(',')) normalized = normalized.replace(/\./g, '').replace(',', '.');
+      return Number(normalized);
+    }
+
+    function normalizedConceptName(value) {
+      return String(value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
+    function findVacationPayment(concepts) {
+      const concept = (concepts || []).find((item) => {
+        const name = normalizedConceptName(item?.name);
+        return name.includes('pluses vacaciones') || name.includes('plus vacaciones');
+      });
+      if (!concept) return null;
+      const days = parseReadNumber(concept.quantity);
+      const paidTotal = parseReadNumber(concept.devengos);
+      if (!Number.isFinite(days) || days <= 0 || days > 31) return null;
+      if (!Number.isFinite(paidTotal) || paidTotal < 0) return null;
+      return { days, paidTotal };
     }
 
     function resetCalculator() {
+      if (vPreviewUrl) URL.revokeObjectURL(vPreviewUrl);
       previewUrls.forEach((url) => { if (url) URL.revokeObjectURL(url); });
+      vPayrollFile = null;
+      vPreviewUrl = null;
       selectedFiles = [null, null, null];
       previewUrls = [null, null, null];
       payrollReadings = [null, null, null];
       dailyValue = 0;
+      grifolsPaidTotal = 0;
       vacationDays = 1;
+      vPayrollFileInput.value = '';
       vPayrollMonthInput.value = '';
       updatePayrollMonthLabels();
+      document.querySelector('[data-v-upload-card]').classList.remove('ready');
+      document.querySelector('[data-v-upload-preview]').replaceChildren(document.createTextNode('V'));
+      document.querySelector('[data-v-file-name]').textContent = 'Ninguna captura seleccionada';
       document.querySelectorAll('[data-file-index]').forEach((input) => { input.value = ''; });
       [0, 1, 2].forEach((index) => {
         document.querySelector(`[data-upload-card="${index}"]`).classList.remove('ready');
@@ -1149,6 +1283,19 @@
       setStatus(uploadMessage);
     });
 
+    vPayrollFileInput.addEventListener('change', () => {
+      const file = vPayrollFileInput.files?.[0];
+      if (!file) return;
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 15 * 1024 * 1024) {
+        vPayrollFileInput.value = '';
+        setStatus(uploadMessage, 'La captura debe ser una imagen JPG, PNG o WEBP de menos de 15 MB.');
+        return;
+      }
+      vPayrollFile = file;
+      updateVacationUploadCard(file);
+      setStatus(uploadMessage);
+    });
+
     document.querySelectorAll('[data-file-index]').forEach((input) => {
       input.addEventListener('change', () => {
         const index = Number(input.dataset.fileIndex);
@@ -1175,9 +1322,18 @@
       readingProgress.hidden = false;
 
       try {
+        readingProgress.textContent = 'Leyendo la nómina que contiene la V…';
+        const vImageDataUrl = await imageFileToJpegDataUrl(vPayrollFile);
+        const vReading = await callPrivateFunction(READ_V_ENDPOINT, { imageDataUrl: vImageDataUrl }, 90000);
+        if (vReading.isPayroll !== true) throw new Error('NOT_PAYROLL');
+        const vacationPayment = findVacationPayment(vReading.concepts);
+        if (!vacationPayment) throw new Error('VACATION_PAYMENT_NOT_FOUND');
+        vacationDays = vacationPayment.days;
+        grifolsPaidTotal = vacationPayment.paidTotal;
+
         const readings = [];
         for (let index = 0; index < 3; index += 1) {
-          readingProgress.textContent = `Leyendo nómina ${index + 1} de 3…`;
+          readingProgress.textContent = `Leyendo nómina anterior ${index + 1} de 3…`;
           const imageDataUrl = await imageFileToJpegDataUrl(selectedFiles[index]);
           const result = await callPrivateFunction(READ_V_ENDPOINT, { imageDataUrl }, 90000);
           if (result.isPayroll !== true) throw new Error('NOT_PAYROLL');
@@ -1192,12 +1348,12 @@
         const calculation = await callPrivateFunction(CALCULATE_V_ENDPOINT, { payrolls: payrollReadings }, 30000);
         dailyValue = Number(calculation.dailyValue);
         if (!Number.isFinite(dailyValue) || dailyValue <= 0) throw new Error('INVALID_RESULT');
-        vacationDays = 1;
         updateResult();
         showMemberScreen(resultScreen, 'Resultado calculado con los criterios configurados por STR.');
       } catch (error) {
         const messages = {
-          NOT_PAYROLL: 'Una de las capturas no parece contener una nómina. Comprueba las tres imágenes.',
+          NOT_PAYROLL: 'Una de las capturas no parece contener una nómina. Comprueba las cuatro imágenes.',
+          VACATION_PAYMENT_NOT_FOUND: 'No hemos podido leer «Pluses vacaciones» con su cantidad y su importe. Repite la captura de la nómina con la V mostrando esa fila completa.',
           REQUEST_TIMEOUT: 'La lectura está tardando demasiado. Comprueba la conexión y vuelve a intentarlo.',
           NO_SESSION: 'Tu sesión ha caducado. Cierra la sesión y solicita un nuevo código.',
           OPENAI_UNAVAILABLE: 'La lectura por IA no está disponible ahora mismo. Inténtalo de nuevo en unos minutos.',
@@ -1212,7 +1368,7 @@
         readingInProgress = false;
         readingProgress.hidden = true;
         readPayrollsButton.disabled = !canReadPayrolls();
-        readPayrollsButton.textContent = 'Leer y calcular mi V';
+        readPayrollsButton.textContent = 'Leer y comparar mi V';
       }
     });
 
@@ -1222,7 +1378,7 @@
     });
 
     document.getElementById('increase-days').addEventListener('click', () => {
-      vacationDays = Math.min(25, vacationDays + 1);
+      vacationDays = Math.min(31, vacationDays + 1);
       updateResult();
     });
 
