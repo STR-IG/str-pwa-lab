@@ -50,7 +50,7 @@
     const REQUEST=URL+'/functions/v1/lab-request-custom-otp';
     const VERIFY=URL+'/functions/v1/lab-verify-custom-otp';
     const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
-    const ALLOWED_DESTINATIONS=new Set(['area-privada.html','revisa-tu-nomina.html']);
+    const ALLOWED_DESTINATIONS=new Set(['area-privada.html','revisa-tu-nomina.html','preguntale-str-ig.html']);
     const requestedDestination=new URLSearchParams(window.location.search).get('next');
     if(ALLOWED_DESTINATIONS.has(requestedDestination)){
       sessionStorage.setItem('strLabNext',requestedDestination);
@@ -220,4 +220,5 @@
   </script>
 </body>
 </html>
+
 
