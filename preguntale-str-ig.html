@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Pregúntale a STR-IG · STR-IG LAB</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e30613;
+      --red-dark: #b9000b;
+      --red-soft: #fff0f1;
+      --black: #161616;
+      --grey: #6e6e73;
+      --light: #f5f5f7;
+      --white: #fff;
+    }
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--light);
+      color: var(--black);
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: calc(14px + env(safe-area-inset-top)) 18px 14px;
+      border-bottom: 1px solid #e4e4e7;
+      background: rgba(245,245,247,.96);
+      backdrop-filter: blur(12px);
+    }
+    .top-inner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .back {
+      display: grid;
+      place-items: center;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--red);
+      background: var(--white);
+      box-shadow: 0 3px 12px rgba(0,0,0,.08);
+      text-decoration: none;
+      font-size: 26px;
+      font-weight: 700;
+    }
+    h1 { font-size: 27px; line-height: 1.05; }
+    main { max-width: 900px; margin: auto; padding: 28px 18px 48px; }
+    .intro { margin-bottom: 20px; color: var(--grey); font-size: 15px; line-height: 1.5; }
+    .option-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 18px;
+      border-radius: 20px;
+      color: inherit;
+      background: var(--white);
+      box-shadow: 0 5px 18px rgba(0,0,0,.07);
+      text-decoration: none;
+      transition: .2s ease;
+    }
+    .option-card:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(0,0,0,.1); }
+    .option-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 52px;
+      width: 52px;
+      height: 52px;
+      border-radius: 15px;
+      color: var(--white);
+      background: var(--red);
+      font-size: 25px;
+    }
+    .option-copy { flex: 1; }
+    .option-copy strong { display: block; margin-bottom: 6px; font-size: 18px; }
+    .available {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: var(--red-dark);
+      background: var(--red-soft);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+    .arrow { color: var(--red); font-size: 25px; font-weight: 700; }
+    #auth-check { color: var(--grey); text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="back" href="index.html" aria-label="Volver a la pantalla principal">‹</a>
+      <h1>Pregúntale a STR-IG</h1>
+    </div>
+  </header>
+
+  <main>
+    <p id="auth-check">Comprobando acceso privado…</p>
+    <section id="content" hidden>
+      <p class="intro">Selecciona la consulta que quieres realizar.</p>
+      <a class="option-card" href="permisos.html">
+        <span class="option-icon" aria-hidden="true">⚖</span>
+        <span class="option-copy">
+          <strong>Permisos retribuidos</strong>
+          <span class="available">Disponible</span>
+        </span>
+        <span class="arrow" aria-hidden="true">›</span>
+      </a>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const URL = 'https://icneigdnuntzugisexaz.supabase.co';
+    const KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase = createClient(URL, KEY, {
+      auth: { detectSessionInUrl: false, persistSession: true, autoRefreshToken: true }
+    });
+
+    async function hasPrivateAccess(session) {
+      if (!session) return false;
+      const { data, error } = await supabase.rpc('is_current_user_private_access_allowed');
+      return !error && data === true;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!(await hasPrivateAccess(session))) {
+      if (session) await supabase.auth.signOut();
+      sessionStorage.setItem('strLabNext', 'preguntale-str-ig.html');
+      window.location.replace('acceso-privado.html?next=preguntale-str-ig.html');
+    } else {
+      document.getElementById('auth-check').hidden = true;
+      document.getElementById('content').hidden = false;
+    }
+  </script>
+</body>
+</html>
+
