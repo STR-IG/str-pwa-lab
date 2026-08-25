@@ -727,6 +727,67 @@
       line-height: 1.4;
     }
 
+    .admin-affiliate-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .admin-affiliate-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+    }
+
+    .admin-affiliate-card strong,
+    .admin-affiliate-card span { display: block; }
+
+    .admin-affiliate-card span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .danger-button {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 14px;
+      border: 1px solid var(--red);
+      border-radius: 999px;
+      color: var(--red);
+      background: white;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .danger-button:disabled { cursor: wait; opacity: .6; }
+
+    .delete-affiliate-dialog {
+      width: min(100% - 32px, 420px);
+      padding: 24px;
+      border: 0;
+      border-radius: 22px;
+      color: var(--ink);
+      background: white;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .24);
+    }
+
+    .delete-affiliate-dialog::backdrop { background: rgba(0, 0, 0, .55); }
+    .delete-affiliate-dialog h2 { margin: 0 0 12px; font-size: 22px; }
+    .delete-affiliate-dialog p { margin: 0; line-height: 1.5; }
+    .delete-affiliate-dialog p + p { margin-top: 8px; }
+
+    .dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .dialog-actions button { margin: 0; }
+
     @media (max-width: 420px) {
       main { padding-top: 22px; }
       .panel { padding: 20px 16px; }
@@ -792,6 +853,7 @@
             <p class="review-help">La herramienta leerá las cuatro capturas, calculará tu V y comparará el resultado con lo pagado por Grifols.</p>
           </div>
           <button id="start-calculator" class="primary" type="button">Empezar</button>
+          <button id="show-affiliate-management" class="secondary" type="button" hidden>Gestionar afiliados</button>
           <button id="sign-out-instructions" class="secondary" type="button">Cerrar sesión</button>
         </div>
 
@@ -883,8 +945,27 @@
           <button id="start-over" class="primary" type="button">Calcular con otras nóminas</button>
           <button id="sign-out-result" class="secondary" type="button">Cerrar sesión</button>
         </div>
+
+        <div id="affiliate-management-screen" class="member-screen">
+          <h2 class="member-title">Gestión de afiliados</h2>
+          <p class="member-copy">Área exclusiva para administradores de la Sección Sindical.</p>
+          <p id="affiliate-management-message" class="status"></p>
+          <div id="affiliate-list" class="admin-affiliate-list" aria-live="polite"></div>
+          <button id="back-from-affiliate-management" class="secondary" type="button">Volver</button>
+          <button id="sign-out-affiliate-management" class="secondary" type="button">Cerrar sesión</button>
+        </div>
       </div>
     </section>
+
+    <dialog id="delete-affiliate-dialog" class="delete-affiliate-dialog">
+      <h2>Borrar afiliado</h2>
+      <p id="delete-affiliate-question"></p>
+      <p><strong>Esta acción no se puede deshacer.</strong></p>
+      <div class="dialog-actions">
+        <button id="cancel-delete-affiliate" class="secondary" type="button">Cancelar</button>
+        <button id="confirm-delete-affiliate" class="danger-button" type="button">Borrar afiliado</button>
+      </div>
+    </dialog>
 
     <p class="privacy"><span aria-hidden="true">🛡️</span><span>El acceso es personal. STR no solicitará tu contraseña del correo electrónico.</span></p>
   </main>
@@ -898,6 +979,7 @@
     const VERIFY_OTP_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-verify-custom-otp`;
     const READ_V_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-read-v-payroll`;
     const CALCULATE_V_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-calculate-v`;
+    const MANAGE_AFFILIATES_ENDPOINT = `${SUPABASE_URL}/functions/v1/lab-manage-affiliates`;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       auth: {
@@ -924,6 +1006,13 @@
     const vPayrollFileInput = document.getElementById('v-payroll-file');
     const vPayrollMonthInput = document.getElementById('v-payroll-month');
     const instructionsScreen = document.getElementById('instructions-screen');
+    const affiliateManagementScreen = document.getElementById('affiliate-management-screen');
+    const showAffiliateManagementButton = document.getElementById('show-affiliate-management');
+    const affiliateManagementMessage = document.getElementById('affiliate-management-message');
+    const affiliateList = document.getElementById('affiliate-list');
+    const deleteAffiliateDialog = document.getElementById('delete-affiliate-dialog');
+    const deleteAffiliateQuestion = document.getElementById('delete-affiliate-question');
+    const confirmDeleteAffiliateButton = document.getElementById('confirm-delete-affiliate');
     const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
     const payrollMonthFormatter = new Intl.DateTimeFormat('es-ES', {
       month: 'long',
@@ -940,6 +1029,7 @@
     let grifolsPaidTotal = 0;
     let vacationDays = 1;
     let readingInProgress = false;
+    let affiliatePendingDeletion = null;
 
     function activateStep(step) {
       emailForm.classList.remove('active');
@@ -951,6 +1041,8 @@
     function showSignedOut() {
       pendingEmail = '';
       sessionStorage.removeItem('strPendingEmail');
+      showAffiliateManagementButton.hidden = true;
+      affiliateList.replaceChildren();
       document.body.classList.remove('member-mode');
       activateStep(emailForm);
       intro.textContent = 'Introduce el correo personal que facilitaste a STR. Te enviaremos un código de 6 dígitos para verificar tu acceso.';
@@ -977,6 +1069,7 @@
       document.body.classList.add('member-mode');
       activateStep(memberArea);
       showMemberScreen(instructionsScreen, 'Área exclusiva para personas afiliadas a STR.');
+      loadAffiliateManagementAccess();
     }
 
     function showUploadScreen() {
@@ -990,6 +1083,76 @@
     function setStatus(element, message = '') {
       element.textContent = message;
       element.classList.toggle('show', Boolean(message));
+    }
+
+    async function callAffiliateManagement(action, email = '') {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('NO_SESSION');
+
+      const response = await fetch(MANAGE_AFFILIATES_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({ action, email })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result?.error || `HTTP_${response.status}`);
+      return result;
+    }
+
+    function affiliateDetail(label, value) {
+      if (!value) return null;
+      const line = document.createElement('span');
+      line.textContent = `${label}: ${value}`;
+      return line;
+    }
+
+    function renderAffiliates(affiliates) {
+      affiliateList.replaceChildren();
+      for (const affiliate of affiliates) {
+        const card = document.createElement('article');
+        card.className = 'admin-affiliate-card';
+
+        const name = document.createElement('strong');
+        name.textContent = affiliate.display_name || affiliate.email;
+        card.appendChild(name);
+
+        [
+          affiliateDetail('N.º afiliado', affiliate.employee_number),
+          affiliateDetail('Email', affiliate.email),
+          affiliateDetail('Teléfono', affiliate.phone)
+        ].forEach((line) => { if (line) card.appendChild(line); });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'danger-button';
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Borrar afiliado';
+        deleteButton.addEventListener('click', () => {
+          affiliatePendingDeletion = affiliate;
+          deleteAffiliateQuestion.textContent = `¿Seguro que quieres borrar a ${affiliate.display_name || affiliate.email}?`;
+          deleteAffiliateDialog.showModal();
+        });
+        card.appendChild(deleteButton);
+        affiliateList.appendChild(card);
+      }
+    }
+
+    async function loadAffiliateManagementAccess(showErrors = false) {
+      try {
+        const result = await callAffiliateManagement('list');
+        showAffiliateManagementButton.hidden = false;
+        renderAffiliates(Array.isArray(result.affiliates) ? result.affiliates : []);
+        setStatus(affiliateManagementMessage);
+      } catch (error) {
+        showAffiliateManagementButton.hidden = true;
+        affiliateList.replaceChildren();
+        if (showErrors && error.message !== 'FORBIDDEN') {
+          setStatus(affiliateManagementMessage, 'No se ha podido cargar la gestión de afiliados. Inténtalo de nuevo.');
+        }
+      }
     }
 
     function imageFileToJpegDataUrl(file) {
@@ -1300,6 +1463,35 @@
 
     document.getElementById('start-calculator').addEventListener('click', showUploadScreen);
     document.getElementById('show-instructions').addEventListener('click', showInstructionsScreen);
+    showAffiliateManagementButton.addEventListener('click', async () => {
+      showMemberScreen(affiliateManagementScreen, 'Gestión de afiliados de la Sección Sindical.');
+      await loadAffiliateManagementAccess(true);
+    });
+    document.getElementById('back-from-affiliate-management').addEventListener('click', showInstructionsScreen);
+    document.getElementById('cancel-delete-affiliate').addEventListener('click', () => {
+      affiliatePendingDeletion = null;
+      deleteAffiliateDialog.close();
+    });
+    confirmDeleteAffiliateButton.addEventListener('click', async () => {
+      if (!affiliatePendingDeletion) return;
+      const target = affiliatePendingDeletion;
+      confirmDeleteAffiliateButton.disabled = true;
+      confirmDeleteAffiliateButton.textContent = 'Borrando…';
+
+      try {
+        await callAffiliateManagement('delete', target.email);
+        affiliatePendingDeletion = null;
+        deleteAffiliateDialog.close();
+        await loadAffiliateManagementAccess(true);
+        setStatus(affiliateManagementMessage, `${target.display_name || target.email} se ha borrado correctamente.`);
+      } catch (_error) {
+        deleteAffiliateDialog.close();
+        setStatus(affiliateManagementMessage, 'No se ha podido borrar el afiliado. No se ha modificado ninguna ficha.');
+      } finally {
+        confirmDeleteAffiliateButton.disabled = false;
+        confirmDeleteAffiliateButton.textContent = 'Borrar afiliado';
+      }
+    });
 
     async function signOut() {
       await supabase.auth.signOut();
@@ -1309,6 +1501,7 @@
     document.getElementById('sign-out-instructions').addEventListener('click', signOut);
     document.getElementById('sign-out-upload').addEventListener('click', signOut);
     document.getElementById('sign-out-result').addEventListener('click', signOut);
+    document.getElementById('sign-out-affiliate-management').addEventListener('click', signOut);
 
     vPayrollMonthInput.addEventListener('input', () => {
       updatePayrollMonthLabels();
