@@ -7,6 +7,7 @@
   <title>Alta de afiliados · STR-IG LAB</title>
   <style>
     *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f5f7;color:#161616;padding-bottom:40px}.topbar{height:64px;background:#161616;color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;position:sticky;top:0;z-index:10}.back{color:#fff;text-decoration:none;font-size:34px;line-height:1}.topbar strong{font-size:18px}.lab{margin-left:auto;background:#e30613;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.5px}main{max-width:620px;margin:auto;padding:24px 16px}.access{display:none}.access.active{display:block}.hero{background:linear-gradient(135deg,#e30613,#a8000b);color:white;border-radius:24px;padding:22px;margin-bottom:18px}.hero small{display:block;text-transform:uppercase;letter-spacing:.8px;font-weight:800;opacity:.9;margin-bottom:7px}.hero h1{margin:0 0 8px;font-size:30px;line-height:1}.hero p{margin:0;line-height:1.45;opacity:.95}.panel{background:#fff;border-radius:22px;padding:20px;box-shadow:0 6px 22px rgba(0,0,0,.07)}label{display:block;font-size:13px;font-weight:800;margin:14px 0 7px}input{width:100%;border:1px solid #d5d5d8;border-radius:13px;padding:14px;font-size:16px;outline:none}input:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.08)}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary,.whatsapp,.secondary{width:100%;border:0;border-radius:14px;padding:15px 16px;font-size:15px;font-weight:800;cursor:pointer;margin-top:18px}.primary{background:#e30613;color:#fff}.primary:disabled{opacity:.6;cursor:wait}.secondary{background:#efeff1;color:#161616}.whatsapp{display:none;background:#171717;color:white;text-align:center;text-decoration:none}.whatsapp.show{display:block}.status{display:none;margin-top:14px;padding:12px;border-radius:12px;font-size:13px;line-height:1.4}.status.show{display:block}.status.ok{background:#eff9f2;color:#195d31}.status.error{background:#fff0f1;color:#8e0010}.security{margin-top:14px;color:#6e6e73;font-size:12px;line-height:1.45}.denied{background:#fff;border-radius:22px;padding:24px;text-align:center;box-shadow:0 6px 22px rgba(0,0,0,.07)}.denied h1{font-size:24px}.denied p{color:#6e6e73;line-height:1.5}.loading{text-align:center;padding:60px 20px;color:#6e6e73}.login-title{text-align:center;margin:0 0 8px;font-size:27px}.login-copy{text-align:center;color:#6e6e73;line-height:1.45;margin:0 0 12px}.login-step{display:none}.login-step.active{display:block}#otp-code{text-align:center;letter-spacing:8px;font-size:25px;font-weight:800}@media(max-width:520px){.row{grid-template-columns:1fr}.hero h1{font-size:27px}}
+    .management{margin-top:18px}.management-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.management-head h2{margin:0;font-size:22px}.count{color:#6e6e73;font-size:13px;font-weight:800}.table-wrap{overflow-x:auto;border:1px solid #e1e1e4;border-radius:16px}.affiliate-table{width:100%;border-collapse:collapse;min-width:720px}.affiliate-table th,.affiliate-table td{padding:13px 12px;text-align:left;border-bottom:1px solid #ededf0;font-size:13px;vertical-align:middle}.affiliate-table th{background:#f7f7f8;font-size:12px;text-transform:uppercase;letter-spacing:.3px}.affiliate-table tr:last-child td{border-bottom:0}.affiliate-table td:first-child{font-weight:800}.danger{border:1px solid #e30613;border-radius:999px;padding:9px 12px;color:#e30613;background:#fff;font-weight:800;cursor:pointer;white-space:nowrap}.danger:disabled{opacity:.6;cursor:wait}.management-status{margin-top:12px;color:#6e6e73;font-size:13px;line-height:1.4}.management-status.error{color:#8e0010}.empty{padding:20px;text-align:center;color:#6e6e73}.delete-dialog{width:min(100% - 32px,430px);border:0;border-radius:22px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.24)}.delete-dialog::backdrop{background:rgba(0,0,0,.55)}.delete-dialog h2{margin:0 0 14px;font-size:22px}.delete-dialog p{margin:0;line-height:1.5}.delete-dialog p+p{margin-top:8px}.dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.dialog-actions button{margin:0}.dialog-actions .secondary{margin-top:0}.dialog-actions .danger{width:100%;border-radius:14px;padding:15px 12px}@media(max-width:520px){.management-head{align-items:flex-start;flex-direction:column}.dialog-actions{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -51,7 +52,30 @@
         <button id="new-signup" class="secondary" type="button" hidden>Nueva alta</button>
         <p class="security">Esta herramienta no aparece para el resto de afiliados. El alta solo puede ejecutarse con una sesión autorizada de Rocío o Dubardo.</p>
       </form>
+      <section class="panel management" aria-labelledby="affiliate-list-title">
+        <div class="management-head">
+          <h2 id="affiliate-list-title">Afiliados dados de alta</h2>
+          <span id="affiliate-count" class="count">Cargando…</span>
+        </div>
+        <div class="table-wrap">
+          <table class="affiliate-table">
+            <thead><tr><th>Nombre</th><th>N.º afiliado</th><th>Email</th><th>Teléfono</th><th>Acción</th></tr></thead>
+            <tbody id="affiliate-list"></tbody>
+          </table>
+        </div>
+        <p id="management-status" class="management-status" aria-live="polite"></p>
+      </section>
     </section>
+
+    <dialog id="delete-affiliate-dialog" class="delete-dialog">
+      <h2>Borrar afiliado</h2>
+      <p id="delete-affiliate-question"></p>
+      <p><strong>Esta acción no se puede deshacer.</strong></p>
+      <div class="dialog-actions">
+        <button id="cancel-delete-affiliate" class="secondary" type="button">Cancelar</button>
+        <button id="confirm-delete-affiliate" class="danger" type="button">Borrar afiliado</button>
+      </div>
+    </dialog>
 
     <section id="denied" class="access denied"><h1>Acceso restringido</h1><p>Esta herramienta es exclusiva para los miembros autorizados del comité de la sección sindical.</p><a href="index.html">Volver al inicio</a></section>
   </main>
@@ -62,6 +86,7 @@
     const SUPABASE_PUBLISHABLE_KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
     const REQUEST=SUPABASE_URL+'/functions/v1/lab-request-custom-otp';
     const VERIFY=SUPABASE_URL+'/functions/v1/lab-verify-custom-otp';
+    const MANAGE_AFFILIATES=SUPABASE_URL+'/functions/v1/lab-manage-affiliates';
     const supabase=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
     const COMMITTEE=new Set(['rocioloralara@gmail.com','dubardollorienzu@gmail.com']);
 
@@ -83,7 +108,14 @@
     const whatsapp=document.getElementById('whatsapp');
     const newSignup=document.getElementById('new-signup');
     const saveButton=document.getElementById('save');
+    const affiliateList=document.getElementById('affiliate-list');
+    const affiliateCount=document.getElementById('affiliate-count');
+    const managementStatus=document.getElementById('management-status');
+    const deleteAffiliateDialog=document.getElementById('delete-affiliate-dialog');
+    const deleteAffiliateQuestion=document.getElementById('delete-affiliate-question');
+    const confirmDeleteAffiliate=document.getElementById('confirm-delete-affiliate');
     let pendingEmail='';
+    let affiliatePendingDeletion=null;
 
     function showOnly(section){
       loading.style.display='none';
@@ -116,7 +148,7 @@
         return;
       }
       const caller=(session.user?.email||'').trim().toLowerCase();
-      if(COMMITTEE.has(caller)) showOnly(authorized); else showOnly(denied);
+      if(COMMITTEE.has(caller)){showOnly(authorized);await loadAffiliates()} else showOnly(denied);
     }
 
     otpCode.addEventListener('input',()=>{otpCode.value=cleanCode(otpCode.value)});
@@ -156,7 +188,7 @@
         if(error||!data?.session){setLoginStatus(verifyStatus,'No se pudo iniciar la sesión. Inténtalo de nuevo.','error');return}
         const caller=(data.session.user?.email||'').trim().toLowerCase();
         sessionStorage.removeItem('strCommitteePendingEmail');
-        if(COMMITTEE.has(caller)) showOnly(authorized); else {await supabase.auth.signOut();showOnly(denied)}
+        if(COMMITTEE.has(caller)){showOnly(authorized);await loadAffiliates()} else {await supabase.auth.signOut();showOnly(denied)}
       }catch(_){setLoginStatus(verifyStatus,'No se ha podido completar la verificación. Comprueba tu conexión.','error')}
       finally{verifyCode.disabled=false;verifyCode.textContent='Entrar'}
     });
@@ -170,6 +202,32 @@
       if(digits.startsWith('0034')) digits=digits.slice(4);
       if(digits.startsWith('34')&&digits.length>9) digits=digits.slice(2);
       return digits;
+    }
+    async function manageAffiliates(action,email=''){
+      const {data:{session}}=await supabase.auth.getSession();
+      if(!session?.access_token) throw new Error('NO_SESSION');
+      const response=await fetch(MANAGE_AFFILIATES,{method:'POST',headers:{'Authorization':`Bearer ${session.access_token}`,'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({action,email})});
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(result?.error||`HTTP_${response.status}`);
+      return result;
+    }
+    function addCell(row,value){const cell=document.createElement('td');cell.textContent=value||'—';row.appendChild(cell)}
+    function renderAffiliates(affiliates){
+      affiliateList.replaceChildren();
+      affiliateCount.textContent=`${affiliates.length} ${affiliates.length===1?'alta':'altas'}`;
+      if(!affiliates.length){const row=document.createElement('tr');const cell=document.createElement('td');cell.colSpan=5;cell.className='empty';cell.textContent='Todavía no hay afiliados dados de alta.';row.appendChild(cell);affiliateList.appendChild(row);return}
+      for(const affiliate of affiliates){
+        const row=document.createElement('tr');
+        addCell(row,affiliate.display_name||affiliate.email);addCell(row,affiliate.employee_number);addCell(row,affiliate.email);addCell(row,affiliate.phone);
+        const actionCell=document.createElement('td');const button=document.createElement('button');button.type='button';button.className='danger';button.textContent='Borrar afiliado';
+        button.addEventListener('click',()=>{affiliatePendingDeletion=affiliate;deleteAffiliateQuestion.textContent=`¿Seguro que quieres borrar a ${affiliate.display_name||affiliate.email}?`;deleteAffiliateDialog.showModal()});
+        actionCell.appendChild(button);row.appendChild(actionCell);affiliateList.appendChild(row);
+      }
+    }
+    async function loadAffiliates(){
+      affiliateCount.textContent='Cargando…';managementStatus.textContent='';managementStatus.className='management-status';
+      try{const result=await manageAffiliates('list');renderAffiliates(Array.isArray(result.affiliates)?result.affiliates:[])}
+      catch(_){affiliateCount.textContent='';managementStatus.textContent='No se ha podido cargar la tabla. Inténtalo de nuevo.';managementStatus.className='management-status error'}
     }
     function whatsappUrl(phone,name){
       const digits=normalizePhone(phone);
@@ -190,9 +248,18 @@
       if(error){console.error(error);setStatus('No se ha podido completar el alta. Comprueba que sigues conectado con una cuenta autorizada.','error');return}
       setStatus(`${name} ha quedado dado/a de alta en la app.`,'ok');
       whatsapp.href=whatsappUrl(digits,name);whatsapp.classList.add('show');newSignup.hidden=false;saveButton.hidden=true;
+      await loadAffiliates();
     });
     newSignup.addEventListener('click',()=>{
       form.reset();status.className='status';status.textContent='';whatsapp.classList.remove('show');newSignup.hidden=true;saveButton.hidden=false;document.getElementById('name').focus();
+    });
+    document.getElementById('cancel-delete-affiliate').addEventListener('click',()=>{affiliatePendingDeletion=null;deleteAffiliateDialog.close()});
+    confirmDeleteAffiliate.addEventListener('click',async()=>{
+      if(!affiliatePendingDeletion)return;
+      const target=affiliatePendingDeletion;confirmDeleteAffiliate.disabled=true;confirmDeleteAffiliate.textContent='Borrando…';
+      try{await manageAffiliates('delete',target.email);affiliatePendingDeletion=null;deleteAffiliateDialog.close();await loadAffiliates();managementStatus.textContent=`${target.display_name||target.email} se ha borrado correctamente.`;managementStatus.className='management-status'}
+      catch(_){deleteAffiliateDialog.close();managementStatus.textContent='No se ha podido borrar el afiliado. No se ha modificado ninguna ficha.';managementStatus.className='management-status error'}
+      finally{confirmDeleteAffiliate.disabled=false;confirmDeleteAffiliate.textContent='Borrar afiliado'}
     });
 
     await routeSession();
