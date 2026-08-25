@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Hospitalización familiar · Pregúntale a STR-IG LAB</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e30613;
+      --red-dark: #b9000b;
+      --green: #0b6b4f;
+      --green-soft: #edf8f3;
+      --amber: #765700;
+      --amber-soft: #fff6d6;
+      --black: #161616;
+      --grey: #6e6e73;
+      --line: #dddddf;
+      --light: #f5f5f7;
+      --white: #fff;
+    }
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--light);
+      color: var(--black);
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: calc(14px + env(safe-area-inset-top)) 18px 14px;
+      border-bottom: 1px solid #e4e4e7;
+      background: rgba(245,245,247,.96);
+      backdrop-filter: blur(12px);
+    }
+    .top-inner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      max-width: 680px;
+      margin: auto;
+    }
+    .back {
+      display: grid;
+      place-items: center;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--red);
+      background: var(--white);
+      box-shadow: 0 3px 12px rgba(0,0,0,.08);
+      text-decoration: none;
+      font-size: 26px;
+      font-weight: 700;
+    }
+    h1 { font-size: clamp(21px, 5vw, 27px); line-height: 1.08; }
+    main { max-width: 680px; margin: auto; padding: 24px 18px 48px; }
+    .panel {
+      padding: 22px;
+      border-radius: 22px;
+      background: var(--white);
+      box-shadow: 0 6px 22px rgba(0,0,0,.07);
+    }
+    .step {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--red-dark);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    h2 { margin-bottom: 8px; font-size: 24px; line-height: 1.15; }
+    .intro { margin-bottom: 22px; color: var(--grey); font-size: 15px; line-height: 1.5; }
+    label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 800; }
+    select {
+      width: 100%;
+      min-height: 56px;
+      padding: 0 44px 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      color: var(--black);
+      background: var(--white);
+      font: inherit;
+      font-size: 16px;
+    }
+    select:focus { outline: 3px solid rgba(227,6,19,.12); border-color: var(--red); }
+    .primary,
+    .secondary {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 16px;
+      border: 0;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .primary { color: var(--white); background: var(--red); }
+    .primary:disabled { opacity: .45; cursor: not-allowed; }
+    .secondary { color: var(--red); background: var(--white); border: 1px solid var(--red); }
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .result.show { display: block; }
+    .result.correct { color: var(--green); background: var(--green-soft); }
+    .result.redirect { color: var(--amber); background: var(--amber-soft); }
+    .result.review { color: var(--red-dark); background: #fff0f1; }
+    .result strong { display: block; margin-bottom: 5px; font-size: 16px; }
+    .result a { display: block; text-align: center; text-decoration: none; }
+    #auth-check { color: var(--grey); text-align: center; }
+    @media (max-width: 440px) {
+      main { padding: 18px 14px 38px; }
+      .panel { padding: 19px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="back" href="preguntale-str-permisos.html" aria-label="Volver a Permisos retribuidos">‹</a>
+      <h1>Hospitalización familiar</h1>
+    </div>
+  </header>
+
+  <main>
+    <p id="auth-check">Comprobando acceso privado…</p>
+    <section id="content" hidden>
+      <div class="panel">
+        <span class="step">Paso 1</span>
+        <h2>¿Quién está hospitalizado?</h2>
+        <p class="intro">Selecciona la relación que tienes con la persona hospitalizada. Así te dirigiremos al permiso correcto.</p>
+
+        <label for="relationship">Familiar o persona afectada</label>
+        <select id="relationship">
+          <option value="">Selecciona una opción</option>
+          <optgroup label="Familia directa y primer grado">
+            <option value="first">Mi padre</option>
+            <option value="first">Mi madre</option>
+            <option value="first">Mi hijo</option>
+            <option value="first">Mi hija</option>
+            <option value="first">Mi suegro</option>
+            <option value="first">Mi suegra</option>
+            <option value="first">Mi yerno</option>
+            <option value="first">Mi nuera</option>
+          </optgroup>
+          <optgroup label="Cónyuge o pareja">
+            <option value="specific">Mi cónyuge</option>
+            <option value="specific">Mi pareja de hecho</option>
+          </optgroup>
+          <optgroup label="Segundo grado">
+            <option value="second">Mi hermano</option>
+            <option value="second">Mi hermana</option>
+            <option value="second">Mi abuelo</option>
+            <option value="second">Mi abuela</option>
+            <option value="second">Mi nieto</option>
+            <option value="second">Mi nieta</option>
+            <option value="second">Mi cuñado</option>
+            <option value="second">Mi cuñada</option>
+          </optgroup>
+          <optgroup label="Otros casos">
+            <option value="specific">Un familiar de mi pareja de hecho</option>
+            <option value="cohabitant">Una persona que convive conmigo</option>
+            <option value="review">Otro familiar o relación</option>
+          </optgroup>
+        </select>
+
+        <button id="continue" class="primary" type="button" disabled>Continuar</button>
+        <div id="result" class="result" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const URL = 'https://icneigdnuntzugisexaz.supabase.co';
+    const KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase = createClient(URL, KEY, {
+      auth: { detectSessionInUrl: false, persistSession: true, autoRefreshToken: true }
+    });
+
+    async function hasPrivateAccess(session) {
+      if (!session) return false;
+      const { data, error } = await supabase.rpc('is_current_user_private_access_allowed');
+      return !error && data === true;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!(await hasPrivateAccess(session))) {
+      if (session) await supabase.auth.signOut();
+      sessionStorage.setItem('strLabNext', 'preguntale-hospitalizacion-familiar.html');
+      window.location.replace('acceso-privado.html?next=preguntale-hospitalizacion-familiar.html');
+    } else {
+      document.getElementById('auth-check').hidden = true;
+      document.getElementById('content').hidden = false;
+    }
+
+    const relationship = document.getElementById('relationship');
+    const continueButton = document.getElementById('continue');
+    const result = document.getElementById('result');
+
+    relationship.addEventListener('change', () => {
+      continueButton.disabled = !relationship.value;
+      result.className = 'result';
+      result.replaceChildren();
+    });
+
+    function showResult(type, title, message, link) {
+      result.className = `result show ${type}`;
+      const heading = document.createElement('strong');
+      heading.textContent = title;
+      const copy = document.createElement('span');
+      copy.textContent = message;
+      result.replaceChildren(heading, copy);
+      if (link) {
+        const action = document.createElement('a');
+        action.className = 'secondary';
+        action.href = link.href;
+        action.textContent = link.label;
+        result.appendChild(action);
+      }
+    }
+
+    continueButton.addEventListener('click', () => {
+      const selected = relationship.options[relationship.selectedIndex]?.text || 'La opción seleccionada';
+      if (relationship.value === 'second') {
+        showResult(
+          'redirect',
+          `${selected} corresponde al segundo grado`,
+          'Debes continuar en Hospitalización familiar de segundo grado para responder el cuestionario correcto.',
+          { href: 'preguntale-str-permisos.html#hospitalizacion-segundo-grado', label: 'Ir al permiso de segundo grado' }
+        );
+        return;
+      }
+      if (relationship.value === 'review') {
+        showResult(
+          'review',
+          'Necesitamos comprobar la relación',
+          'El futuro cuestionario te hará unas preguntas adicionales antes de orientarte. No se descarta automáticamente el permiso.'
+        );
+        return;
+      }
+      if (relationship.value === 'cohabitant' || relationship.value === 'specific') {
+        showResult(
+          'correct',
+          'Caso identificado',
+          'La relación necesita preguntas específicas sobre convivencia o vínculo. Las añadiremos en el siguiente paso.'
+        );
+        return;
+      }
+      showResult(
+        'correct',
+        'Familiar identificado correctamente',
+        'Puedes continuar por Hospitalización familiar de primer grado. Las siguientes preguntas se añadirán en el próximo paso.'
+      );
+    });
+  </script>
+</body>
+</html>
