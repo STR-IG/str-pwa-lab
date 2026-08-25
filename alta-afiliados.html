@@ -231,7 +231,7 @@
     }
     function whatsappUrl(phone,name){
       const digits=normalizePhone(phone);
-      const text=`Hola ${name} 👋\n\nTe damos la bienvenida al área de afiliados/as de STR-IG.\n\nPara acceder a la app:\n1. Abre https://str-ig.github.io/str-pwa-lab/\n2. Entra en una herramienta del Área privada.\n3. Introduce tu correo personal y solicita el código de 6 dígitos.\n4. Escribe el código recibido y ya tendrás acceso.\n\nSi tienes cualquier problema, contacta con nosotros.`;
+      const text=`Hola ${name}:\n\n¡Bienvenido/a de nuevo después de las vacaciones!\n\nTe damos la bienvenida al área de afiliados/as de STR-IG. En la app encontrarás información laboral, permisos, calendarios y herramientas privadas para revisar tu nómina y calcular tu V.\n\nPara acceder a la app:\n1. Abre https://str-ig.github.io/str-pwa-lab/\n2. Entra en una herramienta del Área privada.\n3. Introduce tu correo personal y solicita el código de 6 dígitos.\n4. Escribe el código recibido y ya tendrás acceso.\n\nPara instalarla en Android:\n1. Abre el enlace con Google Chrome.\n2. Pulsa el menú de los tres puntos.\n3. Elige «Añadir a pantalla de inicio» o «Instalar aplicación».\n\nPara instalarla en iPhone:\n1. Abre el enlace con Safari.\n2. Pulsa el botón Compartir.\n3. Elige «Añadir a pantalla de inicio».\n4. Pulsa «Añadir».\n\nSi tienes cualquier problema, contacta con nosotros.`;
       return `https://wa.me/34${digits}?text=${encodeURIComponent(text)}`;
     }
     form.addEventListener('submit',async(event)=>{
