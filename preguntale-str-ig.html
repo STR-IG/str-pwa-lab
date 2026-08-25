@@ -58,45 +58,25 @@
     h1 { font-size: 27px; line-height: 1.05; }
     main { max-width: 900px; margin: auto; padding: 28px 18px 48px; }
     .intro { margin-bottom: 20px; color: var(--grey); font-size: 15px; line-height: 1.5; }
-    .option-card {
-      display: flex;
-      align-items: center;
+    .options-grid {
+      display: grid;
       gap: 16px;
+    }
+    .option-card {
+      display: block;
       width: 100%;
-      padding: 18px;
       border-radius: 20px;
       color: inherit;
-      background: var(--white);
-      box-shadow: 0 5px 18px rgba(0,0,0,.07);
       text-decoration: none;
       transition: .2s ease;
     }
     .option-card:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(0,0,0,.1); }
-    .option-icon {
-      display: grid;
-      place-items: center;
-      flex: 0 0 52px;
-      width: 52px;
-      height: 52px;
+    .option-card img {
+      display: block;
+      width: 100%;
+      height: auto;
       border-radius: 15px;
-      color: var(--white);
-      background: var(--red);
-      font-size: 25px;
     }
-    .option-copy { flex: 1; }
-    .option-copy strong { display: block; margin-bottom: 6px; font-size: 18px; }
-    .available {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 999px;
-      color: var(--red-dark);
-      background: var(--red-soft);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .4px;
-      text-transform: uppercase;
-    }
-    .arrow { color: var(--red); font-size: 25px; font-weight: 700; }
     #auth-check { color: var(--grey); text-align: center; }
   </style>
 </head>
@@ -112,14 +92,11 @@
     <p id="auth-check">Comprobando acceso privado…</p>
     <section id="content" hidden>
       <p class="intro">Selecciona la consulta que quieres realizar.</p>
-      <a class="option-card" href="permisos.html">
-        <span class="option-icon" aria-hidden="true">⚖</span>
-        <span class="option-copy">
-          <strong>Permisos retribuidos</strong>
-          <span class="available">Disponible</span>
-        </span>
-        <span class="arrow" aria-hidden="true">›</span>
-      </a>
+      <div class="options-grid">
+        <a class="option-card" href="permisos.html" aria-label="Abrir Permisos retribuidos, solo para afiliados">
+          <img src="preguntale-str-permisos.png" alt="Permisos retribuidos. Responde a unas preguntas y te orientamos según tu caso. Solo para afiliados.">
+        </a>
+      </div>
     </section>
   </main>
 
