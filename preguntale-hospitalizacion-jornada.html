@@ -53,7 +53,7 @@
       <div class="panel">
         <span class="step">Paso 3</span>
         <h2>El día del ingreso, ¿qué turno tenías?</h2>
-        <p class="intro">El permiso debe comenzar en un día en el que te correspondía trabajar.</p>
+        <p class="intro">El día del ingreso y el primer día del permiso pueden ser distintos. El permiso debe comenzar en un día en el que te corresponda trabajar.</p>
         <p id="relationship-summary" class="selection" hidden></p>
 
         <div class="answers" role="radiogroup" aria-label="Jornada del día del ingreso">
@@ -130,7 +130,7 @@
         return;
       }
       if (selectedValue==='rest') {
-        showResult('redirect','El ingreso se produce durante un descanso','El cómputo comenzará el primer día posterior en el que te corresponda trabajar.');
+        showResult('redirect','El ingreso no tiene que ser el primer día del permiso','Como ese día librabas, el permiso comenzará el primer día posterior en el que te corresponda trabajar. Ese será el día 1 del permiso.');
         return;
       }
       showResult('redirect','Hay que comprobar la hora del ingreso','En el siguiente paso preguntaremos si la hospitalización se produjo antes de las 14:00 para aplicar la regla del turno de noche.');
