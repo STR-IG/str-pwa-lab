@@ -38,8 +38,8 @@
     .icon { width:48px; height:48px; border-radius:14px; background:var(--red); color:white; display:grid; place-items:center; font-size:24px; }
     .quick-card strong { font-size:18px; line-height:1.15; }
     .quick-card small { color:var(--grey); font-size:13px; line-height:1.4; margin-top:8px; }
-    .committee-card { display:none; text-decoration:none; color:#fff; background:linear-gradient(135deg,#161616,#303034); position:relative; overflow:hidden; }
-    .committee-card.show { display:flex; }
+    .committee-card { display:none !important; text-decoration:none; color:#fff; background:linear-gradient(135deg,#161616,#303034); position:relative; overflow:hidden; }
+    .committee-card.show { display:flex !important; }
     .committee-card .icon { background:var(--red); }
     .committee-card small { color:rgba(255,255,255,.72); }
     .committee-badge { position:absolute; top:12px; right:12px; padding:5px 8px; border-radius:999px; background:var(--red); color:white; font-size:9px; font-weight:900; letter-spacing:.6px; }
@@ -141,7 +141,8 @@
   async function updateCommitteeCard(){
     const {data:{session}}=await supabase.auth.getSession();
     const email=(session?.user?.email||'').trim().toLowerCase();
-    card.classList.toggle('show',COMMITTEE.has(email));
+    if(COMMITTEE.has(email)) card.classList.add('show');
+    else card.remove();
   }
   await updateCommitteeCard();
   supabase.auth.onAuthStateChange(()=>{ updateCommitteeCard(); });
