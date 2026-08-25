@@ -38,11 +38,9 @@
     .icon { width:48px; height:48px; border-radius:14px; background:var(--red); color:white; display:grid; place-items:center; font-size:24px; }
     .quick-card strong { font-size:18px; line-height:1.15; }
     .quick-card small { color:var(--grey); font-size:13px; line-height:1.4; margin-top:8px; }
-    .committee-card { display:none !important; text-decoration:none; color:#fff; background:linear-gradient(135deg,#161616,#303034); position:relative; overflow:hidden; }
-    .committee-card.show { display:flex !important; }
-    .committee-card .icon { background:var(--red); }
-    .committee-card small { color:rgba(255,255,255,.72); }
-    .committee-badge { position:absolute; top:12px; right:12px; padding:5px 8px; border-radius:999px; background:var(--red); color:white; font-size:9px; font-weight:900; letter-spacing:.6px; }
+    .committee-fab { display:none !important; position:fixed; right:18px; bottom:calc(88px + env(safe-area-inset-bottom)); z-index:9998; width:46px; height:46px; border:2px solid white; border-radius:50%; place-items:center; color:white; background:#161616; box-shadow:0 5px 16px rgba(0,0,0,.28); text-decoration:none; font-size:28px; font-weight:400; line-height:1; }
+    .committee-fab.show { display:grid !important; }
+    .committee-fab:hover { background:var(--red); }
     .payroll-card { position:relative; min-height:155px; padding:0; overflow:hidden; color:white; background:linear-gradient(90deg,rgba(112,0,9,.92) 0%,rgba(172,0,14,.76) 43%,rgba(105,0,8,.08) 72%),url("revisa-tu-nomina-bg.webp") center / cover no-repeat; box-shadow:none; text-decoration:none; cursor:pointer; }
     .payroll-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.11); }
     .payroll-copy { position:relative; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; width:62%; height:100%; padding:20px; }
@@ -117,7 +115,6 @@
       <a href="acceso-privado.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;"><img src="calcula-tu-v.png" alt="Calcula tu V" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
       <a href="revisa-tu-nomina.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;" aria-label="Revisa tu nómina, acceso para afiliados"><img src="revisa-tu-nomina-card.png" alt="Revisa tu nómina, área privada" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
       <a href="preguntale-str-ig.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;" aria-label="Pregúntale a STR-IG, área privada"><img src="card-preguntale-str-ig.png" alt="Pregúntale a STR-IG, área privada" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <a id="committee-signup-card" href="alta-afiliados.html" class="quick-card committee-card" aria-label="Alta de afiliados, gestión interna STR-IG"><span class="committee-badge">COMITÉ</span><div class="icon">＋</div><div><strong>Alta de afiliados</strong><small>Gestión interna de la sección sindical.</small></div></a>
       <a href="#afiliate-str" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;" aria-label="Afíliate a STR"><img src="card-afiliate-str.svg" alt="Afíliate a STR" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
       <article class="quick-card"><div class="icon">📅</div><div><strong>Calendarios laborales</strong><small>Turnos, festivos y horarios.</small></div></article>
       <article class="quick-card"><div class="icon">💬</div><div><strong>Contacta con STR-IG</strong><small>Escríbenos, estamos aquí.</small></div></article>
@@ -132,6 +129,7 @@
   <section class="section"><div class="section-header"><h2>Nuestras secciones</h2></div><div class="list"><article class="list-item"><div class="list-icon">⚖️</div><div class="list-text"><strong>Derechos laborales</strong><span>Información y herramientas sobre tus derechos.</span></div><div class="arrow">›</div></article><article class="list-item"><div class="list-icon">📅</div><div class="list-text"><strong>Calendarios</strong><span>Turnos, festivos, horarios y planificación anual.</span></div><div class="arrow">›</div></article><article class="list-item"><div class="list-icon">📰</div><div class="list-text"><strong>Actualidad STR-IG</strong><span>Noticias, comunicados y actividad de tu sección.</span></div><div class="arrow">›</div></article><article class="list-item"><div class="list-icon">👥</div><div class="list-text"><strong>El sindicato</strong><span>Conoce STR, nuestro proyecto y nuestros valores.</span></div><div class="arrow">›</div></article><article class="list-item"><div class="list-icon">❤️</div><div class="list-text"><strong>Afíliate</strong><span>Ventajas de afiliarte y cómo hacerlo.</span></div><div class="arrow">›</div></article><article class="list-item"><div class="list-icon">☎️</div><div class="list-text"><strong>Contacto</strong><span>Estamos para ayudarte. Escríbenos o llámanos.</span></div><div class="arrow">›</div></article></div></section>
   <section id="afiliate-str" class="join"><div><h2>Afíliate a STR-IG</h2><p>Juntos somos más fuertes. Defendemos tus derechos.</p></div><a class="join-button" href="#">Quiero afiliarme →</a></section>
 </main>
+<a id="committee-signup-card" href="alta-afiliados.html" class="committee-fab" aria-label="Alta de afiliados, gestión interna STR-IG" title="Alta de afiliados">+</a>
 <nav class="bottom-nav"><a class="active" href="index.html"><b>⌂</b>Inicio</a><a href="#"><b>⚖</b>Derechos</a><a href="#"><b>📰</b>Actualidad</a><a href="#"><b>👥</b>Sindicato</a><a href="#"><b>♡</b>Afíliate</a><a href="#"><b>☎</b>Contacto</a></nav>
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
