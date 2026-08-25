@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Alta de afiliados · STR-IG LAB</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f5f7;color:#161616;padding-bottom:40px}.topbar{height:64px;background:#161616;color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;position:sticky;top:0;z-index:10}.back{color:#fff;text-decoration:none;font-size:34px;line-height:1}.topbar strong{font-size:18px}.lab{margin-left:auto;background:#e30613;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.5px}main{max-width:620px;margin:auto;padding:24px 16px}.access{display:none}.access.active{display:block}.hero{background:linear-gradient(135deg,#e30613,#a8000b);color:white;border-radius:24px;padding:22px;margin-bottom:18px}.hero small{display:block;text-transform:uppercase;letter-spacing:.8px;font-weight:800;opacity:.9;margin-bottom:7px}.hero h1{margin:0 0 8px;font-size:30px;line-height:1}.hero p{margin:0;line-height:1.45;opacity:.95}.panel{background:#fff;border-radius:22px;padding:20px;box-shadow:0 6px 22px rgba(0,0,0,.07)}label{display:block;font-size:13px;font-weight:800;margin:14px 0 7px}input{width:100%;border:1px solid #d5d5d8;border-radius:13px;padding:14px;font-size:16px;outline:none}input:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.08)}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary,.whatsapp,.secondary{width:100%;border:0;border-radius:14px;padding:15px 16px;font-size:15px;font-weight:800;cursor:pointer;margin-top:18px}.primary{background:#e30613;color:#fff}.primary:disabled{opacity:.6;cursor:wait}.secondary{background:#efeff1;color:#161616}.whatsapp{display:none;background:#171717;color:white;text-align:center;text-decoration:none}.whatsapp.show{display:block}.status{display:none;margin-top:14px;padding:12px;border-radius:12px;font-size:13px;line-height:1.4}.status.show{display:block}.status.ok{background:#eff9f2;color:#195d31}.status.error{background:#fff0f1;color:#8e0010}.security{margin-top:14px;color:#6e6e73;font-size:12px;line-height:1.45}.denied{background:#fff;border-radius:22px;padding:24px;text-align:center;box-shadow:0 6px 22px rgba(0,0,0,.07)}.denied h1{font-size:24px}.denied p{color:#6e6e73;line-height:1.5}.loading{text-align:center;padding:60px 20px;color:#6e6e73}.login-title{text-align:center;margin:0 0 8px;font-size:27px}.login-copy{text-align:center;color:#6e6e73;line-height:1.45;margin:0 0 12px}.login-step{display:none}.login-step.active{display:block}#otp-code{text-align:center;letter-spacing:8px;font-size:25px;font-weight:800}@media(max-width:520px){.row{grid-template-columns:1fr}.hero h1{font-size:27px}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="back" href="index.html" aria-label="Volver">‹</a><strong>Gestión interna STR-IG</strong><span class="lab">LAB</span></header>
+  <main>
+    <div id="loading" class="loading">Comprobando acceso…</div>
+
+    <section id="login" class="access">
+      <div class="panel">
+        <h1 class="login-title">Acceso al comité</h1>
+        <p id="login-copy" class="login-copy">Identifícate con tu correo de acceso a STR-IG.</p>
+        <form id="email-form" class="login-step active">
+          <label for="login-email">Correo electrónico personal</label>
+          <input id="login-email" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+          <button id="send-code" class="primary" type="submit">Recibir código de acceso</button>
+          <p id="send-status" class="status"></p>
+        </form>
+        <form id="code-form" class="login-step">
+          <label for="otp-code">Código de 6 cifras</label>
+          <input id="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
+          <button id="verify-code" class="primary" type="submit">Entrar</button>
+          <p id="verify-status" class="status"></p>
+          <button id="change-email" class="secondary" type="button">Usar otro correo</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="authorized" class="access">
+      <div class="hero"><small>Solo comité autorizado</small><h1>Alta de afiliados</h1><p>Da de alta a una persona en el acceso privado de la app y prepara su mensaje de bienvenida por WhatsApp.</p></div>
+      <form id="signup-form" class="panel">
+        <label for="name">Nombre y apellidos</label>
+        <input id="name" autocomplete="name" required placeholder="Nombre completo">
+        <label for="email">Correo personal</label>
+        <input id="email" type="email" autocomplete="email" required placeholder="nombre@correo.com">
+        <div class="row">
+          <div><label for="employee">Número de afiliado</label><input id="employee" inputmode="numeric" required placeholder="00000"></div>
+          <div><label for="phone">Teléfono móvil</label><input id="phone" type="tel" autocomplete="tel" required placeholder="600000000"></div>
+        </div>
+        <button id="save" class="primary" type="submit">Dar de alta en la app</button>
+        <p id="status" class="status"></p>
+        <a id="whatsapp" class="whatsapp" href="#" target="_blank" rel="noopener">Enviar mensaje de alta por WhatsApp</a>
+        <button id="new-signup" class="secondary" type="button" hidden>Nueva alta</button>
+        <p class="security">Esta herramienta no aparece para el resto de afiliados. El alta solo puede ejecutarse con una sesión autorizada de Rocío o Dubardo.</p>
+      </form>
+    </section>
+
+    <section id="denied" class="access denied"><h1>Acceso restringido</h1><p>Esta herramienta es exclusiva para los miembros autorizados del comité de la sección sindical.</p><a href="index.html">Volver al inicio</a></section>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    const SUPABASE_URL='https://icneigdnuntzugisexaz.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const REQUEST=SUPABASE_URL+'/functions/v1/lab-request-custom-otp';
+    const VERIFY=SUPABASE_URL+'/functions/v1/lab-verify-custom-otp';
+    const supabase=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    const COMMITTEE=new Set(['rocioloralara@gmail.com','dubardollorienzu@gmail.com']);
+
+    const loading=document.getElementById('loading');
+    const login=document.getElementById('login');
+    const authorized=document.getElementById('authorized');
+    const denied=document.getElementById('denied');
+    const emailForm=document.getElementById('email-form');
+    const codeForm=document.getElementById('code-form');
+    const loginEmail=document.getElementById('login-email');
+    const otpCode=document.getElementById('otp-code');
+    const sendCode=document.getElementById('send-code');
+    const verifyCode=document.getElementById('verify-code');
+    const sendStatus=document.getElementById('send-status');
+    const verifyStatus=document.getElementById('verify-status');
+    const loginCopy=document.getElementById('login-copy');
+    const form=document.getElementById('signup-form');
+    const status=document.getElementById('status');
+    const whatsapp=document.getElementById('whatsapp');
+    const newSignup=document.getElementById('new-signup');
+    const saveButton=document.getElementById('save');
+    let pendingEmail='';
+
+    function showOnly(section){
+      loading.style.display='none';
+      [login,authorized,denied].forEach(el=>el.classList.toggle('active',el===section));
+    }
+    function setLoginStatus(el,message,type=''){
+      el.textContent=message;
+      el.className='status show'+(type?` ${type}`:'');
+    }
+    function clearLoginStatus(el){el.textContent='';el.className='status'}
+    function cleanCode(v){return String(v).replace(/\D/g,'').slice(0,6)}
+    function showEmailStep(){
+      pendingEmail='';
+      sessionStorage.removeItem('strCommitteePendingEmail');
+      emailForm.classList.add('active');codeForm.classList.remove('active');
+      loginCopy.textContent='Identifícate con tu correo de acceso a STR-IG.';
+      otpCode.value='';clearLoginStatus(verifyStatus);showOnly(login);
+    }
+    function showCodeStep(email){
+      pendingEmail=email;sessionStorage.setItem('strCommitteePendingEmail',email);
+      emailForm.classList.remove('active');codeForm.classList.add('active');
+      loginCopy.textContent='Introduce el código de 6 cifras que hemos enviado a tu correo.';
+      otpCode.value='';showOnly(login);otpCode.focus();
+    }
+    async function routeSession(){
+      const {data:{session}}=await supabase.auth.getSession();
+      if(!session){
+        const saved=sessionStorage.getItem('strCommitteePendingEmail');
+        if(saved){loginEmail.value=saved;showCodeStep(saved)}else showEmailStep();
+        return;
+      }
+      const caller=(session.user?.email||'').trim().toLowerCase();
+      if(COMMITTEE.has(caller)) showOnly(authorized); else showOnly(denied);
+    }
+
+    otpCode.addEventListener('input',()=>{otpCode.value=cleanCode(otpCode.value)});
+    emailForm.addEventListener('submit',async(event)=>{
+      event.preventDefault();
+      const email=loginEmail.value.trim().toLowerCase();
+      if(!COMMITTEE.has(email)){
+        setLoginStatus(sendStatus,'Este correo no está autorizado para la gestión interna.','error');
+        return;
+      }
+      sendCode.disabled=true;sendCode.textContent='Enviando…';clearLoginStatus(sendStatus);
+      try{
+        const response=await fetch(REQUEST,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({email})});
+        const result=await response.json().catch(()=>({}));
+        if(!response.ok||result?.sent===false){
+          setLoginStatus(sendStatus,result?.reason==='rate_limited'?'Espera un minuto antes de solicitar otro código.':'No se ha podido enviar el código. Inténtalo de nuevo.','error');
+          return;
+        }
+        setLoginStatus(sendStatus,'Código enviado.','ok');
+        setTimeout(()=>showCodeStep(email),300);
+      }catch(_){setLoginStatus(sendStatus,'No se ha podido completar la solicitud. Comprueba tu conexión.','error')}
+      finally{sendCode.disabled=false;sendCode.textContent='Recibir código de acceso'}
+    });
+
+    codeForm.addEventListener('submit',async(event)=>{
+      event.preventDefault();
+      const code=cleanCode(otpCode.value);
+      if(!pendingEmail||code.length!==6)return;
+      verifyCode.disabled=true;verifyCode.textContent='Verificando…';clearLoginStatus(verifyStatus);
+      try{
+        const response=await fetch(VERIFY,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({email:pendingEmail,code})});
+        const result=await response.json().catch(()=>({}));
+        if(!result?.ok||!result?.verified||!result?.token_hash){
+          setLoginStatus(verifyStatus,'El código no es correcto, ya se ha usado o ha caducado.','error');return;
+        }
+        const {data,error}=await supabase.auth.verifyOtp({token_hash:result.token_hash,type:'email'});
+        if(error||!data?.session){setLoginStatus(verifyStatus,'No se pudo iniciar la sesión. Inténtalo de nuevo.','error');return}
+        const caller=(data.session.user?.email||'').trim().toLowerCase();
+        sessionStorage.removeItem('strCommitteePendingEmail');
+        if(COMMITTEE.has(caller)) showOnly(authorized); else {await supabase.auth.signOut();showOnly(denied)}
+      }catch(_){setLoginStatus(verifyStatus,'No se ha podido completar la verificación. Comprueba tu conexión.','error')}
+      finally{verifyCode.disabled=false;verifyCode.textContent='Entrar'}
+    });
+    document.getElementById('change-email').addEventListener('click',showEmailStep);
+
+    function setStatus(message,type=''){
+      status.textContent=message; status.className=`status show ${type}`;
+    }
+    function normalizePhone(value){
+      let digits=(value||'').replace(/\D/g,'');
+      if(digits.startsWith('0034')) digits=digits.slice(4);
+      if(digits.startsWith('34')&&digits.length>9) digits=digits.slice(2);
+      return digits;
+    }
+    function whatsappUrl(phone,name){
+      const digits=normalizePhone(phone);
+      const text=`Hola ${name} 👋\n\nTe damos la bienvenida al área de afiliados/as de STR-IG.\n\nPara acceder a la app:\n1. Abre https://str-ig.github.io/str-pwa-lab/\n2. Entra en una herramienta del Área privada.\n3. Introduce tu correo personal y solicita el código de 6 dígitos.\n4. Escribe el código recibido y ya tendrás acceso.\n\nSi tienes cualquier problema, contacta con nosotros.`;
+      return `https://wa.me/34${digits}?text=${encodeURIComponent(text)}`;
+    }
+    form.addEventListener('submit',async(event)=>{
+      event.preventDefault();
+      whatsapp.classList.remove('show');newSignup.hidden=true;setStatus('Guardando alta…');saveButton.disabled=true;
+      const name=document.getElementById('name').value.trim();
+      const email=document.getElementById('email').value.trim().toLowerCase();
+      const employee=document.getElementById('employee').value.trim();
+      const phone=document.getElementById('phone').value.trim();
+      const digits=normalizePhone(phone);
+      if(digits.length!==9){setStatus('Revisa el teléfono. Debe tener 9 cifras.','error');saveButton.disabled=false;return}
+      const {error}=await supabase.rpc('committee_upsert_affiliate',{p_email:email,p_display_name:name,p_employee_number:employee,p_phone:digits});
+      saveButton.disabled=false;
+      if(error){console.error(error);setStatus('No se ha podido completar el alta. Comprueba que sigues conectado con una cuenta autorizada.','error');return}
+      setStatus(`${name} ha quedado dado/a de alta en la app.`,'ok');
+      whatsapp.href=whatsappUrl(digits,name);whatsapp.classList.add('show');newSignup.hidden=false;saveButton.hidden=true;
+    });
+    newSignup.addEventListener('click',()=>{
+      form.reset();status.className='status';status.textContent='';whatsapp.classList.remove('show');newSignup.hidden=true;saveButton.hidden=false;document.getElementById('name').focus();
+    });
+
+    await routeSession();
+  </script>
+</body>
+</html>
