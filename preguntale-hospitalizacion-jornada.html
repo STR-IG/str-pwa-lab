@@ -22,12 +22,9 @@
     h2 { margin-bottom:8px; font-size:24px; line-height:1.15; }
     .intro { margin-bottom:18px; color:var(--grey); font-size:15px; line-height:1.5; }
     .selection { margin-bottom:18px; padding:12px 14px; border-radius:14px; color:var(--green); background:var(--green-soft); font-size:14px; font-weight:800; }
-    .answers { display:grid; gap:12px; }
-    .answer { display:flex; align-items:center; gap:12px; width:100%; min-height:62px; padding:13px 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); text-align:left; font:inherit; font-weight:800; cursor:pointer; }
-    .answer:hover,.answer:focus-visible { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
-    .answer.selected { border-color:var(--red); background:#fff4f5; }
-    .dot { flex:0 0 22px; width:22px; height:22px; border:2px solid #aaa; border-radius:50%; }
-    .answer.selected .dot { border:6px solid var(--red); }
+    label { display:block; margin-bottom:8px; font-size:14px; font-weight:800; }
+    input[type="date"] { width:100%; min-height:58px; padding:0 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); font:inherit; font-size:17px; }
+    input[type="date"]:focus { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
     .primary { width:100%; min-height:52px; margin-top:16px; border:0; border-radius:999px; color:var(--white); background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
     .primary:disabled { opacity:.45; cursor:not-allowed; }
     .result { display:none; margin-top:18px; padding:16px; border-radius:16px; font-size:14px; line-height:1.5; }
@@ -52,15 +49,12 @@
     <section id="content" hidden>
       <div class="panel">
         <span class="step">Paso 3</span>
-        <h2>El día del ingreso, ¿qué turno tenías?</h2>
-        <p class="intro">El día del ingreso y el primer día del permiso pueden ser distintos. El permiso debe comenzar en un día en el que te corresponda trabajar.</p>
+        <h2>¿Qué día piensas coger como primer día de permiso?</h2>
+        <p class="intro">No tiene que ser el día del ingreso ni el primer día laborable posterior. Puedes elegir un día en el que te corresponda trabajar, siempre que la hospitalización continúe.</p>
         <p id="relationship-summary" class="selection" hidden></p>
 
-        <div class="answers" role="radiogroup" aria-label="Jornada del día del ingreso">
-          <button class="answer" type="button" data-value="working" role="radio" aria-checked="false"><span class="dot"></span>Ese día tenía que trabajar</button>
-          <button class="answer" type="button" data-value="rest" role="radio" aria-checked="false"><span class="dot"></span>Ese día libraba</button>
-          <button class="answer" type="button" data-value="night" role="radio" aria-checked="false"><span class="dot"></span>Tenía turno de noche el día anterior</button>
-        </div>
+        <label for="first-leave-day">Primer día que quieres disfrutar</label>
+        <input id="first-leave-day" type="date">
 
         <button id="continue" class="primary" type="button" disabled>Continuar</button>
         <div id="result" class="result" role="status" aria-live="polite"></div>
@@ -97,22 +91,15 @@
       relationshipSummary.hidden=false;
     }
 
-    const answers=[...document.querySelectorAll('.answer')];
+    const firstLeaveDay=document.getElementById('first-leave-day');
     const continueButton=document.getElementById('continue');
     const result=document.getElementById('result');
-    let selectedValue='';
 
-    answers.forEach((answer)=>answer.addEventListener('click',()=>{
-      selectedValue=answer.dataset.value;
-      answers.forEach((item)=>{
-        const selected=item===answer;
-        item.classList.toggle('selected',selected);
-        item.setAttribute('aria-checked',String(selected));
-      });
-      continueButton.disabled=false;
+    firstLeaveDay.addEventListener('change',()=>{
+      continueButton.disabled=!firstLeaveDay.value;
       result.className='result';
       result.replaceChildren();
-    }));
+    });
 
     function showResult(type,title,message) {
       result.className=`result show ${type}`;
@@ -124,16 +111,10 @@
     }
 
     continueButton.addEventListener('click',()=>{
-      sessionStorage.setItem('strLabHospitalWorkday',selectedValue);
-      if (selectedValue==='working') {
-        showResult('correct','El ingreso se produce en día laborable','Ese día puede ser el inicio del permiso. En la siguiente pantalla comprobaremos la fecha del ingreso.');
-        return;
-      }
-      if (selectedValue==='rest') {
-        showResult('redirect','El ingreso no tiene que ser el primer día del permiso','Como ese día librabas, el permiso comenzará el primer día posterior en el que te corresponda trabajar. Ese será el día 1 del permiso.');
-        return;
-      }
-      showResult('redirect','Hay que comprobar la hora del ingreso','En el siguiente paso preguntaremos si la hospitalización se produjo antes de las 14:00 para aplicar la regla del turno de noche.');
+      const selectedDate=new Date(`${firstLeaveDay.value}T12:00:00`);
+      const formattedDate=new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'long',year:'numeric'}).format(selectedDate);
+      sessionStorage.setItem('strLabHospitalFirstLeaveDay',firstLeaveDay.value);
+      showResult('correct',`Primer día elegido: ${formattedDate}`,'Este será el día 1 del permiso si te correspondía trabajar y la hospitalización seguía vigente. Los otros cuatro días podrán ser consecutivos o no; los elegiremos en el siguiente paso.');
     });
   </script>
 </body>
