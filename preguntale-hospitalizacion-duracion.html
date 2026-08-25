@@ -145,7 +145,7 @@
     continueButton.addEventListener('click', () => {
       sessionStorage.setItem('strLabHospitalDuration', selectedValue);
       if (selectedValue === 'yes') {
-        showResult('correct', 'Ingreso hospitalario confirmado', 'Este caso puede continuar por hospitalización familiar. En el siguiente paso comprobaremos cuándo comenzó el ingreso.');
+        window.location.href = 'preguntale-hospitalizacion-jornada.html';
         return;
       }
       if (selectedValue === 'no') {

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Inicio del permiso · Pregúntale a STR-IG LAB</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --red:#e30613; --red-dark:#b9000b; --green:#0b6b4f; --green-soft:#edf8f3; --amber:#765700; --amber-soft:#fff6d6; --black:#161616; --grey:#6e6e73; --line:#dddddf; --light:#f5f5f7; --white:#fff; }
+    body { min-height:100vh; font-family:Arial,Helvetica,sans-serif; background:var(--light); color:var(--black); }
+    .top { position:sticky; top:0; z-index:20; padding:calc(14px + env(safe-area-inset-top)) 18px 14px; border-bottom:1px solid #e4e4e7; background:rgba(245,245,247,.96); backdrop-filter:blur(12px); }
+    .top-inner { display:flex; align-items:center; gap:14px; max-width:680px; margin:auto; }
+    .back { display:grid; place-items:center; flex:0 0 42px; width:42px; height:42px; border-radius:50%; color:var(--red); background:var(--white); box-shadow:0 3px 12px rgba(0,0,0,.08); text-decoration:none; font-size:26px; font-weight:700; }
+    h1 { font-size:clamp(21px,5vw,27px); line-height:1.08; }
+    main { max-width:680px; margin:auto; padding:24px 18px 48px; }
+    .panel { padding:22px; border-radius:22px; background:var(--white); box-shadow:0 6px 22px rgba(0,0,0,.07); }
+    .step { display:inline-block; margin-bottom:10px; color:var(--red-dark); font-size:12px; font-weight:900; letter-spacing:.5px; text-transform:uppercase; }
+    h2 { margin-bottom:8px; font-size:24px; line-height:1.15; }
+    .intro { margin-bottom:18px; color:var(--grey); font-size:15px; line-height:1.5; }
+    .selection { margin-bottom:18px; padding:12px 14px; border-radius:14px; color:var(--green); background:var(--green-soft); font-size:14px; font-weight:800; }
+    .answers { display:grid; gap:12px; }
+    .answer { display:flex; align-items:center; gap:12px; width:100%; min-height:62px; padding:13px 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); text-align:left; font:inherit; font-weight:800; cursor:pointer; }
+    .answer:hover,.answer:focus-visible { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
+    .answer.selected { border-color:var(--red); background:#fff4f5; }
+    .dot { flex:0 0 22px; width:22px; height:22px; border:2px solid #aaa; border-radius:50%; }
+    .answer.selected .dot { border:6px solid var(--red); }
+    .primary { width:100%; min-height:52px; margin-top:16px; border:0; border-radius:999px; color:var(--white); background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
+    .primary:disabled { opacity:.45; cursor:not-allowed; }
+    .result { display:none; margin-top:18px; padding:16px; border-radius:16px; font-size:14px; line-height:1.5; }
+    .result.show { display:block; }
+    .result.correct { color:var(--green); background:var(--green-soft); }
+    .result.redirect { color:var(--amber); background:var(--amber-soft); }
+    .result strong { display:block; margin-bottom:5px; font-size:16px; }
+    #auth-check { color:var(--grey); text-align:center; }
+    @media (max-width:440px) { main { padding:18px 14px 38px; } .panel { padding:19px 16px; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="back" href="preguntale-hospitalizacion-duracion.html" aria-label="Volver a la duración del ingreso">‹</a>
+      <h1>Hospitalización familiar</h1>
+    </div>
+  </header>
+
+  <main>
+    <p id="auth-check">Comprobando acceso privado…</p>
+    <section id="content" hidden>
+      <div class="panel">
+        <span class="step">Paso 3</span>
+        <h2>El día del ingreso, ¿qué turno tenías?</h2>
+        <p class="intro">El permiso debe comenzar en un día en el que te correspondía trabajar.</p>
+        <p id="relationship-summary" class="selection" hidden></p>
+
+        <div class="answers" role="radiogroup" aria-label="Jornada del día del ingreso">
+          <button class="answer" type="button" data-value="working" role="radio" aria-checked="false"><span class="dot"></span>Ese día tenía que trabajar</button>
+          <button class="answer" type="button" data-value="rest" role="radio" aria-checked="false"><span class="dot"></span>Ese día libraba</button>
+          <button class="answer" type="button" data-value="night" role="radio" aria-checked="false"><span class="dot"></span>Tenía turno de noche el día anterior</button>
+        </div>
+
+        <button id="continue" class="primary" type="button" disabled>Continuar</button>
+        <div id="result" class="result" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    const URL='https://icneigdnuntzugisexaz.supabase.co';
+    const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+
+    async function hasPrivateAccess(session) {
+      if (!session) return false;
+      const {data,error}=await supabase.rpc('is_current_user_private_access_allowed');
+      return !error && data===true;
+    }
+
+    const {data:{session}}=await supabase.auth.getSession();
+    if (!(await hasPrivateAccess(session))) {
+      if (session) await supabase.auth.signOut();
+      sessionStorage.setItem('strLabNext','preguntale-hospitalizacion-jornada.html');
+      window.location.replace('acceso-privado.html?next=preguntale-hospitalizacion-jornada.html');
+    } else {
+      document.getElementById('auth-check').hidden=true;
+      document.getElementById('content').hidden=false;
+    }
+
+    const savedRelationship=sessionStorage.getItem('strLabHospitalRelationship');
+    const relationshipSummary=document.getElementById('relationship-summary');
+    if (savedRelationship) {
+      relationshipSummary.textContent=`Familiar seleccionado: ${savedRelationship}`;
+      relationshipSummary.hidden=false;
+    }
+
+    const answers=[...document.querySelectorAll('.answer')];
+    const continueButton=document.getElementById('continue');
+    const result=document.getElementById('result');
+    let selectedValue='';
+
+    answers.forEach((answer)=>answer.addEventListener('click',()=>{
+      selectedValue=answer.dataset.value;
+      answers.forEach((item)=>{
+        const selected=item===answer;
+        item.classList.toggle('selected',selected);
+        item.setAttribute('aria-checked',String(selected));
+      });
+      continueButton.disabled=false;
+      result.className='result';
+      result.replaceChildren();
+    }));
+
+    function showResult(type,title,message) {
+      result.className=`result show ${type}`;
+      const heading=document.createElement('strong');
+      heading.textContent=title;
+      const copy=document.createElement('span');
+      copy.textContent=message;
+      result.replaceChildren(heading,copy);
+    }
+
+    continueButton.addEventListener('click',()=>{
+      sessionStorage.setItem('strLabHospitalWorkday',selectedValue);
+      if (selectedValue==='working') {
+        showResult('correct','El ingreso se produce en día laborable','Ese día puede ser el inicio del permiso. En la siguiente pantalla comprobaremos la fecha del ingreso.');
+        return;
+      }
+      if (selectedValue==='rest') {
+        showResult('redirect','El ingreso se produce durante un descanso','El cómputo comenzará el primer día posterior en el que te corresponda trabajar.');
+        return;
+      }
+      showResult('redirect','Hay que comprobar la hora del ingreso','En el siguiente paso preguntaremos si la hospitalización se produjo antes de las 14:00 para aplicar la regla del turno de noche.');
+    });
+  </script>
+</body>
+</html>
