@@ -60,7 +60,9 @@
     .intro { margin-bottom: 20px; color: var(--grey); font-size: 15px; line-height: 1.5; }
     .options-grid {
       display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 16px;
+      align-items: start;
     }
     .option-card {
       display: block;
