@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Alta de afiliados · STR-IG LAB</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f5f7;color:#161616;padding-bottom:40px}.topbar{height:64px;background:#161616;color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;position:sticky;top:0;z-index:10}.back{color:#fff;text-decoration:none;font-size:34px;line-height:1}.topbar strong{font-size:18px}.lab{margin-left:auto;background:#e30613;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.5px}main{max-width:620px;margin:auto;padding:24px 16px}.access{display:none}.access.active{display:block}.hero{background:linear-gradient(135deg,#e30613,#a8000b);color:white;border-radius:24px;padding:22px;margin-bottom:18px}.hero small{display:block;text-transform:uppercase;letter-spacing:.8px;font-weight:800;opacity:.9;margin-bottom:7px}.hero h1{margin:0 0 8px;font-size:30px;line-height:1}.hero p{margin:0;line-height:1.45;opacity:.95}.panel{background:#fff;border-radius:22px;padding:20px;box-shadow:0 6px 22px rgba(0,0,0,.07)}label{display:block;font-size:13px;font-weight:800;margin:14px 0 7px}input{width:100%;border:1px solid #d5d5d8;border-radius:13px;padding:14px;font-size:16px;outline:none}input:focus{border-color:#e30613;box-shadow:0 0 0 3px rgba(227,6,19,.08)}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary,.whatsapp,.secondary{width:100%;border:0;border-radius:14px;padding:15px 16px;font-size:15px;font-weight:800;cursor:pointer;margin-top:18px}.primary{background:#e30613;color:#fff}.secondary{background:#efeff1;color:#161616}.whatsapp{display:none;background:#171717;color:white;text-align:center;text-decoration:none}.whatsapp.show{display:block}.status{display:none;margin-top:14px;padding:12px;border-radius:12px;font-size:13px;line-height:1.4}.status.show{display:block}.status.ok{background:#eff9f2;color:#195d31}.status.error{background:#fff0f1;color:#8e0010}.security{margin-top:14px;color:#6e6e73;font-size:12px;line-height:1.45}.denied{background:#fff;border-radius:22px;padding:24px;text-align:center;box-shadow:0 6px 22px rgba(0,0,0,.07)}.denied h1{font-size:24px}.denied p{color:#6e6e73;line-height:1.5}.loading{text-align:center;padding:60px 20px;color:#6e6e73}@media(max-width:520px){.row{grid-template-columns:1fr}.hero h1{font-size:27px}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="back" href="index.html" aria-label="Volver">‹</a><strong>Gestión interna STR-IG</strong><span class="lab">LAB</span></header>
+  <main>
+    <div id="loading" class="loading">Comprobando acceso…</div>
+
+    <section id="authorized" class="access">
+      <div class="hero"><small>Solo comité autorizado</small><h1>Alta de afiliados</h1><p>Da de alta a una persona en el acceso privado de la app y prepara su mensaje de bienvenida por WhatsApp.</p></div>
+      <form id="signup-form" class="panel">
+        <label for="name">Nombre y apellidos</label>
+        <input id="name" autocomplete="name" required placeholder="Nombre completo">
+
+        <label for="email">Correo personal</label>
+        <input id="email" type="email" autocomplete="email" required placeholder="nombre@correo.com">
+
+        <div class="row">
+          <div><label for="employee">Número de afiliado</label><input id="employee" inputmode="numeric" required placeholder="00000"></div>
+          <div><label for="phone">Teléfono móvil</label><input id="phone" type="tel" autocomplete="tel" required placeholder="600000000"></div>
+        </div>
+
+        <button id="save" class="primary" type="submit">Dar de alta en la app</button>
+        <p id="status" class="status"></p>
+        <a id="whatsapp" class="whatsapp" href="#" target="_blank" rel="noopener">Enviar mensaje de alta por WhatsApp</a>
+        <button id="new-signup" class="secondary" type="button" hidden>Nueva alta</button>
+        <p class="security">Esta herramienta no aparece para el resto de afiliados. El alta solo puede ejecutarse con una sesión autorizada de Rocío o Dubardo.</p>
+      </form>
+    </section>
+
+    <section id="denied" class="access denied"><h1>Acceso restringido</h1><p>Esta herramienta es exclusiva para los miembros autorizados del comité de la sección sindical.</p><a href="index.html">Volver al inicio</a></section>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    const SUPABASE_URL='https://icneigdnuntzugisexaz.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    const COMMITTEE=new Set(['rocioloralara@gmail.com','dubardollorienzu@gmail.com']);
+    const loading=document.getElementById('loading');
+    const authorized=document.getElementById('authorized');
+    const denied=document.getElementById('denied');
+    const form=document.getElementById('signup-form');
+    const status=document.getElementById('status');
+    const whatsapp=document.getElementById('whatsapp');
+    const newSignup=document.getElementById('new-signup');
+    const saveButton=document.getElementById('save');
+
+    const {data:{session}}=await supabase.auth.getSession();
+    const caller=(session?.user?.email||'').trim().toLowerCase();
+    loading.style.display='none';
+    if(COMMITTEE.has(caller)) authorized.classList.add('active'); else denied.classList.add('active');
+
+    function setStatus(message,type=''){
+      status.textContent=message; status.className=`status show ${type}`;
+    }
+    function normalizePhone(value){
+      let digits=(value||'').replace(/\D/g,'');
+      if(digits.startsWith('0034')) digits=digits.slice(4);
+      if(digits.startsWith('34')&&digits.length>9) digits=digits.slice(2);
+      return digits;
+    }
+    function whatsappUrl(phone,name){
+      const digits=normalizePhone(phone);
+      const text=`Hola ${name} 👋\n\nTe damos la bienvenida al área de afiliados/as de STR-IG.\n\nPara acceder a la app:\n1. Abre https://str-ig.github.io/str-pwa-lab/\n2. Entra en una herramienta del Área privada.\n3. Introduce tu correo personal y solicita el código de 6 dígitos.\n4. Escribe el código recibido y ya tendrás acceso.\n\nSi tienes cualquier problema, contacta con nosotros.`;
+      return `https://wa.me/34${digits}?text=${encodeURIComponent(text)}`;
+    }
+
+    form.addEventListener('submit',async(event)=>{
+      event.preventDefault();
+      whatsapp.classList.remove('show'); newSignup.hidden=true; setStatus('Guardando alta…'); saveButton.disabled=true;
+      const name=document.getElementById('name').value.trim();
+      const email=document.getElementById('email').value.trim().toLowerCase();
+      const employee=document.getElementById('employee').value.trim();
+      const phone=document.getElementById('phone').value.trim();
+      const digits=normalizePhone(phone);
+      if(digits.length!==9){ setStatus('Revisa el teléfono. Debe tener 9 cifras.','error'); saveButton.disabled=false; return; }
+      const {error}=await supabase.rpc('committee_upsert_affiliate',{p_email:email,p_display_name:name,p_employee_number:employee,p_phone:digits});
+      saveButton.disabled=false;
+      if(error){ console.error(error); setStatus('No se ha podido completar el alta. Comprueba que sigues conectado con una cuenta autorizada.','error'); return; }
+      setStatus(`${name} ha quedado dado/a de alta en la app.`, 'ok');
+      whatsapp.href=whatsappUrl(digits,name); whatsapp.classList.add('show'); newSignup.hidden=false; saveButton.hidden=true;
+    });
+
+    newSignup.addEventListener('click',()=>{
+      form.reset(); status.className='status'; status.textContent=''; whatsapp.classList.remove('show'); newSignup.hidden=true; saveButton.hidden=false; document.getElementById('name').focus();
+    });
+  </script>
+</body>
+</html>
