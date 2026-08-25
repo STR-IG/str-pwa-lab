@@ -252,6 +252,11 @@
         );
         return;
       }
+      if (relationship.value === 'first') {
+        sessionStorage.setItem('strLabHospitalRelationship', selected);
+        window.location.href = 'preguntale-hospitalizacion-duracion.html';
+        return;
+      }
       if (relationship.value === 'cohabitant' || relationship.value === 'specific') {
         showResult(
           'correct',
@@ -260,11 +265,6 @@
         );
         return;
       }
-      showResult(
-        'correct',
-        'Familiar identificado correctamente',
-        'Puedes continuar por Hospitalización familiar de primer grado. Las siguientes preguntas se añadirán en el próximo paso.'
-      );
     });
   </script>
 </body>
