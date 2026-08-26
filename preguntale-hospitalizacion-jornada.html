@@ -23,8 +23,10 @@
     .intro { margin-bottom:18px; color:var(--grey); font-size:15px; line-height:1.5; }
     .selection { margin-bottom:18px; padding:12px 14px; border-radius:14px; color:var(--green); background:var(--green-soft); font-size:14px; font-weight:800; }
     label { display:block; margin-bottom:8px; font-size:14px; font-weight:800; }
-    input[type="date"] { width:100%; min-height:58px; padding:0 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); font:inherit; font-size:17px; }
+    .date-row { display:grid; grid-template-columns:1fr 58px; gap:10px; align-items:stretch; }
+    input[type="date"] { width:100%; min-width:0; min-height:58px; padding:0 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); font:inherit; font-size:17px; -webkit-appearance:auto; appearance:auto; }
     input[type="date"]:focus { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
+    .calendar-button { min-width:58px; min-height:58px; border:1px solid var(--line); border-radius:16px; color:var(--red); background:var(--white); font-size:26px; cursor:pointer; }
     .date-help { margin-top:7px; color:var(--grey); font-size:13px; }
     .primary { width:100%; min-height:52px; margin-top:16px; border:0; border-radius:999px; color:var(--white); background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
     .primary:disabled { opacity:.45; cursor:not-allowed; }
@@ -55,8 +57,11 @@
         <p id="relationship-summary" class="selection" hidden></p>
 
         <label for="first-leave-day">Primer día que quieres disfrutar</label>
-        <input id="first-leave-day" type="date" aria-describedby="date-help">
-        <p id="date-help" class="date-help">Selecciona la fecha en el calendario. El navegador la mostrará con el formato de tu dispositivo.</p>
+        <div class="date-row">
+          <input id="first-leave-day" type="date" aria-describedby="date-help">
+          <button id="open-calendar" class="calendar-button" type="button" aria-label="Abrir calendario">📅</button>
+        </div>
+        <p id="date-help" class="date-help">Toca el campo o el icono del calendario para seleccionar la fecha.</p>
 
         <button id="continue" class="primary" type="button" disabled>Continuar</button>
         <div id="result" class="result" role="status" aria-live="polite"></div>
@@ -94,10 +99,12 @@
     }
 
     const firstLeaveDay=document.getElementById('first-leave-day');
+    const openCalendarButton=document.getElementById('open-calendar');
     const continueButton=document.getElementById('continue');
     const result=document.getElementById('result');
 
     function parseIsoDate(value) {
+      if (!value || typeof value !== 'string') return null;
       const match=value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if (!match) return null;
       const year=Number(match[1]);
@@ -121,8 +128,21 @@
       showResult('correct',`Primer día elegido: ${formattedDate}`,'A continuación comprobaremos el turno, la hora del ingreso y la situación médica posterior.');
     }
 
+    function openCalendar() {
+      try {
+        if (typeof firstLeaveDay.showPicker === 'function') {
+          firstLeaveDay.showPicker();
+          return;
+        }
+      } catch (_) {}
+      firstLeaveDay.focus();
+      firstLeaveDay.click();
+    }
+
+    openCalendarButton.addEventListener('click',openCalendar);
     firstLeaveDay.addEventListener('input',updateDateState);
     firstLeaveDay.addEventListener('change',updateDateState);
+    firstLeaveDay.addEventListener('blur',updateDateState);
 
     const savedFirstLeaveDay=sessionStorage.getItem('strLabHospitalFirstLeaveDay');
     if (parseIsoDate(savedFirstLeaveDay || '')) {
@@ -141,7 +161,10 @@
 
     continueButton.addEventListener('click',()=>{
       const parsedDate=parseIsoDate(firstLeaveDay.value);
-      if (!parsedDate) return;
+      if (!parsedDate) {
+        updateDateState();
+        return;
+      }
       sessionStorage.setItem('strLabHospitalFirstLeaveDay',parsedDate.iso);
       window.location.href='preguntale-hospitalizacion-turno.html';
     });
