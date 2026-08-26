@@ -34,6 +34,11 @@
     .result.show { display:block; }
     .result strong { display:block; margin-bottom:7px; font-size:16px; }
     .result ul { margin-left:20px; }
+    .result p { margin-top:8px; }
+    .result h3 { margin-top:14px; font-size:15px; }
+    .result.review { color:var(--amber); background:var(--amber-soft); }
+    .result.not-compatible { color:#9f111b; background:#fff0f1; }
+    .finish-link { display:inline-block; margin-top:16px; color:inherit; font-weight:800; }
     .primary { width:100%; min-height:52px; margin-top:18px; border:0; border-radius:999px; color:var(--white); background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
     .primary:disabled { opacity:.45; cursor:not-allowed; }
     #auth-check { color:var(--grey); text-align:center; }
@@ -57,7 +62,7 @@
       </div>
       <p class="notice">La herramienta comprobará fechas repetidas y el orden temporal. La valoración final también deberá tener en cuenta el turno y la documentación médica.</p>
       <p id="error" class="error" role="alert"></p>
-      <button id="continue" class="primary" type="button" disabled>Confirmar los cinco días</button>
+      <button id="continue" class="primary" type="button" disabled>Obtener orientación</button>
       <div id="result" class="result" role="status" aria-live="polite"></div>
     </div></section>
   </main>
@@ -66,6 +71,7 @@
     const URL='https://icneigdnuntzugisexaz.supabase.co';
     const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
     const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    const ANSWER_URL=`${URL}/functions/v1/lab-answer-hospitalization`;
     async function hasPrivateAccess(session){if(!session)return false;const{data,error}=await supabase.rpc('is_current_user_private_access_allowed');return !error&&data===true;}
     const{data:{session}}=await supabase.auth.getSession();
     if(!(await hasPrivateAccess(session))){if(session)await supabase.auth.signOut();sessionStorage.setItem('strLabNext','preguntale-hospitalizacion-dias.html');window.location.replace('acceso-privado.html?next=preguntale-hospitalizacion-dias.html');}else{document.getElementById('auth-check').hidden=true;document.getElementById('content').hidden=false;}
@@ -83,7 +89,31 @@
     inputs.forEach((input)=>{input.addEventListener('input',validateDays);input.addEventListener('change',validateDays);});
     try{const savedDays=JSON.parse(sessionStorage.getItem('strLabHospitalAdditionalLeaveDays')||'[]');if(Array.isArray(savedDays))inputs.forEach((input,index)=>{input.value=isIsoDate(savedDays[index]||'')?savedDays[index]:'';});}catch{}
     validateDays();
-    continueButton.addEventListener('click',()=>{if(!validateDays())return;const values=inputs.map((input)=>input.value);sessionStorage.setItem('strLabHospitalAdditionalLeaveDays',JSON.stringify(values));const heading=document.createElement('strong');heading.textContent='Cinco días seleccionados';const list=document.createElement('ul');[firstDay,...values].forEach((value)=>{const item=document.createElement('li');item.textContent=formatDate(value);list.append(item);});result.replaceChildren(heading,list);result.className='result show';});
+    function appendList(title,values){if(!Array.isArray(values)||!values.length)return;const heading=document.createElement('h3');heading.textContent=title;const list=document.createElement('ul');values.forEach((value)=>{const item=document.createElement('li');item.textContent=String(value);list.append(item);});result.append(heading,list);}
+    function showGuidance(guidance){const status=String(guidance?.status||'revision');result.className=`result show ${status==='not_compatible'?'not-compatible':status}`;const heading=document.createElement('strong');heading.textContent=String(guidance?.title||'Orientación de STR-IG');const summary=document.createElement('p');summary.textContent=String(guidance?.summary||'Revisa el caso con la Sección Sindical.');result.replaceChildren(heading,summary);appendList('Por qué',guidance?.reasons);appendList('Qué te recomendamos',guidance?.recommendations);const source=document.createElement('p');source.textContent='Orientación informativa basada en los datos indicados. No sustituye la revisión de la documentación ni el asesoramiento sindical.';const finish=document.createElement('a');finish.className='finish-link';finish.href='preguntale-str-permisos.html';finish.textContent='Volver a permisos retribuidos';result.append(source,finish);}
+    function errorMessage(code){const messages={UNAUTHORIZED:'Tu sesión ha caducado. Vuelve a entrar en el área privada.',FORBIDDEN:'Tu acceso privado no está activo.',INVALID_QUESTIONNAIRE:'Falta algún dato del cuestionario o hay una fecha incompatible. Revisa los pasos anteriores.',AI_UNAVAILABLE:'La orientación por IA no está disponible ahora. Inténtalo de nuevo en unos minutos.',AI_EMPTY_RESPONSE:'La IA no ha devuelto una orientación válida. Inténtalo de nuevo.'};return messages[code]||'No se ha podido obtener la orientación. Inténtalo de nuevo.';}
+    continueButton.addEventListener('click',async()=>{
+      if(!validateDays())return;
+      const values=inputs.map((input)=>input.value);
+      sessionStorage.setItem('strLabHospitalAdditionalLeaveDays',JSON.stringify(values));
+      continueButton.disabled=true;
+      continueButton.textContent='Consultando a STR-IG…';
+      result.className='result show';
+      const loading=document.createElement('strong');loading.textContent='Analizando tus respuestas…';
+      const loadingCopy=document.createElement('p');loadingCopy.textContent='La IA está preparando una orientación. No se envían imágenes ni datos personales.';
+      result.replaceChildren(loading,loadingCopy);
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),30000);
+      try{
+        const payload={relationship:sessionStorage.getItem('strLabHospitalRelationship')||'',duration:sessionStorage.getItem('strLabHospitalDuration')||'',admissionDate:sessionStorage.getItem('strLabHospitalAdmissionDate')||'',admissionTime:sessionStorage.getItem('strLabHospitalAdmissionTime')||'',workShift:sessionStorage.getItem('strLabHospitalWorkShift')||'',medicalStatus:sessionStorage.getItem('strLabHospitalMedicalStatus')||'',dischargeDate:sessionStorage.getItem('strLabHospitalDischargeDate')||'',restUntil:sessionStorage.getItem('strLabHospitalRestUntil')||'',leaveDays:[firstDay,...values]};
+        const response=await fetch(ANSWER_URL,{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(data?.error||`HTTP_${response.status}`);
+        showGuidance(data?.guidance);
+        continueButton.textContent='Actualizar orientación';
+      }catch(error){result.className='result show not-compatible';const heading=document.createElement('strong');heading.textContent='No se ha podido completar la consulta';const copy=document.createElement('p');copy.textContent=error?.name==='AbortError'?'La consulta ha tardado demasiado. Comprueba la conexión e inténtalo de nuevo.':errorMessage(error?.message);result.replaceChildren(heading,copy);continueButton.textContent='Volver a intentarlo';}
+      finally{clearTimeout(timeout);continueButton.disabled=false;}
+    });
   </script>
 </body>
 </html>
