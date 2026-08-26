@@ -252,17 +252,9 @@
         );
         return;
       }
-      if (relationship.value === 'first') {
+      if (relationship.value === 'first' || relationship.value === 'specific' || relationship.value === 'cohabitant') {
         sessionStorage.setItem('strLabHospitalRelationship', selected);
         window.location.href = 'preguntale-hospitalizacion-duracion.html';
-        return;
-      }
-      if (relationship.value === 'cohabitant' || relationship.value === 'specific') {
-        showResult(
-          'correct',
-          'Caso identificado',
-          'La relación necesita preguntas específicas sobre convivencia o vínculo. Las añadiremos en el siguiente paso.'
-        );
         return;
       }
     });
