@@ -56,15 +56,17 @@
         <p class="intro">No tiene que ser el día del ingreso ni el primer día laborable posterior. Puedes elegir un día en el que te corresponda trabajar, siempre que la hospitalización o el reposo domiciliario prescrito continúen.</p>
         <p id="relationship-summary" class="selection" hidden></p>
 
-        <label for="first-leave-day">Primer día que quieres disfrutar</label>
-        <div class="date-row">
-          <input id="first-leave-day" type="date" aria-describedby="date-help">
-          <button id="open-calendar" class="calendar-button" type="button" aria-label="Abrir calendario">📅</button>
-        </div>
-        <p id="date-help" class="date-help">Toca el campo o el icono del calendario para seleccionar la fecha.</p>
+        <form id="date-form" novalidate>
+          <label for="first-leave-day">Primer día que quieres disfrutar</label>
+          <div class="date-row">
+            <input id="first-leave-day" type="date" aria-describedby="date-help">
+            <button id="open-calendar" class="calendar-button" type="button" aria-label="Abrir calendario">📅</button>
+          </div>
+          <p id="date-help" class="date-help">Toca el campo o el icono del calendario para seleccionar la fecha.</p>
 
-        <button id="continue" class="primary" type="button" disabled>Continuar</button>
-        <div id="result" class="result" role="status" aria-live="polite"></div>
+          <button id="continue" class="primary" type="submit" disabled>Continuar</button>
+          <div id="result" class="result" role="status" aria-live="polite"></div>
+        </form>
       </div>
     </section>
   </main>
@@ -100,6 +102,7 @@
 
     const firstLeaveDay=document.getElementById('first-leave-day');
     const openCalendarButton=document.getElementById('open-calendar');
+    const dateForm=document.getElementById('date-form');
     const continueButton=document.getElementById('continue');
     const result=document.getElementById('result');
 
@@ -159,14 +162,16 @@
       result.replaceChildren(heading,copy);
     }
 
-    continueButton.addEventListener('click',()=>{
+    dateForm.addEventListener('submit',(event)=>{
+      event.preventDefault();
       const parsedDate=parseIsoDate(firstLeaveDay.value);
       if (!parsedDate) {
         updateDateState();
+        firstLeaveDay.focus();
         return;
       }
       sessionStorage.setItem('strLabHospitalFirstLeaveDay',parsedDate.iso);
-      window.location.href='preguntale-hospitalizacion-turno.html';
+      window.location.assign('preguntale-hospitalizacion-turno.html');
     });
   </script>
 </body>
