@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#e30613">
-  <title>Hospitalización familiar · Pregúntale a STR-IG LAB</title>
+  <title>Hospitalización familiar de segundo grado · Pregúntale a STR-IG LAB</title>
   <link rel="icon" type="image/png" href="icono-str-ig.png">
   <link rel="apple-touch-icon" href="icono-str-ig.png">
   <link rel="manifest" href="manifest.json">
@@ -96,13 +96,12 @@
       width: 100%;
       min-height: 52px;
       margin-top: 16px;
-      border: 0;
       border-radius: 999px;
       font: inherit;
       font-weight: 800;
       cursor: pointer;
     }
-    .primary { color: var(--white); background: var(--red); }
+    .primary { border: 0; color: var(--white); background: var(--red); }
     .primary:disabled { opacity: .45; cursor: not-allowed; }
     .secondary { color: var(--red); background: var(--white); border: 1px solid var(--red); }
     .result {
@@ -130,7 +129,7 @@
   <header class="top">
     <div class="top-inner">
       <a class="back" href="preguntale-str-permisos.html" aria-label="Volver a Permisos retribuidos">‹</a>
-      <h1>Hospitalización familiar</h1>
+      <h1>Hospitalización familiar · segundo grado</h1>
     </div>
   </header>
 
@@ -140,11 +139,21 @@
       <div class="panel">
         <span class="step">Paso 1</span>
         <h2>¿Quién está hospitalizado?</h2>
-        <p class="intro">Selecciona la relación que tienes con la persona hospitalizada. Así te dirigiremos al permiso correcto.</p>
+        <p class="intro">Selecciona la relación que tienes con la persona hospitalizada. Así comprobaremos que estás en el permiso correcto.</p>
 
         <label for="relationship">Familiar o persona afectada</label>
         <select id="relationship">
           <option value="">Selecciona una opción</option>
+          <optgroup label="Segundo grado">
+            <option value="second">Mi hermano</option>
+            <option value="second">Mi hermana</option>
+            <option value="second">Mi abuelo</option>
+            <option value="second">Mi abuela</option>
+            <option value="second">Mi nieto</option>
+            <option value="second">Mi nieta</option>
+            <option value="second">Mi cuñado</option>
+            <option value="second">Mi cuñada</option>
+          </optgroup>
           <optgroup label="Familia directa y primer grado">
             <option value="first">Mi padre</option>
             <option value="first">Mi madre</option>
@@ -156,22 +165,12 @@
             <option value="first">Mi nuera</option>
           </optgroup>
           <optgroup label="Cónyuge o pareja">
-            <option value="specific">Mi cónyuge</option>
-            <option value="specific">Mi pareja de hecho</option>
-          </optgroup>
-          <optgroup label="Segundo grado">
-            <option value="second">Mi hermano</option>
-            <option value="second">Mi hermana</option>
-            <option value="second">Mi abuelo</option>
-            <option value="second">Mi abuela</option>
-            <option value="second">Mi nieto</option>
-            <option value="second">Mi nieta</option>
-            <option value="second">Mi cuñado</option>
-            <option value="second">Mi cuñada</option>
+            <option value="first">Mi cónyuge</option>
+            <option value="first">Mi pareja de hecho</option>
           </optgroup>
           <optgroup label="Otros casos">
-            <option value="specific">Un familiar de mi pareja de hecho</option>
-            <option value="cohabitant">Una persona que convive conmigo</option>
+            <option value="first">Un familiar de mi pareja de hecho</option>
+            <option value="first">Una persona que convive conmigo</option>
             <option value="review">Otro familiar o relación</option>
           </optgroup>
         </select>
@@ -187,6 +186,7 @@
 
     const URL = 'https://icneigdnuntzugisexaz.supabase.co';
     const KEY = 'sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const PAGE = 'preguntale-hospitalizacion-segundo-grado-familiar.html';
     const supabase = createClient(URL, KEY, {
       auth: { detectSessionInUrl: false, persistSession: true, autoRefreshToken: true }
     });
@@ -200,8 +200,8 @@
     const { data: { session } } = await supabase.auth.getSession();
     if (!(await hasPrivateAccess(session))) {
       if (session) await supabase.auth.signOut();
-      sessionStorage.setItem('strLabNext', 'preguntale-hospitalizacion-familiar.html');
-      window.location.replace('acceso-privado.html?next=preguntale-hospitalizacion-familiar.html');
+      sessionStorage.setItem('strLabNext', PAGE);
+      window.location.replace(`acceso-privado.html?next=${PAGE}`);
     } else {
       document.getElementById('auth-check').hidden = true;
       document.getElementById('content').hidden = false;
@@ -236,11 +236,16 @@
     continueButton.addEventListener('click', () => {
       const selected = relationship.options[relationship.selectedIndex]?.text || 'La opción seleccionada';
       if (relationship.value === 'second') {
+        sessionStorage.setItem('strLabHospitalRelationship', selected);
+        window.location.href = 'preguntale-hospitalizacion-duracion.html';
+        return;
+      }
+      if (relationship.value === 'first') {
         showResult(
           'redirect',
-          `${selected} corresponde al segundo grado`,
-          'Debes continuar en Hospitalización familiar de segundo grado para responder el cuestionario correcto.',
-          { href: 'preguntale-hospitalizacion-segundo-grado-familiar.html', label: 'Ir al permiso de segundo grado' }
+          `${selected} no corresponde a esta card`,
+          'Debes continuar en Hospitalización familiar de primer grado. Allí responderás el mismo cuestionario con la categoría correcta de Grifols.',
+          { href: 'preguntale-hospitalizacion-familiar.html', label: 'Ir al permiso de primer grado' }
         );
         return;
       }
@@ -248,14 +253,8 @@
         showResult(
           'review',
           'Necesitamos comprobar la relación',
-          'El futuro cuestionario te hará unas preguntas adicionales antes de orientarte. No se descarta automáticamente el permiso.'
+          'No descartamos automáticamente el permiso. Consulta con STR-IG para clasificar correctamente este vínculo.'
         );
-        return;
-      }
-      if (relationship.value === 'first' || relationship.value === 'specific' || relationship.value === 'cohabitant') {
-        sessionStorage.setItem('strLabHospitalRelationship', selected);
-        window.location.href = 'preguntale-hospitalizacion-duracion.html';
-        return;
       }
     });
   </script>

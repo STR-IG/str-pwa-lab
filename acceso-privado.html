@@ -50,7 +50,7 @@
     const REQUEST=URL+'/functions/v1/lab-request-custom-otp';
     const VERIFY=URL+'/functions/v1/lab-verify-custom-otp';
     const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
-    const ALLOWED_DESTINATIONS=new Set(['area-privada.html','revisa-tu-nomina.html','preguntale-str-ig.html','preguntale-str-permisos.html','preguntale-hospitalizacion-familiar.html','preguntale-hospitalizacion-duracion.html','preguntale-hospitalizacion-jornada.html','preguntale-hospitalizacion-turno.html','preguntale-hospitalizacion-reposo.html','preguntale-hospitalizacion-dias.html']);
+    const ALLOWED_DESTINATIONS=new Set(['area-privada.html','revisa-tu-nomina.html','preguntale-str-ig.html','preguntale-str-permisos.html','preguntale-hospitalizacion-familiar.html','preguntale-hospitalizacion-segundo-grado-familiar.html','preguntale-hospitalizacion-duracion.html','preguntale-hospitalizacion-jornada.html','preguntale-hospitalizacion-turno.html','preguntale-hospitalizacion-reposo.html','preguntale-hospitalizacion-dias.html']);
     const requestedDestination=new URLSearchParams(window.location.search).get('next');
     if(ALLOWED_DESTINATIONS.has(requestedDestination)){
       sessionStorage.setItem('strLabNext',requestedDestination);
