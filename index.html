@@ -32,9 +32,15 @@
     .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
     .section-header h2 { font-size:23px; }
     .section-header a { color:var(--red); text-decoration:none; font-weight:700; font-size:14px; }
-    .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .area-block { margin-bottom:32px; }
+    .area-block + .area-block { padding-top:30px; border-top:2px solid #dedee2; }
+    .area-heading { margin-bottom:16px; font-size:22px; font-weight:900; letter-spacing:.7px; color:var(--black); }
+    .area-heading::after { display:block; width:52px; height:4px; margin-top:8px; border-radius:999px; background:var(--red); content:""; }
+    .area-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; width:100%; max-width:780px; }
     .quick-card { background:white; border-radius:20px; padding:20px; min-height:155px; box-shadow:0 5px 18px rgba(0,0,0,.07); display:flex; flex-direction:column; justify-content:space-between; transition:.2s ease; cursor:pointer; }
     .quick-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,.11); }
+    .menu-image-card { aspect-ratio:1.45/1; min-height:0; padding:0; overflow:hidden; background:transparent; box-shadow:none; }
+    .menu-image-card img { width:100%; height:100%; object-fit:cover; display:block; }
     .icon { width:48px; height:48px; border-radius:14px; background:var(--red); color:white; display:grid; place-items:center; font-size:24px; }
     .quick-card strong { font-size:18px; line-height:1.15; }
     .quick-card small { color:var(--grey); font-size:13px; line-height:1.4; margin-top:8px; }
@@ -89,8 +95,12 @@
       .hero h1 { font-size:34px; }
       .hero-description { font-size:15px; }
       main { padding:24px 14px; }
-      .quick-grid { grid-template-columns:repeat(2,1fr); }
+      .area-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+      .area-block { margin-bottom:26px; }
+      .area-block + .area-block { padding-top:24px; }
+      .area-heading { margin-bottom:13px; font-size:19px; }
       .quick-card { min-height:135px; padding:16px; }
+      .menu-image-card { min-height:0; padding:0; }
       .quick-card strong { font-size:16px; }
       .payroll-card { min-height:135px; padding:0; }
       .payroll-copy { width:68%; padding:14px; }
@@ -108,16 +118,23 @@
 <body>
 <header class="hero"></header>
 <main>
-  <section class="section">
-    <div class="quick-grid">
-      <a href="permisos.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;"><img src="permisos-retribuidos.png" alt="Permisos retribuidos" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <a href="menu-comedor.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;"><img src="menu-comedor.png" alt="Menú comedor" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <a href="acceso-privado.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;"><img src="calcula-tu-v.png" alt="Calcula tu V" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <a href="revisa-tu-nomina.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;" aria-label="Revisa tu nómina, acceso para afiliados"><img src="revisa-tu-nomina-card.png" alt="Revisa tu nómina, área privada" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <a href="preguntale-str-ig.html" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;" aria-label="Pregúntale a STR-IG, área privada"><img src="card-preguntale-str-ig.png" alt="Pregúntale a STR-IG, área privada" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <a href="#afiliate-str" class="quick-card" style="padding:0; overflow:hidden; background:transparent; box-shadow:none;" aria-label="Afíliate a STR"><img src="card-afiliate-str.svg" alt="Afíliate a STR" style="width:100%; height:100%; object-fit:cover; display:block;"></a>
-      <article class="quick-card"><div class="icon">📅</div><div><strong>Calendarios laborales</strong><small>Turnos, festivos y horarios.</small></div></article>
-      <article class="quick-card"><div class="icon">💬</div><div><strong>Contacta con STR-IG</strong><small>Escríbenos, estamos aquí.</small></div></article>
+  <section class="section" aria-label="Accesos principales">
+    <div class="area-block">
+      <h2 class="area-heading">ÁREA PÚBLICA</h2>
+      <div class="area-grid">
+        <a href="permisos.html" class="quick-card menu-image-card"><img src="permisos-retribuidos.png" alt="Permisos retribuidos"></a>
+        <a href="menu-comedor.html" class="quick-card menu-image-card"><img src="menu-comedor.png" alt="Menú comedor"></a>
+        <article class="quick-card menu-image-card" aria-label="Nuestra sección sindical STR-IG, próximamente"><img src="card-seccion-sindical-provisional.svg" alt="Nuestra sección sindical STR-IG"></article>
+        <a href="#afiliate-str" class="quick-card menu-image-card" aria-label="Afíliate a STR-IG"><img src="card-afiliate-str.svg" alt="Afíliate a STR-IG"></a>
+      </div>
+    </div>
+    <div class="area-block">
+      <h2 class="area-heading">ÁREA PRIVADA</h2>
+      <div class="area-grid">
+        <a href="acceso-privado.html" class="quick-card menu-image-card"><img src="calcula-tu-v.png" alt="Calcula tu V, área privada"></a>
+        <a href="revisa-tu-nomina.html" class="quick-card menu-image-card" aria-label="Revisa tu nómina, acceso para afiliados"><img src="revisa-tu-nomina-card.png" alt="Revisa tu nómina, área privada"></a>
+        <a href="preguntale-str-ig.html" class="quick-card menu-image-card" aria-label="Pregúntale a STR-IG, área privada"><img src="card-preguntale-str-ig.png" alt="Pregúntale a STR-IG, área privada"></a>
+      </div>
     </div>
   </section>
   <section id="permisos" class="section"><div class="section-header"><h2>Permisos retribuidos</h2><a href="#">Ver todos →</a></div><div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; width:100%;"><a href="#hospitalizacion-primer-grado" class="permit-link" style="display:block; width:100%;"><img src="boton-hospitalizacion-primer-grado.png" alt="Hospitalización familiar primer grado" style="width:100%; height:auto; display:block; border-radius:18px;"></a><a href="#hospitalizacion-segundo-grado" class="permit-link" style="display:block; width:100%;"><img src="card-hospitalizacion-familiar-segundo-grado.png" alt="Hospitalización familiar segundo grado" style="width:100%; aspect-ratio:1.45/1; object-fit:contain; display:block; border-radius:18px;"></a><a href="#intervencion-familiar-sin-ingreso-primer-grado" class="permit-link" style="display:block; width:100%;"><img src="intervencion-familiar-sin-ingreso-primer-grado.png" alt="Intervención familiar sin ingreso 1er grado" style="width:100%; aspect-ratio:1.45/1; object-fit:contain; display:block; border-radius:18px;"></a><article class="permit-card"><div class="icon">🕊️</div><h3>Fallecimiento familiar</h3><span class="tag">Ver permiso</span></article><article class="permit-card"><div class="icon">💍</div><h3>Matrimonio</h3><span class="tag">15 días</span></article><article class="permit-card"><div class="icon">🩺</div><h3>Intervención quirúrgica</h3><span class="tag">Ver permiso</span></article><article class="permit-card"><div class="icon">📄</div><h3>Deber inexcusable</h3><span class="tag">Ver permiso</span></article><article class="permit-card"><div class="icon">⚠️</div><h3>Fuerza mayor</h3><span class="tag">Ver permiso</span></article></div></section>
