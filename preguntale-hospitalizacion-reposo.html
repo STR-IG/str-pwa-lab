@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#e30613">
+  <title>Hospitalización y reposo · Pregúntale a STR-IG LAB</title>
+  <link rel="icon" type="image/png" href="icono-str-ig.png">
+  <link rel="apple-touch-icon" href="icono-str-ig.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    :root { --red:#e30613; --red-dark:#b9000b; --green:#0b6b4f; --green-soft:#edf8f3; --amber:#765700; --amber-soft:#fff6d6; --black:#161616; --grey:#6e6e73; --line:#dddddf; --light:#f5f5f7; --white:#fff; }
+    body { min-height:100vh; font-family:Arial,Helvetica,sans-serif; background:var(--light); color:var(--black); }
+    .top { position:sticky; top:0; z-index:20; padding:calc(14px + env(safe-area-inset-top)) 18px 14px; border-bottom:1px solid #e4e4e7; background:rgba(245,245,247,.96); backdrop-filter:blur(12px); }
+    .top-inner { display:flex; align-items:center; gap:14px; max-width:680px; margin:auto; }
+    .back { display:grid; place-items:center; flex:0 0 42px; width:42px; height:42px; border-radius:50%; color:var(--red); background:var(--white); box-shadow:0 3px 12px rgba(0,0,0,.08); text-decoration:none; font-size:26px; font-weight:700; }
+    h1 { font-size:clamp(21px,5vw,27px); line-height:1.08; }
+    main { max-width:680px; margin:auto; padding:24px 18px 48px; }
+    .panel { padding:22px; border-radius:22px; background:var(--white); box-shadow:0 6px 22px rgba(0,0,0,.07); }
+    .step { display:inline-block; margin-bottom:10px; color:var(--red-dark); font-size:12px; font-weight:900; letter-spacing:.5px; text-transform:uppercase; }
+    h2 { margin-bottom:8px; font-size:24px; line-height:1.15; }
+    .intro { margin-bottom:18px; color:var(--grey); font-size:15px; line-height:1.5; }
+    .answers { display:grid; gap:12px; }
+    .answer { display:flex; align-items:center; gap:12px; width:100%; min-height:62px; padding:13px 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); text-align:left; font:inherit; font-weight:800; cursor:pointer; }
+    .answer:hover,.answer:focus-visible { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
+    .answer.selected { border-color:var(--red); background:#fff4f5; }
+    .dot { flex:0 0 22px; width:22px; height:22px; border:2px solid #aaa; border-radius:50%; }
+    .answer.selected .dot { border:6px solid var(--red); }
+    .details { display:grid; gap:16px; margin-top:18px; padding:16px; border-radius:16px; background:#fafafa; }
+    .details[hidden] { display:none; }
+    label { display:block; margin-bottom:8px; font-size:14px; font-weight:800; }
+    input[type="date"] { width:100%; min-height:58px; padding:0 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); font:inherit; font-size:16px; }
+    input:focus { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
+    .notice,.error { margin-top:16px; padding:13px 14px; border-radius:14px; font-size:14px; line-height:1.45; }
+    .notice { color:var(--amber); background:var(--amber-soft); }
+    .error { display:none; color:#9f111b; background:#fff0f1; }
+    .error.show { display:block; }
+    .primary { width:100%; min-height:52px; margin-top:18px; border:0; border-radius:999px; color:var(--white); background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
+    .primary:disabled { opacity:.45; cursor:not-allowed; }
+    #auth-check { color:var(--grey); text-align:center; }
+    @media (max-width:440px) { main { padding:18px 14px 38px; } .panel { padding:19px 16px; } }
+  </style>
+</head>
+<body>
+  <header class="top"><div class="top-inner"><a class="back" href="preguntale-hospitalizacion-turno.html" aria-label="Volver al turno y hora del ingreso">‹</a><h1>Hospitalización familiar</h1></div></header>
+  <main>
+    <p id="auth-check">Comprobando acceso privado…</p>
+    <section id="content" hidden><div class="panel">
+      <span class="step">Paso 5</span>
+      <h2>¿Cuál es ahora la situación médica?</h2>
+      <p class="intro">Indica si la hospitalización continúa o qué consta en el informe tras el alta hospitalaria.</p>
+      <div class="answers" role="radiogroup" aria-label="Situación después de la hospitalización">
+        <button class="answer" type="button" data-value="hospitalized" role="radio" aria-checked="false"><span class="dot"></span>Continúa hospitalizado</button>
+        <button class="answer" type="button" data-value="rest" role="radio" aria-checked="false"><span class="dot"></span>Alta hospitalaria con reposo domiciliario prescrito</button>
+        <button class="answer" type="button" data-value="no-rest" role="radio" aria-checked="false"><span class="dot"></span>Alta hospitalaria sin reposo domiciliario prescrito</button>
+        <button class="answer" type="button" data-value="unknown" role="radio" aria-checked="false"><span class="dot"></span>Todavía no tengo el informe o no lo sé</button>
+      </div>
+      <div id="discharge-details" class="details" hidden>
+        <div><label for="discharge-date">Fecha del alta hospitalaria</label><input id="discharge-date" type="date"></div>
+        <div id="rest-field" hidden><label for="rest-until">Reposo domiciliario prescrito hasta</label><input id="rest-until" type="date"></div>
+      </div>
+      <p class="notice"><strong>Importante:</strong> el reposo domiciliario no se pregunta para negar el permiso por hospitalización. Permite comprobar si la causa continúa después del alta.</p>
+      <p id="error" class="error" role="alert"></p>
+      <button id="continue" class="primary" type="button" disabled>Continuar</button>
+    </div></section>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    const URL='https://icneigdnuntzugisexaz.supabase.co';
+    const KEY='sb_publishable_apKjcPClIBTHS2wwN6qPsA_6Vm4tk9m';
+    const supabase=createClient(URL,KEY,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}});
+    async function hasPrivateAccess(session){if(!session)return false;const{data,error}=await supabase.rpc('is_current_user_private_access_allowed');return !error&&data===true;}
+    const{data:{session}}=await supabase.auth.getSession();
+    if(!(await hasPrivateAccess(session))){if(session)await supabase.auth.signOut();sessionStorage.setItem('strLabNext','preguntale-hospitalizacion-reposo.html');window.location.replace('acceso-privado.html?next=preguntale-hospitalizacion-reposo.html');}else{document.getElementById('auth-check').hidden=true;document.getElementById('content').hidden=false;}
+
+    const answers=[...document.querySelectorAll('.answer')];
+    const dischargeDetails=document.getElementById('discharge-details');
+    const dischargeDate=document.getElementById('discharge-date');
+    const restField=document.getElementById('rest-field');
+    const restUntil=document.getElementById('rest-until');
+    const continueButton=document.getElementById('continue');
+    const errorBox=document.getElementById('error');
+    let selectedValue='';
+    function isIsoDate(value){const match=value.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!match)return false;const date=new Date(Number(match[1]),Number(match[2])-1,Number(match[3]),12);return date.getFullYear()===Number(match[1])&&date.getMonth()===Number(match[2])-1&&date.getDate()===Number(match[3]);}
+    function selectAnswer(value){selectedValue=value;answers.forEach((answer)=>{const selected=answer.dataset.value===value;answer.classList.toggle('selected',selected);answer.setAttribute('aria-checked',String(selected));});dischargeDetails.hidden=!['rest','no-rest'].includes(value);restField.hidden=value!=='rest';updateState();}
+    function updateState(){let valid=Boolean(selectedValue);let message='';if(['rest','no-rest'].includes(selectedValue)&&!isIsoDate(dischargeDate.value))valid=false;if(selectedValue==='rest'){if(!isIsoDate(restUntil.value))valid=false;else if(isIsoDate(dischargeDate.value)&&restUntil.value<dischargeDate.value){valid=false;message='La fecha final del reposo no puede ser anterior al alta hospitalaria.';}}continueButton.disabled=!valid;errorBox.textContent=message;errorBox.classList.toggle('show',Boolean(message));}
+    answers.forEach((answer)=>answer.addEventListener('click',()=>selectAnswer(answer.dataset.value)));
+    [dischargeDate,restUntil].forEach((field)=>{field.addEventListener('input',updateState);field.addEventListener('change',updateState);});
+    dischargeDate.value=sessionStorage.getItem('strLabHospitalDischargeDate')||'';
+    restUntil.value=sessionStorage.getItem('strLabHospitalRestUntil')||'';
+    const savedStatus=sessionStorage.getItem('strLabHospitalMedicalStatus')||'';
+    if(savedStatus)selectAnswer(savedStatus);else updateState();
+    continueButton.addEventListener('click',()=>{if(continueButton.disabled)return;sessionStorage.setItem('strLabHospitalMedicalStatus',selectedValue);if(['rest','no-rest'].includes(selectedValue))sessionStorage.setItem('strLabHospitalDischargeDate',dischargeDate.value);else sessionStorage.removeItem('strLabHospitalDischargeDate');if(selectedValue==='rest')sessionStorage.setItem('strLabHospitalRestUntil',restUntil.value);else sessionStorage.removeItem('strLabHospitalRestUntil');window.location.href='preguntale-hospitalizacion-dias.html';});
+  </script>
+</body>
+</html>

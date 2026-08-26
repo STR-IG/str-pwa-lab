@@ -51,7 +51,7 @@
       <div class="panel">
         <span class="step">Paso 3</span>
         <h2>¿Qué día piensas coger como primer día de permiso?</h2>
-        <p class="intro">No tiene que ser el día del ingreso ni el primer día laborable posterior. Puedes elegir un día en el que te corresponda trabajar, siempre que la hospitalización continúe.</p>
+        <p class="intro">No tiene que ser el día del ingreso ni el primer día laborable posterior. Puedes elegir un día en el que te corresponda trabajar, siempre que la hospitalización o el reposo domiciliario prescrito continúen.</p>
         <p id="relationship-summary" class="selection" hidden></p>
 
         <label for="first-leave-day">Primer día que quieres disfrutar</label>
@@ -109,9 +109,16 @@
     }
 
     function updateDateState() {
-      continueButton.disabled=!parseIsoDate(firstLeaveDay.value);
-      result.className='result';
-      result.replaceChildren();
+      const parsedDate=parseIsoDate(firstLeaveDay.value);
+      continueButton.disabled=!parsedDate;
+      if (!parsedDate) {
+        result.className='result';
+        result.replaceChildren();
+        return;
+      }
+      const formattedDate=new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'long',year:'numeric'}).format(parsedDate.date);
+      sessionStorage.setItem('strLabHospitalFirstLeaveDay',parsedDate.iso);
+      showResult('correct',`Primer día elegido: ${formattedDate}`,'A continuación comprobaremos el turno, la hora del ingreso y la situación médica posterior.');
     }
 
     firstLeaveDay.addEventListener('input',updateDateState);
@@ -135,9 +142,8 @@
     continueButton.addEventListener('click',()=>{
       const parsedDate=parseIsoDate(firstLeaveDay.value);
       if (!parsedDate) return;
-      const formattedDate=new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'long',year:'numeric'}).format(parsedDate.date);
       sessionStorage.setItem('strLabHospitalFirstLeaveDay',parsedDate.iso);
-      showResult('correct',`Primer día elegido: ${formattedDate}`,'Este será el día 1 del permiso si te correspondía trabajar y la hospitalización seguía vigente. Los otros cuatro días podrán ser consecutivos o no; los elegiremos en el siguiente paso.');
+      window.location.href='preguntale-hospitalizacion-turno.html';
     });
   </script>
 </body>
