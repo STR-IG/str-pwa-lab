@@ -23,8 +23,8 @@
     .intro { margin-bottom:18px; color:var(--grey); font-size:15px; line-height:1.5; }
     .selection { margin-bottom:18px; padding:12px 14px; border-radius:14px; color:var(--green); background:var(--green-soft); font-size:14px; font-weight:800; }
     label { display:block; margin-bottom:8px; font-size:14px; font-weight:800; }
-    input[type="text"] { width:100%; min-height:58px; padding:0 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); font:inherit; font-size:17px; }
-    input[type="text"]:focus { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
+    input[type="date"] { width:100%; min-height:58px; padding:0 15px; border:1px solid var(--line); border-radius:16px; color:var(--black); background:var(--white); font:inherit; font-size:17px; }
+    input[type="date"]:focus { border-color:var(--red); outline:3px solid rgba(227,6,19,.10); }
     .date-help { margin-top:7px; color:var(--grey); font-size:13px; }
     .primary { width:100%; min-height:52px; margin-top:16px; border:0; border-radius:999px; color:var(--white); background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
     .primary:disabled { opacity:.45; cursor:not-allowed; }
@@ -55,8 +55,8 @@
         <p id="relationship-summary" class="selection" hidden></p>
 
         <label for="first-leave-day">Primer día que quieres disfrutar</label>
-        <input id="first-leave-day" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="DD/MM/AAAA" aria-describedby="date-help">
-        <p id="date-help" class="date-help">Formato: día/mes/año</p>
+        <input id="first-leave-day" type="date" aria-describedby="date-help">
+        <p id="date-help" class="date-help">Selecciona la fecha en el calendario. El navegador la mostrará con el formato de tu dispositivo.</p>
 
         <button id="continue" class="primary" type="button" disabled>Continuar</button>
         <div id="result" class="result" role="status" aria-live="polite"></div>
@@ -97,24 +97,31 @@
     const continueButton=document.getElementById('continue');
     const result=document.getElementById('result');
 
-    function parseSpanishDate(value) {
-      const match=value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    function parseIsoDate(value) {
+      const match=value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if (!match) return null;
-      const day=Number(match[1]);
+      const year=Number(match[1]);
       const month=Number(match[2]);
-      const year=Number(match[3]);
+      const day=Number(match[3]);
       const date=new Date(year,month-1,day,12,0,0);
       if (date.getFullYear()!==year || date.getMonth()!==month-1 || date.getDate()!==day) return null;
-      return {date,iso:`${match[3]}-${match[2]}-${match[1]}`};
+      return {date,iso:value};
     }
 
-    firstLeaveDay.addEventListener('input',()=>{
-      const digits=firstLeaveDay.value.replace(/\D/g,'').slice(0,8);
-      firstLeaveDay.value=digits.length>4 ? `${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4)}` : digits.length>2 ? `${digits.slice(0,2)}/${digits.slice(2)}` : digits;
-      continueButton.disabled=!parseSpanishDate(firstLeaveDay.value);
+    function updateDateState() {
+      continueButton.disabled=!parseIsoDate(firstLeaveDay.value);
       result.className='result';
       result.replaceChildren();
-    });
+    }
+
+    firstLeaveDay.addEventListener('input',updateDateState);
+    firstLeaveDay.addEventListener('change',updateDateState);
+
+    const savedFirstLeaveDay=sessionStorage.getItem('strLabHospitalFirstLeaveDay');
+    if (parseIsoDate(savedFirstLeaveDay || '')) {
+      firstLeaveDay.value=savedFirstLeaveDay;
+      updateDateState();
+    }
 
     function showResult(type,title,message) {
       result.className=`result show ${type}`;
@@ -126,7 +133,7 @@
     }
 
     continueButton.addEventListener('click',()=>{
-      const parsedDate=parseSpanishDate(firstLeaveDay.value);
+      const parsedDate=parseIsoDate(firstLeaveDay.value);
       if (!parsedDate) return;
       const formattedDate=new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'long',year:'numeric'}).format(parsedDate.date);
       sessionStorage.setItem('strLabHospitalFirstLeaveDay',parsedDate.iso);
