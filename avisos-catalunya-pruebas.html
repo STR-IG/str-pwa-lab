@@ -14,6 +14,16 @@
 <p id="status" class="status" role="status">Consultando la fuente oficial…</p>
 <div id="alerts"></div><p id="checked" class="muted"></p>
 <button id="refresh" type="button">Volver a consultar</button>
+<section aria-labelledby="measure" class="note">
+<h2 id="measure">Recomendaciones a la población</h2>
+<p><strong>Nota oficial del 17/10/2026 · 13:35.</strong> Resumen revisado manualmente; no se actualiza con el botón.</p>
+<p>Protecció Civil pide reducir la movilidad durante las lluvias más intensas y evitar actividades al aire libre y zonas inundables. <strong>La nota indica que no se aplicarán restricciones.</strong></p>
+<dl><dt>Maresme, Selva y Vallès Oriental</dt><dd>17 de octubre · de 14:00 a 20:00.</dd>
+<dt>Barcelonès, Vallès Occidental, Baix Llobregat y Garraf</dt><dd>Del 17 de octubre a las 20:00 al 18 de octubre a las 02:00.</dd></dl>
+<p id="period" class="status">Franjas descritas en la nota: 17–18 de octubre de 2026. Comprueba posibles actualizaciones en la fuente.</p>
+<a class="action" href="https://govern.cat/salapremsa/notes-premsa/881660/proteccio-civil-envia-dos-alert-previsio-pluges-torrencials-aquesta-tarda-nit" target="_blank" rel="noopener noreferrer">Leer instrucciones oficiales ↗</a>
+<p class="muted">Estos horarios corresponden al episodio comunicado; no son la fecha de activación del plan. Conserva el documento original para consultar o aportar su contenido.</p>
+</section>
 <p class="note"><strong>Medidas, territorio y vigencia:</strong> consulta el comunicado original. El estado del plan no indica por sí solo una restricción de movilidad ni acredita cómo te afecta.</p>
 <a href="https://interior.gencat.cat/es/arees_dactuacio/proteccio_civil/plans-proteccio-civil/plans-especials/" target="_blank" rel="noopener noreferrer">Consultar Protecció Civil ↗</a>
 <p class="muted">Fuente: datos abiertos de la Generalitat · CECAT. Esta pantalla consulta la fuente al abrirse y al pulsar el botón. No conserva avisos anteriores.</p>
@@ -55,5 +65,7 @@ async function update(){
 refresh.addEventListener('click',update);
 window.addEventListener('offline',()=>{alerts.replaceChildren();statusNode.textContent='Sin conexión. Estado no disponible: consulta la fuente cuando recuperes la conexión.';checked.textContent='';});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)update();});
+function markPeriod(){if(Date.now()>=Date.parse('2026-10-18T02:00:00+02:00'))document.getElementById('period').textContent='Las franjas descritas en esta nota han finalizado. Este resumen es histórico y no confirma las medidas actuales. Consulta la fuente oficial.';}
+markPeriod();setInterval(markPeriod,60000);
 update();
 </script></body></html>
